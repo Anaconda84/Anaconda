@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<RDF xmlns="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+     xmlns:em="http://www.mozilla.org/2004/em-rdf#">
+  <Description about="urn:mozilla:install-manifest">
+	  <em:id>tribe@tribler.org</em:id>
+	  <em:version>0.1</em:version>
+	  <em:type>2</em:type>
+
+    <!-- Firefox -->
+    <em:targetApplication>
+      <Description>
+       	<em:id>{ec8030f7-c20a-464f-9b0e-13a3a9e97384}</em:id>
+      	<em:minVersion>3.5</em:minVersion>
+      	<em:maxVersion>3.7a1pre</em:maxVersion>
+      </Description>
+    </em:targetApplication>		
+
+    <!-- Front End MetaData -->
+    <em:name>Tribe</em:name>
+    <em:description>use bittorrent urls inside of the video tag</em:description>
+    <em:creator>tribler.org</em:creator>
+    <em:homepageURL>http://tribler.org/</em:homepageURL>
+<!--
+    <em:iconURL>chrome://tribler/content/icon.png</em:iconURL>
+    <em:updateURL>http://tribler.org/update.rdf</em:updateURL>
+    <em:updateKey>
+    </em:updateKey>
+-->
+  </Description>
+</RDF>
+

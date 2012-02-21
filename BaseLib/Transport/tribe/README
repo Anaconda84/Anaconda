@@ -1,0 +1,16 @@
+install dependancies:
+ sudo apt-get install python-wxgtk2.8 python-apsw python-m2crypto
+
+in one terminal:
+ bzr branch lp:~j/+junk/tribe/
+ cd tribe
+ ant
+ or for dev setup:
+  echo `pwd`/tribe > ~/.mozilla/firefox/*default/extensions/tribe@tribler.org
+
+restart firefox and open tribe/test.html
+
+to enable debugging open about:config and set
+tribe.logging.enabled to true
+
+

@@ -1,0 +1,5 @@
+*.pyc
+AGP/*
+build/*
+dist/*
+TUD/*

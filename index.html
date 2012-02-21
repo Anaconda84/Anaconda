@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+  <script src="http://cdn.sockjs.org/sockjs-0.1.2.min.js"></script>
+  <script>
+    $(function() {
+      var timer = null;
+      var sent = 0;
+      var recv = 0;
+
+      function refresh() {
+        $('#msg').text('Sent: ' + sent + ' Recv: ' + recv);
+      }
+
+      var conn = new SockJS('http://localhost:6868/websocket');
+
+      conn.onopen = function() {
+        function sendPing()
+        {
+          sent += 1;
+
+          conn.send('START http://neb.ucoz.ru/111.torrent');
+
+          timer = setTimeout(sendPing, 100);
+        }
+        timer = setTimeout(sendPing, 100);
+      };
+
+      conn.onmessage = function(e) {
+        document.write(e);
+      }
+
+      conn.onclose = function() {
+        if (timer != null) {
+          clearTimeout(timer);
+          timer = null;
+        }
+      };
+    });
+</script>
+</head>
+<body>
+<h3>Broadcast Ping!</h3>
+<div id="msg"></div>
+</body>
+</html>

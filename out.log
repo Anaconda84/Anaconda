@@ -1,0 +1,403 @@
+
+C:\tmp\Next-Share-M32\Next-Share>REM @echo off 
+
+C:\tmp\Next-Share-M32\Next-Share>set LIBRARYNAME=BaseLib 
+
+C:\tmp\Next-Share-M32\Next-Share>set PYTHONHOME=c:\Python27 
+
+C:\tmp\Next-Share-M32\Next-Share>REM Arno: Add . to find our core (py 2.5) 
+
+C:\tmp\Next-Share-M32\Next-Share>set PYTHONPATH=.;c:\Python27 
+
+C:\tmp\Next-Share-M32\Next-Share>echo PYTHONPATH SET TO .;c:\Python27 
+PYTHONPATH SET TO .;c:\Python27
+
+C:\tmp\Next-Share-M32\Next-Share>set NSIS="c:\Program Files\NSIS\makensis.exe" 
+
+C:\tmp\Next-Share-M32\Next-Share>REM ----- Check for Python and essential site-packages 
+
+C:\tmp\Next-Share-M32\Next-Share>IF NOT EXIST c:\Python27\python.exe (
+echo .  
+ echo Could not locate Python in c:\Python27.  
+ echo Please modify this script or install python [www.python.org]  
+ exit /b 
+) 
+
+C:\tmp\Next-Share-M32\Next-Share>IF NOT EXIST c:\Python27\Lib\site-packages\wx-*-unicode (
+echo .  
+ echo Could not locate wxPython in c:\Python27\Lib\site-packages.  
+ echo Please modify this script or install wxPython [www.wxpython.org]  
+ exit /b 
+) 
+
+C:\tmp\Next-Share-M32\Next-Share>IF NOT EXIST c:\Python27\Lib\site-packages\py2exe (
+echo .  
+ echo Could not locate py2exe in c:\Python27\Lib\site-packages.  
+ echo Please modify this script or install wxPython [www.py2exe.org]  
+ exit /b 
+) 
+
+C:\tmp\Next-Share-M32\Next-Share>REM ----- Check for NSIS installer 
+
+C:\tmp\Next-Share-M32\Next-Share>IF NOT EXIST "c:\Program Files\NSIS\makensis.exe" (
+echo .  
+ echo Could not locate the NSIS installer at "c:\Program Files\NSIS\makensis.exe".  
+ echo Please modify this script or install NSIS [nsis.sf.net]  
+ exit /b 
+) 
+
+C:\tmp\Next-Share-M32\Next-Share>REM ----- Clean up 
+
+C:\tmp\Next-Share-M32\Next-Share>call clean.bat 
+
+C:\tmp\Next-Share-M32\Next-Share>rmdir /S /Q build 
+
+C:\tmp\Next-Share-M32\Next-Share>rmdir /S /Q dist 
+
+C:\tmp\Next-Share-M32\Next-Share>del /S /Q *.pyc 
+
+C:\tmp\Next-Share-M32\Next-Share>REM ----- Build 
+
+C:\tmp\Next-Share-M32\Next-Share>REM Arno: When adding files here, make sure tribler.nsi actually 
+
+C:\tmp\Next-Share-M32\Next-Share>REM packs them in the installer .EXE 
+
+C:\tmp\Next-Share-M32\Next-Share>mkdir dist\installdir 
+
+C:\tmp\Next-Share-M32\Next-Share>c:\Python27\python.exe -O BaseLib\Player\Build\Win32\setuptriblerplay.py py2exe 
+running py2exe
+creating C:\tmp\Next-Share-M32\Next-Share\build
+creating C:\tmp\Next-Share-M32\Next-Share\build\bdist.win32
+creating C:\tmp\Next-Share-M32\Next-Share\build\bdist.win32\winexe
+creating C:\tmp\Next-Share-M32\Next-Share\build\bdist.win32\winexe\collect-2.7
+creating C:\tmp\Next-Share-M32\Next-Share\build\bdist.win32\winexe\bundle-2.7
+creating C:\tmp\Next-Share-M32\Next-Share\build\bdist.win32\winexe\temp
+*** searching for required modules ***
+*** parsing results ***
+creating python loader for extension 'win32pdh' (c:\Python27\lib\site-packages\win32\win32pdh.pyd -> win32pdh.pyd)
+creating python loader for extension 'select' (c:\Python27\DLLs\select.pyd -> select.pyd)
+creating python loader for extension 'unicodedata' (c:\Python27\DLLs\unicodedata.pyd -> unicodedata.pyd)
+creating python loader for extension 'wx._controls_' (c:\Python27\lib\site-packages\wx-2.8-msw-unicode\wx\_controls_.pyd -> wx._controls_.pyd)
+creating python loader for extension 'apsw' (c:\Python27\lib\site-packages\apsw.pyd -> apsw.pyd)
+creating python loader for extension 'win32file' (c:\Python27\lib\site-packages\win32\win32file.pyd -> win32file.pyd)
+creating python loader for extension 'wx._windows_' (c:\Python27\lib\site-packages\wx-2.8-msw-unicode\wx\_windows_.pyd -> wx._windows_.pyd)
+creating python loader for extension '_hashlib' (c:\Python27\DLLs\_hashlib.pyd -> _hashlib.pyd)
+creating python loader for extension 'bz2' (c:\Python27\DLLs\bz2.pyd -> bz2.pyd)
+creating python loader for extension '_ssl' (c:\Python27\DLLs\_ssl.pyd -> _ssl.pyd)
+creating python loader for extension '_sqlite3' (c:\Python27\DLLs\_sqlite3.pyd -> _sqlite3.pyd)
+creating python loader for extension 'win32ui' (c:\Python27\lib\site-packages\Pythonwin\win32ui.pyd -> win32ui.pyd)
+creating python loader for extension 'wx._core_' (c:\Python27\lib\site-packages\wx-2.8-msw-unicode\wx\_core_.pyd -> wx._core_.pyd)
+creating python loader for extension 'wx._misc_' (c:\Python27\lib\site-packages\wx-2.8-msw-unicode\wx\_misc_.pyd -> wx._misc_.pyd)
+creating python loader for extension 'M2Crypto.__m2crypto' (c:\Python27\lib\site-packages\M2Crypto\__m2crypto.pyd -> M2Crypto.__m2crypto.pyd)
+creating python loader for extension '_win32sysloader' (c:\Python27\lib\site-packages\win32\_win32sysloader.pyd -> _win32sysloader.pyd)
+creating python loader for extension 'wx._gdi_' (c:\Python27\lib\site-packages\wx-2.8-msw-unicode\wx\_gdi_.pyd -> wx._gdi_.pyd)
+creating python loader for extension 'pyexpat' (c:\Python27\DLLs\pyexpat.pyd -> pyexpat.pyd)
+creating python loader for extension 'win32com.shell.shell' (c:\Python27\lib\site-packages\win32comext\shell\shell.pyd -> win32com.shell.shell.pyd)
+creating python loader for extension 'win32api' (c:\Python27\lib\site-packages\win32\win32api.pyd -> win32api.pyd)
+creating python loader for extension '_socket' (c:\Python27\DLLs\_socket.pyd -> _socket.pyd)
+*** finding dlls needed ***
+
+C:\tmp\Next-Share-M32\Next-Share>REM Arno: Move py2exe results to installdir 
+
+C:\tmp\Next-Share-M32\Next-Share>move dist\*.* dist\installdir 
+
+C:\tmp\Next-Share-M32\Next-Share>copy BaseLib\Player\Build\Win32\triblerplay.nsi dist\installdir 
+Скопировано файлов:         1.
+
+C:\tmp\Next-Share-M32\Next-Share>copy BaseLib\Player\Build\Win32\swarmplayer.exe.manifest dist\installdir 
+Скопировано файлов:         1.
+
+C:\tmp\Next-Share-M32\Next-Share>REM copy c:\Python27\msvcr71.dll dist\installdir 
+
+C:\tmp\Next-Share-M32\Next-Share>REM For Vista. This works only when building on XP 
+
+C:\tmp\Next-Share-M32\Next-Share>REM as Vista doesn't have this DLL by default. 
+
+C:\tmp\Next-Share-M32\Next-Share>REM JD: My XP SP2 doesn't have it. It /is/ shipped with wxPython though 
+
+C:\tmp\Next-Share-M32\Next-Share>copy c:\Python27\Lib\site-packages\wx-2.8-msw-unicode\wx\msvcp71.dll dist\installdir 
+Не удается найти указанный файл.
+
+C:\tmp\Next-Share-M32\Next-Share>copy C:\Windows\msvcp71.dll dist\installdir 
+Скопировано файлов:         1.
+
+C:\tmp\Next-Share-M32\Next-Share>copy c:\Python27\msvcp60.dll dist\installdir 
+Не удается найти указанный файл.
+
+C:\tmp\Next-Share-M32\Next-Share>REM py2exe does this: copy SSLEAY32.dll dist\installdir 
+
+C:\tmp\Next-Share-M32\Next-Share>REM copy LIBEAY32.dll dist\installdir 
+
+C:\tmp\Next-Share-M32\Next-Share>type BaseLib\LICENSE.txt BaseLib\binary-LICENSE-postfix.txt  1>BaseLib\binary-LICENSE.txt 
+
+C:\tmp\Next-Share-M32\Next-Share>copy BaseLib\binary-LICENSE.txt dist\installdir 
+Скопировано файлов:         1.
+
+C:\tmp\Next-Share-M32\Next-Share>mkdir dist\installdir\BaseLib 
+
+C:\tmp\Next-Share-M32\Next-Share>mkdir dist\installdir\BaseLib\Core 
+
+C:\tmp\Next-Share-M32\Next-Share>copy BaseLib\Core\superpeer.txt dist\installdir\BaseLib\Core 
+Скопировано файлов:         1.
+
+C:\tmp\Next-Share-M32\Next-Share>mkdir dist\installdir\BaseLib\Core\Statistics 
+
+C:\tmp\Next-Share-M32\Next-Share>copy BaseLib\Core\Statistics\*.txt dist\installdir\BaseLib\Core\Statistics 
+BaseLib\Core\Statistics\crawler.txt
+Скопировано файлов:         1.
+
+C:\tmp\Next-Share-M32\Next-Share>copy BaseLib\Core\Statistics\*.sql dist\installdir\BaseLib\Core\Statistics 
+BaseLib\Core\Statistics\tribler_friendship_stats_sdb.sql
+BaseLib\Core\Statistics\tribler_seedingstats_sdb.sql
+BaseLib\Core\Statistics\tribler_videoplayback_stats.sql
+Скопировано файлов:         3.
+
+C:\tmp\Next-Share-M32\Next-Share>mkdir dist\installdir\BaseLib\Images 
+
+C:\tmp\Next-Share-M32\Next-Share>copy BaseLib\Images\*.* dist\installdir\BaseLib\Images 
+BaseLib\Images\background.png
+BaseLib\Images\fullScreen.png
+BaseLib\Images\fullScreen_hover.png
+BaseLib\Images\logoTribler.png
+BaseLib\Images\logoTribler_small.png
+BaseLib\Images\mute.png
+BaseLib\Images\mute_hover.png
+BaseLib\Images\pause.png
+BaseLib\Images\pause_hover.png
+BaseLib\Images\play.png
+BaseLib\Images\play_hover.png
+BaseLib\Images\save.png
+BaseLib\Images\saveDisabled.png
+BaseLib\Images\saveDisabled_hover.png
+BaseLib\Images\save_hover.png
+BaseLib\Images\sliderDot.png
+BaseLib\Images\sliderVolume.png
+BaseLib\Images\splash.jpg
+BaseLib\Images\SwarmPlayerIcon.ico
+BaseLib\Images\SwarmPlayerLogo.png
+BaseLib\Images\SwarmPluginIcon.ico
+BaseLib\Images\SwarmPluginLogo.png
+BaseLib\Images\SwarmServerIcon.ico
+BaseLib\Images\torrenticon.ico
+BaseLib\Images\tribler.ico
+BaseLib\Images\volume.png
+BaseLib\Images\volume_hover.png
+Скопировано файлов:        27.
+
+C:\tmp\Next-Share-M32\Next-Share>mkdir dist\installdir\BaseLib\Video 
+
+C:\tmp\Next-Share-M32\Next-Share>mkdir dist\installdir\BaseLib\Video\Images 
+
+C:\tmp\Next-Share-M32\Next-Share>copy BaseLib\Video\Images\*.* dist\installdir\BaseLib\Video\Images 
+BaseLib\Video\Images\4framebackground.png
+BaseLib\Video\Images\4framesliderDot.png
+BaseLib\Video\Images\4framesliderDot_dis.png
+BaseLib\Video\Images\4framesliderVolume.png
+BaseLib\Video\Images\background.png
+BaseLib\Video\Images\bl.png
+BaseLib\Video\Images\br.png
+BaseLib\Video\Images\fullScreen-hover.png
+BaseLib\Video\Images\fullScreen.png
+BaseLib\Video\Images\fullScreen_dis.png
+BaseLib\Video\Images\fullScreen_hover.png
+BaseLib\Video\Images\pause.png
+BaseLib\Video\Images\pause_dis.png
+BaseLib\Video\Images\pause_hover.png
+BaseLib\Video\Images\play.png
+BaseLib\Video\Images\play_dis.png
+BaseLib\Video\Images\play_hover.png
+BaseLib\Video\Images\sliderDot.png
+BaseLib\Video\Images\sliderDot_dis.png
+BaseLib\Video\Images\sliderDot_hover.png
+BaseLib\Video\Images\sliderVolume.png
+BaseLib\Video\Images\tl.png
+BaseLib\Video\Images\tr.png
+BaseLib\Video\Images\vol0.png
+BaseLib\Video\Images\vol0Enabled.png
+BaseLib\Video\Images\vol0Enabled_clicked.png
+BaseLib\Video\Images\vol0_clicked.png
+BaseLib\Video\Images\vol1.png
+BaseLib\Video\Images\vol1Enabled.png
+BaseLib\Video\Images\vol1Enabled_clicked.png
+BaseLib\Video\Images\vol1_hover.png
+BaseLib\Video\Images\vol2.png
+BaseLib\Video\Images\vol2Enabled.png
+BaseLib\Video\Images\vol2Enabled_clicked.png
+BaseLib\Video\Images\vol2_hover.png
+BaseLib\Video\Images\vol3.png
+BaseLib\Video\Images\vol3Enabled.png
+BaseLib\Video\Images\vol3Enabled_clicked.png
+BaseLib\Video\Images\vol3_hover.png
+BaseLib\Video\Images\vol4.png
+BaseLib\Video\Images\vol4Enabled.png
+BaseLib\Video\Images\vol4Enabled_clicked.png
+BaseLib\Video\Images\vol4_hover.png
+BaseLib\Video\Images\vol5.png
+BaseLib\Video\Images\vol5Enabled_clicked.png
+BaseLib\Video\Images\vol5_hover.png
+BaseLib\Video\Images\vol6.png
+BaseLib\Video\Images\vol6Enabled_clicked.png
+BaseLib\Video\Images\vol6_hover.png
+Скопировано файлов:        49.
+
+C:\tmp\Next-Share-M32\Next-Share>copy BaseLib\Player\Build\Win32\heading.bmp dist\installdir 
+Скопировано файлов:         1.
+
+C:\tmp\Next-Share-M32\Next-Share>mkdir dist\installdir\BaseLib\Lang 
+
+C:\tmp\Next-Share-M32\Next-Share>copy BaseLib\Lang\*.lang dist\installdir\BaseLib\Lang 
+BaseLib\Lang\english.lang
+Скопировано файлов:         1.
+
+C:\tmp\Next-Share-M32\Next-Share>copy ffmpeg.exe dist\installdir 
+Не удается найти указанный файл.
+
+C:\tmp\Next-Share-M32\Next-Share>xcopy vlc dist\installdir\vlc /E /I 
+Скопировано файлов: 0.
+
+C:\tmp\Next-Share-M32\Next-Share>copy reset*.bat dist\installdir 
+reset-keepid.bat
+reset.bat
+Скопировано файлов:         2.
+
+C:\tmp\Next-Share-M32\Next-Share>cd dist\installdir 
+
+C:\tmp\Next-Share-M32\Next-Share\dist\installdir>"c:\Program Files\NSIS\makensis.exe" triblerplay.nsi 
+MakeNSIS v2.46 - Copyright 1995-2009 Contributors
+See the file COPYING for license details.
+Credits can be found in the Users Manual.
+
+Processing config: 
+Processing plugin dlls: "c:\Program Files\NSIS\Plugins\*.dll"
+ - AdvSplash::show
+ - Banner::destroy
+ - Banner::getWindow
+ - Banner::show
+ - BgImage::AddImage
+ - BgImage::AddText
+ - BgImage::Clear
+ - BgImage::Destroy
+ - BgImage::Redraw
+ - BgImage::SetBg
+ - BgImage::SetReturn
+ - BgImage::Sound
+ - Dialer::AttemptConnect
+ - Dialer::AutodialHangup
+ - Dialer::AutodialOnline
+ - Dialer::AutodialUnattended
+ - Dialer::GetConnectedState
+ - InstallOptions::dialog
+ - InstallOptions::initDialog
+ - InstallOptions::show
+ - LangDLL::LangDialog
+ - Math::Script
+ - NSISdl::download
+ - NSISdl::download_quiet
+ - Splash::show
+ - StartMenu::Init
+ - StartMenu::Select
+ - StartMenu::Show
+ - System::Alloc
+ - System::Call
+ - System::Copy
+ - System::Free
+ - System::Get
+ - System::Int64Op
+ - System::Store
+ - TypeLib::GetLibVersion
+ - TypeLib::Register
+ - TypeLib::UnRegister
+ - UserInfo::GetAccountType
+ - UserInfo::GetName
+ - UserInfo::GetOriginalAccountType
+ - VPatch::GetFileCRC32
+ - VPatch::GetFileMD5
+ - VPatch::vpatchfile
+ - nsDialogs::Create
+ - nsDialogs::CreateControl
+ - nsDialogs::CreateItem
+ - nsDialogs::CreateTimer
+ - nsDialogs::GetUserData
+ - nsDialogs::KillTimer
+ - nsDialogs::OnBack
+ - nsDialogs::OnChange
+ - nsDialogs::OnClick
+ - nsDialogs::OnNotify
+ - nsDialogs::SelectFileDialog
+ - nsDialogs::SelectFolderDialog
+ - nsDialogs::SetRTL
+ - nsDialogs::SetUserData
+ - nsDialogs::Show
+ - nsExec::Exec
+ - nsExec::ExecToLog
+ - nsExec::ExecToStack
+
+!define: "MUI_INSERT_NSISCONF"=""
+
+Changing directory to: "C:\tmp\Next-Share-M32\Next-Share\dist\installdir"
+
+Processing script file: "triblerplay.nsi"
+!define: "PRODUCT"="SwarmPlayer"
+!define: "VERSION"="1.1.0"
+!define: "LIBRARYNAME"="BaseLib"
+!include: "c:\Program Files\NSIS\Include\MUI.nsh"
+!include: "c:\Program Files\NSIS\Contrib\Modern UI\System.nsh"
+NSIS Modern User Interface version 1.8 - Copyright 2002-2009 Joost Verburg (c:\Program Files\NSIS\Contrib\Modern UI\System.nsh:8)
+!define: "MUI_INCLUDED"=""
+!define: "MUI_SYSVERSION"="1.8"
+!define: "MUI_VERBOSE"="3"
+!include: closed: "c:\Program Files\NSIS\Contrib\Modern UI\System.nsh"
+!include: closed: "c:\Program Files\NSIS\Include\MUI.nsh"
+Name: "SwarmPlayer 1.1.0"
+OutFile: "SwarmPlayer_1.1.0.exe"
+InstallDir: "$PROGRAMFILES\SwarmPlayer"
+InstallRegKey: "HKCU\Software\SwarmPlayer\"
+SetCompressor: lzma
+CompletedText: "Installation completed. Thank you for choosing SwarmPlayer"
+BrandingText: "SwarmPlayer"
+!define: "MUI_ABORTWARNING"=""
+!define: "MUI_HEADERIMAGE"=""
+!define: "MUI_HEADERIMAGE_BITMAP"="heading.bmp"
+!define: "MUI_LICENSEPAGE_RADIOBUTTONS"=""
+!define: "MUI_LICENSEPAGE_RADIOBUTTONS_TEXT_ACCEPT"="I accept"
+!define: "MUI_LICENSEPAGE_RADIOBUTTONS_TEXT_DECLINE"="I decline"
+!insertmacro: MUI_PAGE_LICENSE
+!insertmacro: end of MUI_PAGE_LICENSE
+!insertmacro: MUI_PAGE_COMPONENTS
+!insertmacro: end of MUI_PAGE_COMPONENTS
+!insertmacro: MUI_PAGE_DIRECTORY
+!insertmacro: end of MUI_PAGE_DIRECTORY
+!insertmacro: MUI_PAGE_INSTFILES
+!insertmacro: end of MUI_PAGE_INSTFILES
+!insertmacro: MUI_PAGE_FINISH
+!insertmacro: end of MUI_PAGE_FINISH
+!insertmacro: MUI_UNPAGE_CONFIRM
+!insertmacro: end of MUI_UNPAGE_CONFIRM
+!insertmacro: MUI_UNPAGE_INSTFILES
+!insertmacro: end of MUI_UNPAGE_INSTFILES
+!insertmacro: MUI_LANGUAGE
+!insertmacro: end of MUI_LANGUAGE
+LangString: "DESC_SecMain" 1033 "Install SwarmPlayer"
+LangString: "DESC_SecDesk" 1033 "Create Desktop Shortcuts"
+LangString: "DESC_SecStart" 1033 "Create Start Menu Shortcuts"
+LangString: "DESC_SecDefaultTStream" 1033 "Associate .tstream files with SwarmPlayer"
+LangString: "DESC_SecDefaultTorrent" 1033 "Associate .torrent files with SwarmPlayer"
+Section: "!Main EXE" ->(SecMain)
+SectionIn: [RO] 
+SetOutPath: "$INSTDIR"
+File: "binary-LICENSE.txt" [compress] 20760/88591 bytes
+File: "swarmplayer.exe.manifest" [compress] 359/666 bytes
+File: "swarmplayer.exe" -> no files found.
+Usage: File [/nonfatal] [/a] ([/r] [/x filespec [...]] filespec [...] |
+   /oname=outfile one_file_only)
+Error in script "triblerplay.nsi" on line 83 -- aborting creation process
+
+C:\tmp\Next-Share-M32\Next-Share\dist\installdir>move swarmplayer_*.exe .. 
+
+C:\tmp\Next-Share-M32\Next-Share\dist\installdir>cd .. 
+
+C:\tmp\Next-Share-M32\Next-Share\dist>REM Arno : sign SwarmPlayer_*.exe 
+
+C:\tmp\Next-Share-M32\Next-Share\dist>"C:\Program Files\Microsoft Platform SDK for Windows Server 2003 R2\Bin\signtool.exe" sign /f c:\build\certs\swarmplayerprivatekey.pfx /p "" /d "SwarmPlayer" /du "http://www.pds.ewi.tudelft.nl/code.html" /t "http://timestamp.verisign.com/scripts/timestamp.dll" "SwarmPlayer_*.exe" 
+
+C:\tmp\Next-Share-M32\Next-Share\dist>cd .. 

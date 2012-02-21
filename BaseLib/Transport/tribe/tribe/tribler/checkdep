@@ -1,0 +1,13 @@
+#!/usr/bin/python
+try:
+    import wx
+    #import OpenSSL
+    #import M2Crypto
+    import apsw
+except ImportError:
+    import os
+    #ubuntu
+    if os.path.exists('/usr/bin/gdebi-gtk'):
+        deb = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'tribe-dependencie.deb')
+        os.system('/usr/bin/gdebi-gtk %s'%deb)
+    #FIXME: add checks for other operating systems

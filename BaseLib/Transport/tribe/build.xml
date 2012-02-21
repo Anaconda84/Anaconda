@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+
+<project name="Tribe" default="createxpi">
+
+  <target name="createxpi">
+    <zip destfile="Tribe.xpi" basedir="tribe" includes="**/**"/>
+  </target>
+  
+</project>

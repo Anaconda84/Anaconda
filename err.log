@@ -1,0 +1,21 @@
+Не удается найти C:\tmp\Next-Share-M32\Next-Share\*.pyc
+BaseLib\Player\swarmplayer.pyc:451: SyntaxWarning: name 'START_TIME' is assigned to before global declaration
+C:\tmp\Next-Share-M32\Next-Share\BaseLib\Player\swarmplayer.py:451: SyntaxWarning: name 'START_TIME' is assigned to before global declaration
+  global START_TIME
+Не найден файл: *
+Не удается найти C:\tmp\Next-Share-M32\Next-Share\dist\installdir\*.txt
+
+BaseLib\ns-LICENSE.txt
+
+
+
+BaseLib\binary-LICENSE-postfix.txt
+
+
+Системе не удается найти указанный путь.
+Системе не удается найти указанный путь.
+Файл с таким именем уже существует
+или не найден.
+Системе не удается найти указанный путь.
+Системе не удается найти указанный путь.
+Системе не удается найти указанный путь.
