@@ -462,8 +462,8 @@ class BackgroundApp(BaseApp):
     def gui_states_callback(self,dslist,haspeerlist):
         """ Override BaseApp """
         #print >>sys.stderr,"bg: gui_states_callback",currentThread().getName()
-
         (playing_dslist,totalhelping,totalspeed) = BaseApp.gui_states_callback(self,dslist,haspeerlist)
+#        print >>sys.stderr,"playing_dslist=",playing_dslist,"  totalhelping=",totalhelping,"  down=",totalspeed[DOWNLOAD],"  up=",totalspeed[UPLOAD],"\n"
         try:
             self.report_periodic_vod_stats(playing_dslist)
         except:
@@ -475,8 +475,10 @@ class BackgroundApp(BaseApp):
             uic = duser['uic']
             if uic is not None:
                 # Generate info string for all
-                [topmsg,msg,duser['said_start_playback'],duser['decodeprogress']] = get_status_msgs(ds,self.approxplayerstate,self.appname,duser['said_start_playback'],duser['decodeprogress'],totalhelping,totalspeed)
-                info = msg
+#                [topmsg,msg,duser['said_start_playback'],duser['decodeprogress']] = get_status_msgs(ds,self.approxplayerstate,self.appname,duser['said_start_playback'],duser['decodeprogress'],totalhelping,totalspeed)
+#		print >>sys.stderr,"topmsg=",topmsg,"  msg=",msg,"\n"
+                info = 'totalhelping='+str(totalhelping)+"\tdown="+str(totalspeed[DOWNLOAD])+"\tup="+str(totalspeed[UPLOAD])+'<BR>'
+#		info = msg
                 #if DEBUG:
                 #    print >>sys.stderr, 'bg: 4INFO: Sending',info
                 uic.info(info)

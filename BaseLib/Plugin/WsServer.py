@@ -53,7 +53,7 @@ class WsConnection(SockJSConnection):
             torrenturl = msg.partition( ' ' )[2].strip()
             if torrenturl is None:
                 raise ValueError('bg: Unformatted START command')
-	    print >>sys.stderr, "WsServer: Connect from WsServer to Swarm - ",torrenturl,'   localhost:',Ports.i2iport,"\n"
+	    print >>sys.stderr, "WsServer: Connecting from WsServer to Swarm - ",torrenturl,'   localhost:',Ports.i2iport,"\n"
             self.connect_to_swarm(Ports.i2iport,"START",torrenturl)
 	       
 #        self.send(msg)
