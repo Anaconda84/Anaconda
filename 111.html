@@ -1,16 +1,17 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <script>
-    var s = "PLAY http://127.0.0.1:6878/content/4fc74e884364d1bd9155f89f0859e8ef26c74e90/0.204087840455";
-    if( (myArray = /^PLAY\s(.+)/.exec(s)) != null)
-    {
-       alert(myArray[1]);
-    }
-  </script>
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+  <script src="http://cdn.sockjs.org/sockjs-0.1.2.min.js"></script>
+  <script src="http://cdn.sublimevideo.net/js/YOURTOKEN.js" type="text/javascript"></script>
 </head>
 <body>
 <h3>Broadcast Ping!</h3>
 <div id="msg"></div>
+
+<video class="sublime" width="640" height="360" poster="video-poster.jpg" preload="none">
+  <source src="111.mp4" />
+</video>
+
 </body>
 </html>

@@ -3,6 +3,7 @@
 <head>
   <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
   <script src="http://cdn.sockjs.org/sockjs-0.1.2.min.js"></script>
+  <script src="http://cdn.sublimevideo.net/js/YOURTOKEN.js" type="text/javascript"></script>
   <script>
     $(function() {
       var timer = null;
@@ -12,6 +13,11 @@
       function refresh(text) {
         $('#msg').text(text);
       }
+
+      function refreshvs(url) {
+        $('#vs').src(url);
+      }
+
 
       conn.onopen = function() {
 	sendRequest();
@@ -24,7 +30,8 @@
       conn.onmessage = function(e) {
         if( (myArray = /^PLAY\s(.+)/.exec(e.data)) != null)
         {
-          alert(myArray[1]);
+	  refresh(myArray[1]);
+          refreshvs(myArray[1]);
         }
         else
         {
@@ -44,5 +51,10 @@
 <body>
 <h3>Broadcast Ping!</h3>
 <div id="msg"></div>
+
+<video class="sublime" width="640" height="360" poster="video-poster.jpg" preload="none">
+  <source id="vs" src="http://yoursite.com/video.mp4" />
+</video>
+
 </body>
 </html>
