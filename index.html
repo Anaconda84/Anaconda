@@ -22,7 +22,14 @@
       };
 
       conn.onmessage = function(e) {
-	refresh(e.data);
+        if( (myArray = /^PLAY\s(.+)/.exec(e.data)) != null)
+        {
+          alert(myArray[1]);
+        }
+        else
+        {
+	  refresh(e.data);
+        }
       }
 
       conn.onclose = function() {

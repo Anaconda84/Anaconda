@@ -6,30 +6,23 @@
   <script>
     $(function() {
       var timer = null;
-      var sent = 0;
-      var recv = 0;
-
-      function refresh() {
-        $('#msg').text('Sent: ' + sent + ' Recv: ' + recv);
-      }
 
       var conn = new SockJS('http://localhost:6868/websocket');
 
+      function refresh(text) {
+        $('#msg').text(text);
+      }
+
       conn.onopen = function() {
-        function sendPing()
+	sendRequest();
+        function sendRequest()
         {
-          sent += 1;
-          refresh();
-
           conn.send('START http://neb.ucoz.ru/111.torrent');
-
-          timer = setTimeout(sendPing, 100);
         }
-        timer = setTimeout(sendPing, 100);
       };
 
       conn.onmessage = function(e) {
-        recv += 1;
+	refresh(e.data);
       }
 
       conn.onclose = function() {
