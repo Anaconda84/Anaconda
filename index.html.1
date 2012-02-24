@@ -14,11 +14,13 @@
       }
 
       conn.onopen = function() {
-	sendPing();
         function sendPing()
         {
           conn.send('START http://neb.ucoz.ru/111.torrent');
+
+          timer = setTimeout(sendPing, 100);
         }
+        timer = setTimeout(sendPing, 100);
       };
 
       conn.onmessage = function(e) {

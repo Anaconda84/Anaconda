@@ -18,7 +18,6 @@ class Ports():
 class WsServer(Thread):
     def __init__(self,i2iport, httpport, ws_serverport):
         Thread.__init__(self)
-#        self.setDaemon(True)
         self.setName('WsServer')
 	Ports.i2iport = i2iport
 	Ports.httpport = httpport
@@ -54,27 +53,44 @@ class WsConnection(SockJSConnection):
             if torrenturl is None:
                 raise ValueError('bg: Unformatted START command')
 	    print >>sys.stderr, "WsServer: Connecting from WsServer to Swarm - ",torrenturl,'   localhost:',Ports.i2iport,"\n"
-            self.connect_to_swarm(Ports.i2iport,"START",torrenturl)
-	       
-#        self.send(msg)
+#            self.connect_to_swarm(Ports.i2iport,"START",torrenturl)
+	    self.ws_serv_to_swarm = WsServerToSwarm(self,Ports.i2iport,"START",torrenturl)   
+	    self.ws_serv_to_swarm.start()
 
     def on_close(self):
         print >>sys.stderr,'WsServer: Client disconnected.'
+	self.disconnect_to_swarm()
         self.clients.remove(self)
 
-    def connect_to_swarm(self,port,cmd,param):
-#	import ipdb; ipdb.set_trace()
-        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        s.connect(('127.0.0.1',port))
-        msg = cmd+' '+param+'\r\n'
-        s.send(msg)
+    def disconnect_to_swarm(self):
+	if self.ws_serv_to_swarm.s is not None:
+	    self.ws_serv_to_swarm.s.close()
+	    print >>sys.stderr,"WSServer: Disconnected from WS to Swarm."
+	self.ws_serv_to_swarm.stop_flag = True
+
+class WsServerToSwarm(Thread):
+    def __init__(self,wsconnection,port,cmd,param):
+        Thread.__init__(self)
+        self.setName('WsServerToSwarm')
+	self.wsconnection = wsconnection
+	self.port = port
+	self.cmd = cmd
+	self.param = param
+
+    def run(self):
+        self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.s.connect(('127.0.0.1',self.port))
+        print >>sys.stderr,"WSServer: Connected from WS to Swarm."
+        msg = self.cmd+' '+self.param+'\r\n'
+        self.s.send(msg)
         
-        while True:
-            data = s.recv(1024)
-            print >>sys.stderr,"pe: Got BG command",data
-	    self.send(data)
+	self.stop_flag = False
+        while not self.stop_flag:
+            data = self.s.recv(1024)
+            print >>sys.stderr,"WSServer: Got BG command",data
+	    self.wsconnection.send(data)
             if len(data) == 0:
-                print >>sys.stderr,"pe: BG closes IC"
+                print >>sys.stderr,"WSServer: BG closes IC"
                 return
             elif data.startswith("PLAY"):
                 
@@ -82,10 +98,7 @@ class WsConnection(SockJSConnection):
                 f.write("\"\\Program Files\\GnuWin32\\bin\\wget.exe\" -S "+data[4:])
                 f.close()
                 break
-
-        time.sleep(1000)
-        return
-
+        print >>sys.stderr,"WSServer: Shutdown process WsServerToSwarm."
 
 if __name__ == "__main__":
     ws_serv = WsServer(62062,6878,6868)
