@@ -14,8 +14,8 @@
       }
 
       conn.onopen = function() {
-	sendPing();
-        function sendPing()
+	sendRequest();
+        function sendRequest()
         {
           conn.send('START http://neb.ucoz.ru/111.torrent');
         }

@@ -53,7 +53,6 @@ class WsConnection(SockJSConnection):
             if torrenturl is None:
                 raise ValueError('bg: Unformatted START command')
 	    print >>sys.stderr, "WsServer: Connecting from WsServer to Swarm - ",torrenturl,'   localhost:',Ports.i2iport,"\n"
-#            self.connect_to_swarm(Ports.i2iport,"START",torrenturl)
 	    self.ws_serv_to_swarm = WsServerToSwarm(self,Ports.i2iport,"START",torrenturl)   
 	    self.ws_serv_to_swarm.start()
 
@@ -93,10 +92,7 @@ class WsServerToSwarm(Thread):
                 print >>sys.stderr,"WSServer: BG closes IC"
                 return
             elif data.startswith("PLAY"):
-                
-                f = open("bla.bat","wb")
-                f.write("\"\\Program Files\\GnuWin32\\bin\\wget.exe\" -S "+data[4:])
-                f.close()
+                self.stop_flag = True
                 break
         print >>sys.stderr,"WSServer: Shutdown process WsServerToSwarm."
 
