@@ -731,7 +731,8 @@ class BGInstanceConnection(InstanceConnection):
     def start_playback(self,infohash):
         """ Register cstream with HTTP server and tell IC to start reading """
         
-        self.urlpath = URLPATH_CONTENT_PREFIX+'/'+infohash2urlpath(infohash)+'/'+str(random.random())
+        #self.urlpath = URLPATH_CONTENT_PREFIX+'/'+infohash2urlpath(infohash)+'/'+str(random.random())
+        self.urlpath = URLPATH_CONTENT_PREFIX+'/'+infohash2urlpath(infohash)+'/'+str(random.random())+'.mp4'
 
         self.videoHTTPServer.set_inputstream(self.cstreaminfo,self.urlpath)
         
