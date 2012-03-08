@@ -15,7 +15,6 @@
         }
 
         function refresh(text) {
-          $('#msg').text(text);
           div.innerHTML = text;
         }
 
@@ -46,10 +45,10 @@
       }
     };
     player.onBeforePlay(setup);
-    player.onPlay(function() { refresh("Video is playing!"); });
-    player.onPause(function() { refresh("The video paused."); });
-    player.onBuffer(function() { refresh("Video is buffering..."); });
-    player.onIdle(function() { refresh("The video stopped."); });
+    player.onPause(function() { div.innerHTML = ""; });
+    player.onPause(function() { div.innerHTML = "The video paused."; });
+    player.onBuffer(function() { div.innerHTML = "Video is buffering..."; });
+    player.onIdle(function() { div.innerHTML = "The video stopped."; });
 
     this.resize = function(width, height) {};
   };
