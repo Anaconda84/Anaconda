@@ -28,6 +28,7 @@ following software packages. See www.p2p-next.org for binary distributions.
    simplejson >= 2.1.1 (if Python < 2.6)
    xulrunner-sdk >= 1.9.1.5 < 1.9.2 (optional, to run SwarmPlayer V2/SwarmTransport)
    7-Zip >= 4.6.5 (optional, to build SwarmPlayer V2/SwarmTransport)
+   tornadio2 - https://github.com/MrJoes/tornadio2, doc - http://tornadio2.readthedocs.org/en/latest/index.html
 
 Next-Share runs on Windows (XP,Vista), Mac OS X and Linux. On Linux, it is 
 easiest to try to install these packages via a package manager such as
@@ -49,7 +50,7 @@ INSTALLING ON LINUX
      python2.5 BaseLib/Player/swarmplayer.py
   
 
-INSTALLING ON WINDOWS
+Running ON WINDOWS
 ---------------------
 
 1. Unpack the main source code.
@@ -69,3 +70,9 @@ protocol, see the instructions in the D6.5.4 deliverable in the Publications
 section of www.p2p-next.org.
 
 Arno Bakker, 2010-08-16
+
+INSTALLING ON WINDOWS
+---------------------
+1. Run makedist.bat
+Shilow Konstantin, 2012-03-12
+

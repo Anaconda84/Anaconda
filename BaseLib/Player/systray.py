@@ -155,7 +155,7 @@ class PlayerOptionsDialog(wx.Dialog):
         self.wxapp.save_playerconfig()
          
         if self.port is not None and self.port != self.wxapp.s.get_listen_port():
-            dlg = wx.MessageDialog(None, "The SwarmPlugin will now exit to change the port. Reload the Web page to restart it", self.wxapp.appname+" Restart", wx.OK|wx.ICON_INFORMATION)
+            dlg = wx.MessageDialog(None, "The SwarmVideo will now exit to change the port. Reload the Web page to restart it", self.wxapp.appname+" Restart", wx.OK|wx.ICON_INFORMATION)
             result = dlg.ShowModal()
             dlg.Destroy()
             self.wxapp.OnExit()
@@ -180,7 +180,7 @@ class PlayerAdvancedOptionsDialog(wx.Dialog):
     
     def __init__(self,icons,port,wxapp):
         style = wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER  # TODO: Add OK+Cancel
-        wx.Dialog.__init__(self, None, -1, 'SwarmPlugin Advanced Options', size=(400,200), style=style)
+        wx.Dialog.__init__(self, None, -1, 'SwarmVideo Advanced Options', size=(400,200), style=style)
         self.wxapp = wxapp
 
         self.SetIcons(icons)
