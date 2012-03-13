@@ -45,7 +45,7 @@
       }
     };
     player.onBeforePlay(setup);
-    player.onPause(function() { div.innerHTML = ""; });
+    player.onPlay(function() { div.innerHTML = ""; });
     player.onPause(function() { div.innerHTML = "The video paused."; });
     player.onBuffer(function() { div.innerHTML = "Video is buffering..."; });
     player.onIdle(function() { div.innerHTML = "The video stopped."; });
