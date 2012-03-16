@@ -1,0 +1,19 @@
+*** tmp/orginal_finder.py	2010-07-06 13:33:14.000000000 -0400
+--- /usr/share/pyshared/cx_Freeze/finder.py	2010-07-05 13:09:07.000000000 -0400
+***************
+*** 255,260 ****
+--- 255,268 ----
+          module = self._AddModule(name)
+          module.file = path
+          module.parent = parent
++         # TOTAL HACK WORKAROUND BY PETER
++         if fp.name.endswith(".pyc"):
++             print "Peter's horrible hack is activiating, forcing", fp.name, "into binary mode, and as compiled Python."
++             type = imp.PY_COMPILED
++             # Next, switch out of universal newline mode in this crazy case.
++             fp.close()
++             fp = open(fp.name, "rb")
++         # END TOTAL HACK
+          if type == imp.PY_SOURCE:
+              module.code = compile(fp.read() + "\n", path, "exec")
+          elif type == imp.PY_COMPILED:
