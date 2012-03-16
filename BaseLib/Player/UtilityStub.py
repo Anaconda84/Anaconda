@@ -27,7 +27,11 @@ class UtilityStub:
         return self.statedir
     
     def getPath(self):
-        return self.installdir.decode(sys.getfilesystemencoding())
+        fsenc = sys.getfilesystemencoding()
+        if fsenc:
+            return self.installdir.decode(fsenc)
+        else:
+            return self.installdir
 
     def Read(self,key):
         if key == 'language_file':
