@@ -1,0 +1,12 @@
+*** escape.py.old	2012-03-16 20:19:16.000000000 +0400
+--- escape.py	2012-03-16 21:00:42.169220793 +0400
+***************
+*** 43,48 ****
+--- 43,49 ----
+      _json_encode = json.dumps
+  except Exception:
+      try:
++         from encoding import hex_codec
+          import simplejson
+          _json_decode = lambda s: simplejson.loads(_unicode(s))
+          _json_encode = lambda v: simplejson.dumps(v)
