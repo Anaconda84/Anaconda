@@ -17,7 +17,7 @@ p.section="utils"
 p.arch="all"
 p.postinstall="postinstall.sh"
 
-dir = '.'
+dir = 'build'
 
 filelist = []
 for root, dirs, files in os.walk(dir):
@@ -25,8 +25,7 @@ for root, dirs, files in os.walk(dir):
         fullname = os.path.join(root, name)
         filelist.append(fullname)
 
-home = os.path.expanduser('~')
-p[home+"/swarmvideo"] = filelist
+p["/home/kos/SwarmVideo"] = filelist
 
 p.generate("0.8")
 
