@@ -19,7 +19,7 @@ following software packages. See www.p2p-next.org for binary distributions.
 
    Python >= 2.5
    M2Crypto >= 0.16
-   wxPython >= 2.8 UNICODE (i.e., use --enable-unicode to build)
+   wxPython >= 2.8 UNICODE (i.e., use --enable-unicode to build python-wxgtk2.8)
    APSW aka. python-apsw >= 3.6.x (Python wrappers for SQLite database)
    pywin32 >= Build 208 (Windows only, for e.g. UPnP support)
    vlc:
@@ -29,6 +29,7 @@ following software packages. See www.p2p-next.org for binary distributions.
    xulrunner-sdk >= 1.9.1.5 < 1.9.2 (optional, to run SwarmPlayer V2/SwarmTransport)
    7-Zip >= 4.6.5 (optional, to build SwarmPlayer V2/SwarmTransport)
    sockjs-tornado - https://github.com/MrJoes/sockjs-tornado.git
+   python-py2deb - For create deb packets (Linux only)
 
 Next-Share runs on Windows (XP,Vista), Mac OS X and Linux. On Linux, it is 
 easiest to try to install these packages via a package manager such as
