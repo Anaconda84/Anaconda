@@ -16,6 +16,7 @@ p.license="gpl"
 p.section="utils"
 p.arch="all"
 p.postinstall="postinstall.sh"
+#p.preinstall="preinstall.sh"
 
 dir = '.'
 
