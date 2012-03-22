@@ -26,8 +26,7 @@ for root, dirs, files in os.walk(dir):
         fullname = os.path.join(root, name)
         filelist.append(fullname)
 
-home = os.path.expanduser('~')
-p[home+"/swarmvideo"] = filelist
+p["/usr/bin/swarmvideo"] = filelist
 
 p.generate("0.8")
 
