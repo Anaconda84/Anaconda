@@ -1,0 +1,37 @@
+
+==============================================================================
+                             SwarmVideo: 
+      The next generation Peer-to-Peer content delivery platform
+    
+==============================================================================
+
+LICENSE
+-------
+See LICENSE.txt.
+
+
+PREREQUISITES
+-------------
+
+To run the SwarmVideo program you will need to install the
+following software packages.
+
+   python-wxgtk >= 2.8 UNICODE (i.e., use --enable-unicode to build python-wxgtk2.8)
+
+INSTALLING ON LINUX
+-------------------
+ 
+1. Unpack the main source code.
+
+2. Install python-wxgtk2.8 package.(sudo apt-get install python-wxgtk2.8 etc.)
+
+3. Unpack SwarmVideo.linux-x.x.tar.gz to install directory (e.g /usr/bin/SwarmVideo)
+
+4. Adding in file .profile, or bashrc these commands for automatically running:
+      cd <install-directory>
+      ./SwarmEngine &
+
+5. Running program:
+      cd <install-directory>
+      ./SwarmEngine &
+
