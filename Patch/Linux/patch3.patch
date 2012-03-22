@@ -1,5 +1,5 @@
 *** __init__.py.old	2012-03-16 20:19:11.000000000 +0400
---- __init__.py	2012-03-16 21:05:14.857227705 +0400
+--- /usr/local/lib/python2.7/dist-packages/sockjs_tornado-0.0.2-py2.7.egg/sockjs/__init__.py	2012-03-16 21:05:14.857227705 +0400
 ***************
 *** 1 ****
 ! __import__('pkg_resources').declare_namespace(__name__)
