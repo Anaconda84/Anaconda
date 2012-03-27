@@ -245,4 +245,6 @@ tdefdefaults = {}
 tdefdefaults.update(tdefdictdefaults)
 tdefdefaults.update(tdefmetadefaults)
 
-use_websockets = False
+update_sites = 'http://localhost'
+update_path = 'distr'
+
