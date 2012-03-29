@@ -12,3 +12,8 @@ URLPATH_WEBIF_PREFIX = '/webUI'
 # After this time the ATOM feed URL and all links are no longer valid.
 HITS_TIMEOUT = 1800.0
  
+UPDATE_SITES = 'http://localhost'
+UPDATE_PATH = 'distr'
+
+VERSION = '0.8'
+

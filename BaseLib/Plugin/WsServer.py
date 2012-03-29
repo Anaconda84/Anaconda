@@ -9,6 +9,7 @@ import socket
 import urlparse
 import time
 
+from defs import *
 
 from sockjs.tornado import SockJSConnection, SockJSRouter, proto
 
@@ -52,8 +53,12 @@ class WsConnection(SockJSConnection):
             torrenturl = msg.partition( ' ' )[2].strip()
             if torrenturl is None:
                 raise ValueError('bg: Unformatted START command')
-	    print >>sys.stderr, "WsServer: Connecting from WsServer to Swarm - ",torrenturl,'   localhost:',Ports.i2iport,"\n"
+	    print >>sys.stderr, "WsServer: Receive START command from WS to Swarm - ",torrenturl,'   localhost:',Ports.i2iport,"\n"
 	    self.ws_serv_to_swarm = WsServerToSwarm(self,Ports.i2iport,"START",torrenturl)   
+	    self.ws_serv_to_swarm.start()
+        if msg.startswith( 'VERSION' ):
+	    print >>sys.stderr, "WsServer: Receive VERSION command from WS to Swarm - localhost: ",Ports.i2iport,"\n"
+	    self.ws_serv_to_swarm = WsServerToSwarm(self,Ports.i2iport,"VERSION",'')   
 	    self.ws_serv_to_swarm.start()
 
     def on_close(self):
@@ -80,20 +85,24 @@ class WsServerToSwarm(Thread):
         self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.s.connect(('127.0.0.1',self.port))
         print >>sys.stderr,"WSServer: Connected from WS to Swarm."
-        msg = self.cmd+' '+self.param+'\r\n'
-        self.s.send(msg)
+        if self.cmd == 'START':
+            msg = self.cmd+' '+self.param+'\r\n'
+            self.s.send(msg)
         
-	self.stop_flag = False
-        while not self.stop_flag:
-            data = self.s.recv(1024)
-            print >>sys.stderr,"WSServer: Got BG command",data
-	    self.wsconnection.send(data)
-            if len(data) == 0:
-                print >>sys.stderr,"WSServer: BG closes IC"
-                return
-            elif data.startswith("PLAY"):
-                self.stop_flag = True
-                break
+	    self.stop_flag = False
+            while not self.stop_flag:
+                data = self.s.recv(1024)
+                print >>sys.stderr,"WSServer: Got BG command",data
+	        self.wsconnection.send(data)
+                if len(data) == 0:
+                    print >>sys.stderr,"WSServer: BG closes IC"
+                    return
+                elif data.startswith("PLAY"):
+                   self.stop_flag = True
+                   break
+        if self.cmd == 'VERSION':
+            self.wsconnection.send(VERSION)
+
         print >>sys.stderr,"WSServer: Shutdown process WsServerToSwarm."
 
 if __name__ == "__main__":

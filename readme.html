@@ -12,30 +12,56 @@
 	</style>
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
 <script src="http://cdn.sockjs.org/sockjs-0.1.2.min.js"></script>
+  <script>
+    $(function() {
+      var conn = new SockJS('http://localhost:6868/websocket');
+
+      function refresh(text) {
+        $('#ver').text(text);
+      }
+
+      function sendRequest()
+      {
+        conn.send('VERSION');
+      }
+
+      conn.onopen = function() {
+	sendRequest();
+      };
+
+      conn.onmessage = function(e) {
+	  refresh(e.data);
+      }
+
+      conn.onclose = function() {
+      };
+    });
+  </script>
 
 </head>
 <body>
-<script type='text/javascript' src='jwplayer.js'></script>
+  <script type='text/javascript' src='jwplayer.js'></script>
 
-<div id='mediaplayer'>Loading player...</div>
+  <div id='mediaplayer'>Loading player...</div>
 
-<script type="text/javascript">
-  jwplayer('mediaplayer').setup({
-    'id': 'playerID',
-    'width': '480',
-    'height': '270',
-    provider: 'http',
-    plugins: {
-      './infomessages.js': {
-        text: 'Start buffering...'
-      }
-    },
-    'modes': [
-        {type: 'html5'},
-        {type: 'flash', src: 'player.swf'},
-    ]
-  });
-</script>
+  <script type="text/javascript">
+    jwplayer('mediaplayer').setup({
+      'id': 'playerID',
+      'width': '480',
+      'height': '270',
+      provider: 'http',
+      plugins: {
+        './infomessages.js': {
+          text: 'Start buffering...'
+        }
+      },
+      'modes': [
+          {type: 'html5'},
+          {type: 'flash', src: 'player.swf'},
+      ]
+    });
+  </script>
 
+  <div id="ver"></div>
 </body>
 </html>

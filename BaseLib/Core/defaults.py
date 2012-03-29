@@ -245,6 +245,3 @@ tdefdefaults = {}
 tdefdefaults.update(tdefdictdefaults)
 tdefdefaults.update(tdefmetadefaults)
 
-update_sites = 'http://localhost'
-update_path = 'distr'
-
