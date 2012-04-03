@@ -1,0 +1,7 @@
+*** ./__init__.py	2012-04-03 04:56:36.000000000 -0700
+--- /opt/local/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/sockjs_tornado-0.0.2-py2.7.egg/sockjs/__init__.py	2012-04-03 04:54:33.000000000 -0700
+***************
+*** 1 ****
+! __import__('pkg_resources').declare_namespace(__name__)
+--- 1 ----
+! #__import__('pkg_resources').declare_namespace(__name__)
