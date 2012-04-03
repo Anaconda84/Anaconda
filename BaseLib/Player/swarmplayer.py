@@ -38,15 +38,15 @@ from cStringIO import StringIO
 from threading import Thread
 from base64 import encodestring
 
-if sys.platform == "darwin":
+#if sys.platform == "darwin":
     # on Mac, we can only load VLC/OpenSSL libraries
     # relative to the location of tribler.py
-    os.chdir(os.path.abspath(os.path.dirname(sys.argv[0])))
-try:
-    import wxversion
-    wxversion.select('2.8')
-except:
-    pass
+#    os.chdir(os.path.abspath(os.path.dirname(sys.argv[0])))
+#try:
+#    import wxversion
+#    wxversion.select('2.8')
+#except:
+#    pass
 import wx
 
 from BaseLib.__init__ import LIBRARYNAME

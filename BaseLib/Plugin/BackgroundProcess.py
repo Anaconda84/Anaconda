@@ -66,11 +66,11 @@ if sys.platform == "win32":
     except:
         pass
 
-try:
-    import wxversion
-    wxversion.select('2.8')
-except:
-    pass
+#try:
+#    import wxversion
+#    wxversion.select('2.8')
+#except:
+#    pass
 import wx
 
 from BaseLib.Core.API import *
