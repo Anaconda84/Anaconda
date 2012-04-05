@@ -11,6 +11,7 @@ APP = ['BaseLib/Plugin/SwarmEngine.py']
 DATA_FILES = []
 OPTIONS = {'argv_emulation': True,
            'compressed': True,
+           'iconfile': 'systray.ico',
           }
 
 setup(

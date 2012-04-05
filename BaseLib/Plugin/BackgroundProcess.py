@@ -72,6 +72,7 @@ if sys.platform == "win32":
 #except:
 #    pass
 import wx
+import re
 
 from BaseLib.Core.API import *
 from BaseLib.Core.osutils import *
@@ -110,7 +111,6 @@ IDLE_BEFORE_SELFKILL = 60.0 # Number of seconds
 class BackgroundApp(BaseApp):
 
     def __init__(self, redirectstderrout, appname, appversion, params, single_instance_checker, installdir, i2iport, sport, httpport, ws_serverport):
-
 	# Running WebSocket server SockJS Tornado
         Router = SockJSRouter(WsConnection, '/websocket')
     	ws_serv = WsServer(i2iport, httpport,ws_serverport)
@@ -120,7 +120,7 @@ class BackgroundApp(BaseApp):
         # Almost generic HTTP server
         self.videoHTTPServer = VideoHTTPServer(httpport)
         self.videoHTTPServer.register(self.videoservthread_error_callback,self.videoservthread_set_status_callback)
-
+        
         BaseApp.__init__(self, redirectstderrout, appname, appversion, params, single_instance_checker, installdir, i2iport, sport)
         self.httpport = httpport
         
@@ -149,7 +149,7 @@ class BackgroundApp(BaseApp):
 
         # Generic HTTP server start. Don't add mappers dynamically afterwards!
         self.videoHTTPServer.background_serve()
-
+        
         # Maps Downloads to a using InstanceConnection and streaminfo when it 
         # plays. So it contains the Downloads in VOD mode for which there is
         # active interest from a plugin.
@@ -944,10 +944,15 @@ def run_bgapp(appname,appversion,i2iport,sessport,httpport,ws_serverport, params
     else:
         installdir = os.getcwd()  
 
+    # Added for extract base directory
+    result = re.finditer(ur"(.+)/BaseLib/Plugin", installdir)
+    for match in result:
+        if(match.groups()[0]):
+            installdir = match.groups()[0]
+    
     # Launch first single instance
     app = BackgroundApp(0, appname, appversion, params, single_instance_checker, installdir, i2iport, sessport, httpport, ws_serverport)
     s = app.s
-
     # Enable P2P-Next ULANC logging.
     if PHONEHOME: 
         status = Status.get_status_holder("LivingLab")

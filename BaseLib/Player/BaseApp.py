@@ -79,7 +79,6 @@ class BaseApp(wx.App,InstanceConnectionHandler):
         
         InstanceConnectionHandler.__init__(self,self.i2ithread_readlinecallback)
         wx.App.__init__(self, redirectstderrout)
-
         
     def OnInitBase(self):
         """ To be wrapped in a OnInit() method that returns True/False """
@@ -104,7 +103,12 @@ class BaseApp(wx.App,InstanceConnectionHandler):
         # Install systray icon
         # Note: setting this makes the program not exit when the videoFrame
         # is being closed.
-        self.tbicon = PlayerTaskBarIcon(self,self.iconpath)
+        if sys.platform == "darwin":
+            #self.tbicon = OSXPlayerTaskBarIcon(self,self.iconpath)
+            frame = self.tbicon = OSXPlayerTaskBarIcon(None, -1, "koskos",self.iconpath)
+            frame.Show(True)
+        else:
+            self.tbicon = PlayerTaskBarIcon(self,self.iconpath)
         
         # Start Tribler Session
         cfgfilename = Session.get_default_config_filename(state_dir)
@@ -479,7 +483,10 @@ class BaseApp(wx.App,InstanceConnectionHandler):
         txt += 'UL:   %.1f\n' % (totalspeed[UPLOAD])
         txt += 'Helping: %d\n' % (totalhelping) 
         #print >>sys.stderr,"main: ToolTip summary",txt
-        self.OnSetSysTrayTooltip(txt)
+        if sys.platform == "darwin":
+            pass
+        else:
+            self.OnSetSysTrayTooltip(txt)
 
         # No playing Downloads        
         if len(playing_dslist) == 0:
