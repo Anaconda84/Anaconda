@@ -391,8 +391,10 @@ class SimpleServer(BaseHTTPServer.BaseHTTPRequestHandler):
                 # Ric: bitrate needs to be detected even if the file is already completed
                 if streaminfo.has_key('bitrate') and length is not None:
                     bitrate = streaminfo['bitrate']
-                    estduration = float(length) / float(bitrate)
-                    self.send_header("X-Content-Duration", estduration)
+                    print >>sys.stderr,"!!!!!!!!! length=",length,"bitrate=",bitrate
+                    if bitrate is not None:
+                        estduration = float(length) / float(bitrate)
+                        self.send_header("X-Content-Duration", estduration)
 
                 if length is not None:
                     self.send_header("Content-Length", nbytes2send)
