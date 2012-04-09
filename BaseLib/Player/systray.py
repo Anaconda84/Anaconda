@@ -218,19 +218,12 @@ class PlayerAdvancedOptionsDialog(wx.Dialog):
 class OSXPlayerTaskBarIcon(wx.Frame):
     def __init__(self, parent, id, title, iconfilename):
         pass
-        wx.Frame.__init__(self, parent, -1, title, size = (800, 600),
+        # size = (0, 0) - no window, to Dock
+        wx.Frame.__init__(self, parent, -1, title, size = (0, 0),
                          style=wx.DEFAULT_FRAME_STYLE|wx.NO_FULL_REPAINT_ON_RESIZE)
         # FIXME: substitute your icon file here.
-        icon = wx.Icon(iconfilename, wx.BITMAP_TYPE_ICO)
-        self.SetIcon(icon)
-        if wx.Platform == '__WXMSW__':
-            # setup a taskbar icon, and catch some events from it
-            self.tbicon = wx.TaskBarIcon()
-            self.tbicon.SetIcon(icon, "SysTray Demo")
-            wx.EVT_TASKBAR_LEFT_DCLICK(self.tbicon, self.OnTaskBarActivate)
-            wx.EVT_TASKBAR_RIGHT_UP(self.tbicon, self.OnTaskBarMenu)
-            wx.EVT_MENU(self.tbicon, self.TBMENU_RESTORE, self.OnTaskBarActivate)
-            wx.EVT_MENU(self.tbicon, self.TBMENU_CLOSE, self.OnTaskBarClose)
+        # icon = wx.Icon(iconfilename, wx.BITMAP_TYPE_ICO)
+        # self.SetIcon(icon)
         wx.EVT_ICONIZE(self, self.OnIconify)
         return
     def OnIconify(self, evt):

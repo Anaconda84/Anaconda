@@ -6,7 +6,7 @@ DIST="SwarmVideo.linux-$VERSION.tar.gz"
 rm -R build
 rm -R dist
 
-python setup.py build
+python setup_linux_pkg.py build
 
 mkdir dist
 cp LICENSE.txt dist
