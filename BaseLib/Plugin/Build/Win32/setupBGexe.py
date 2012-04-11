@@ -13,5 +13,12 @@ mainfile = os.path.join(LIBRARYNAME,'Plugin','SwarmEngine.py')
 # Arno: 2009-06-09: changed from console= to make sure py2exe writes
 # a BackgroundProcess.exe.log
 #
-setup(windows=[mainfile]) 
+setup(
+    options = {
+        "py2exe": {
+            "dll_excludes": ["MSVCP90.dll"]
+        }
+    },
+    windows=[mainfile]
+) 
 
