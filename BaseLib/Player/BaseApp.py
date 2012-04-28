@@ -29,6 +29,7 @@ from threading import enumerate,currentThread,RLock
 from traceback import print_exc
 # Ric: added svc ext  
 from BaseLib.Video.utils import svcextdefaults
+from BaseLib.Plugin.defs import *
 
 if sys.platform == "darwin":
     # on Mac, we can only load VLC/OpenSSL libraries
@@ -58,7 +59,7 @@ DISKSPACE_LIMIT = 5L * 1024L * 1024L * 1024L  # 5 GB
 DEFAULT_MAX_UPLOAD_SEED_WHEN_SEEDING = 75 # KB/s
 
 class BaseApp(wx.App,InstanceConnectionHandler):
-    def __init__(self, redirectstderrout, appname, appversion, params, single_instance_checker, installdir, i2iport, sport):
+    def __init__(self, logdir, appname, appversion, params, single_instance_checker, installdir, i2iport, sport):
         self.appname = appname
         self.appversion = appversion
         self.params = params
@@ -76,9 +77,14 @@ class BaseApp(wx.App,InstanceConnectionHandler):
         self.playermode = DLSTATUS_DOWNLOADING
         self.getpeerlistcount = 2 # for research Reporter
         self.shuttingdown = False
-        
-        InstanceConnectionHandler.__init__(self,self.i2ithread_readlinecallback)
-        wx.App.__init__(self, redirectstderrout)
+
+	InstanceConnectionHandler.__init__(self,self.i2ithread_readlinecallback)
+
+	if LOG_FILE is None:
+	    wx.App.__init__(self, 0)
+	else:
+	    self.logfile = os.path.join(logdir, LOG_FILE) 
+	    wx.App.__init__(self, True, self.logfile)
         
     def OnInitBase(self):
         """ To be wrapped in a OnInit() method that returns True/False """

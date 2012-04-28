@@ -10,7 +10,6 @@ import urlparse
 import time
 
 from defs import *
-
 from sockjs.tornado import SockJSConnection, SockJSRouter, proto
 
 class Ports():

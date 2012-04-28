@@ -2,6 +2,7 @@ import glob
 import logging
 import logging.handlers
 import time
+import sys
 
 class Log():
     """
@@ -13,12 +14,13 @@ class Log():
         @param mode - debug, info, warning,  error, critical 
         """
         self.logfile = logfile
+	sys.stderr = file( self.logfile, "a+" )
         self.my_logger = logging.getLogger('MyLogger')
-#        formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
-	formatter = logging.Formatter('%(asctime)s %(levelname)s in \'%(module)s\' at line %(lineno)d: %(message)s')
+        formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
+#	formatter = logging.Formatter('%(asctime)s %(levelname)s in \'%(module)s\' at line %(lineno)d: %(message)s')
         # Add the log message handler to the logger
         handler = logging.handlers.RotatingFileHandler(
-              self.logfile, backupCount=5)
+              self.logfile, backupCount=1)
 	handler.setFormatter(formatter)
         self.my_logger.addHandler(handler)
 
@@ -35,15 +37,18 @@ class Log():
         if level == 'critical':
             self.my_logger.setLevel(logging.CRITICAL)
 
-        
     def rotate(self):
         """  Rotate logs. """
         # Add timestamp
-        self.my_logger.critical('\n---------\nLog closed on %s.\n---------\n' % time.asctime())
+        print >> sys.stderr,'\n---------\nLog closed on %s.\n---------\n' % time.asctime()
+	sys.stderr.flush()
+	sys.stderr.close()
         # Roll over on application start
         self.my_logger.handlers[0].doRollover()
+	sys.stderr = file( self.logfile, "a+" )
         # Add timestamp
-        self.my_logger.critical('\n---------\nLog started on %s.\n---------\n' % time.asctime())
+        print >> sys.stderr,'\n---------\nLog started on %s.\n---------\n' % time.asctime()
+	sys.stderr.flush()
 
     def message(self, level, msg, *args):
         """ Output message
@@ -67,7 +72,6 @@ class Log():
 
 if __name__ == '__main__':
     my_log = Log('logging_rotatingfile_example.out')
-    my_log.setLevel('debug')
-    my_log.message('debug', '11111111111111')
+    print >> sys.stderr,'Durak!!!!!!!!!!!';
     my_log.rotate()
-
+    print >> sys.stderr,'Idiot!!!!!!!!!!!';

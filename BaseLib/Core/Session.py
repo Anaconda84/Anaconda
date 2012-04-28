@@ -79,12 +79,12 @@ class Session(SessionRuntimeConfig):
             # Work from copy
             self.sessconfig = copy.copy(scfg.sessconfig)
         
-        # Create dir for session state, if not exist    
+        # Create dir for session state, if not exist
         state_dir = self.sessconfig['state_dir']
         if state_dir is None:
             state_dir = Session.get_default_state_dir()
             self.sessconfig['state_dir'] = state_dir
-            
+    
         if not os.path.isdir(state_dir):
             os.makedirs(state_dir)
 

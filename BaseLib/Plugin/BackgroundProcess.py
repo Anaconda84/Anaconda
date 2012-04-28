@@ -97,7 +97,7 @@ from BaseLib.Core.ClosedSwarm.ClosedSwarm import InvalidPOAException
 
 from BaseLib.Plugin.WsServer import *
 from sockjs.tornado import SockJSConnection, SockJSRouter, proto
-
+from BaseLib.Plugin.defs import *
 
 DEBUG = True
 PHONEHOME = True
@@ -110,7 +110,7 @@ IDLE_BEFORE_SELFKILL = 60.0 # Number of seconds
 
 class BackgroundApp(BaseApp):
 
-    def __init__(self, redirectstderrout, appname, appversion, params, single_instance_checker, installdir, i2iport, sport, httpport, ws_serverport):
+    def __init__(self, logdir, appname, appversion, params, single_instance_checker, installdir, i2iport, sport, httpport, ws_serverport):
 	# Running WebSocket server SockJS Tornado
         Router = SockJSRouter(WsConnection, '/websocket')
     	ws_serv = WsServer(i2iport, httpport,ws_serverport)
@@ -121,7 +121,7 @@ class BackgroundApp(BaseApp):
         self.videoHTTPServer = VideoHTTPServer(httpport)
         self.videoHTTPServer.register(self.videoservthread_error_callback,self.videoservthread_set_status_callback)
         
-        BaseApp.__init__(self, redirectstderrout, appname, appversion, params, single_instance_checker, installdir, i2iport, sport)
+        BaseApp.__init__(self, logdir, appname, appversion, params, single_instance_checker, installdir, i2iport, sport)
         self.httpport = httpport
         
         # SEARCH:P2P
@@ -950,8 +950,14 @@ def run_bgapp(appname,appversion,i2iport,sessport,httpport,ws_serverport, params
         if(match.groups()[0]):
             installdir = match.groups()[0]
     
+    logdir = get_appstate_dir() 
+    logdir = os.path.join(logdir, '.SwarmVideo', 'Log')
+
+    if not os.path.isdir(logdir):
+        os.makedirs(logdir)
+
     # Launch first single instance
-    app = BackgroundApp(0, appname, appversion, params, single_instance_checker, installdir, i2iport, sessport, httpport, ws_serverport)
+    app = BackgroundApp(logdir, appname, appversion, params, single_instance_checker, installdir, i2iport, sessport, httpport, ws_serverport)
     s = app.s
     # Enable P2P-Next ULANC logging.
     if PHONEHOME: 

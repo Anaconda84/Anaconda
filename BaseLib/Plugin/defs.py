@@ -17,3 +17,6 @@ UPDATE_PATH = 'distr'
 
 VERSION = '0.8'
 
+# output log file filename or None(to screen)
+#LOG_FILE = None
+LOG_FILE = 'SwarmPlugin.log'
