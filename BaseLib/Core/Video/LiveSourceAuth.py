@@ -1,3 +1,4 @@
+import time 
 # written by Arno Bakker
 # see LICENSE.txt for license information
 
@@ -90,13 +91,13 @@ class ECDSAAuthenticator(Authenticator):
     
     def __init__(self,piecelen,npieces,keypair=None,pubkeypem=None):
         
-        print >>sys.stderr,"ECDSAAuth: npieces",npieces
+        print >>sys.stderr,time.asctime(),'-', "ECDSAAuth: npieces",npieces
         
         Authenticator.__init__(self,piecelen,npieces)
         self.contentblocksize = piecelen-self.OUR_SIGSIZE
         self.keypair = keypair
         if pubkeypem is not None:
-            #print >>sys.stderr,"ECDSAAuth: pubkeypem",`pubkeypem`
+            #print >>sys.stderr,time.asctime(),'-', "ECDSAAuth: pubkeypem",`pubkeypem`
             self.pubkey = EC.pub_key_from_der(pubkeypem)
         else:
             self.pubkey = None
@@ -107,7 +108,7 @@ class ECDSAAuthenticator(Authenticator):
     
     def sign(self,content):
         rtstamp = time.time()
-        #print >>sys.stderr,"ECDSAAuth: sign: ts %.5f s" % rtstamp
+        #print >>sys.stderr,time.asctime(),'-', "ECDSAAuth: sign: ts %.5f s" % rtstamp
         
         extra = struct.pack('>Qd', self.seqnum,rtstamp)
         self.seqnum += 1L
@@ -136,13 +137,13 @@ class ECDSAAuthenticator(Authenticator):
         """
         try:
             # Can we do this without memcpy?
-            #print >>sys.stderr,"ECDSAAuth: verify",len(piece)
+            #print >>sys.stderr,time.asctime(),'-', "ECDSAAuth: verify",len(piece)
             extra = piece[-self.OUR_SIGSIZE:-self.OUR_SIGSIZE+self.EXTRA_SIZE]
             lensig = ord(piece[-self.OUR_SIGSIZE+self.EXTRA_SIZE])
             if lensig > self.MAX_ECDSA_ASN1_SIGSIZE:
-                print >>sys.stderr,"ECDSAAuth: @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ failed piece",index,"lensig wrong",lensig
+                print >>sys.stderr,time.asctime(),'-', "ECDSAAuth: @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ failed piece",index,"lensig wrong",lensig
                 return False
-            #print >>sys.stderr,"ECDSAAuth: verify lensig",lensig
+            #print >>sys.stderr,time.asctime(),'-', "ECDSAAuth: verify lensig",lensig
             diff = lensig-self.MAX_ECDSA_ASN1_SIGSIZE
             if diff == 0:
                 sig = piece[-self.OUR_SIGSIZE+self.EXTRA_SIZE+self.LENGTH_SIZE:]
@@ -150,34 +151,34 @@ class ECDSAAuthenticator(Authenticator):
                 sig = piece[-self.OUR_SIGSIZE+self.EXTRA_SIZE+self.LENGTH_SIZE:diff]
             content = piece[:-self.OUR_SIGSIZE]
             if DEBUG:
-                print >>sys.stderr,"ECDSAAuth: verify piece",index,"sig",`sig`
-                print >>sys.stderr,"ECDSAAuth: verify dig",sha(content).hexdigest()
+                print >>sys.stderr,time.asctime(),'-', "ECDSAAuth: verify piece",index,"sig",`sig`
+                print >>sys.stderr,time.asctime(),'-', "ECDSAAuth: verify dig",sha(content).hexdigest()
         
             ret = ecdsa_verify_data_pubkeyobj(content,extra,self.pubkey,sig)
             if ret:
                 (seqnum, rtstamp) = self._decode_extra(piece)
                 
                 if DEBUG:
-                    print >>sys.stderr,"ECDSAAuth: verify piece",index,"seq",seqnum,"ts %.5f s" % rtstamp,"ls",lensig
+                    print >>sys.stderr,time.asctime(),'-', "ECDSAAuth: verify piece",index,"seq",seqnum,"ts %.5f s" % rtstamp,"ls",lensig
                 
                 mod = seqnum % self.get_npieces()
                 thres = self.seqnum - self.get_npieces()/2
                 if seqnum <= thres:
-                    print >>sys.stderr,"ECDSAAuth: @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ failed piece",index,"old seqnum",seqnum,"<<",self.seqnum
+                    print >>sys.stderr,time.asctime(),'-', "ECDSAAuth: @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ failed piece",index,"old seqnum",seqnum,"<<",self.seqnum
                     return False
                 elif mod != index:
-                    print >>sys.stderr,"ECDSAAuth: @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ failed piece",index,"expected",mod
+                    print >>sys.stderr,time.asctime(),'-', "ECDSAAuth: @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ failed piece",index,"expected",mod
                     return False 
                 elif self.startts is not None and rtstamp < self.startts:
-                    print >>sys.stderr,"ECDSAAuth: @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ failed piece",index,"older than oldest known ts",rtstamp,self.startts
+                    print >>sys.stderr,time.asctime(),'-', "ECDSAAuth: @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ failed piece",index,"older than oldest known ts",rtstamp,self.startts
                     return False
                 else:
                     self.seqnum = max(self.seqnum,seqnum)
                     if self.startts is None:
                         self.startts = rtstamp-300.0 # minus 5 min in case we read piece N+1 before piece N
-                        print >>sys.stderr,"ECDSAAuth: @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@: startts",self.startts
+                        print >>sys.stderr,time.asctime(),'-', "ECDSAAuth: @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@: startts",self.startts
             else:
-                print >>sys.stderr,"ECDSAAuth: @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ piece",index,"failed sig"
+                print >>sys.stderr,time.asctime(),'-', "ECDSAAuth: @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ piece",index,"failed sig"
             
             return ret
         except:
@@ -242,7 +243,7 @@ class RSAAuthenticator(Authenticator):
         Authenticator.__init__(self,piecelen,npieces)
         self.keypair = keypair
         if pubkeypem is not None:
-            #print >>sys.stderr,"ECDSAAuth: pubkeypem",`pubkeypem`
+            #print >>sys.stderr,time.asctime(),'-', "ECDSAAuth: pubkeypem",`pubkeypem`
             self.pubkey = RSA_pub_key_from_der(pubkeypem)
         else:
             self.pubkey = self.keypair
@@ -254,7 +255,7 @@ class RSAAuthenticator(Authenticator):
     
     def sign(self,content):
         rtstamp = time.time()
-        #print >>sys.stderr,"ECDSAAuth: sign: ts %.5f s" % rtstamp
+        #print >>sys.stderr,time.asctime(),'-', "ECDSAAuth: sign: ts %.5f s" % rtstamp
         
         extra = struct.pack('>Qd', self.seqnum,rtstamp)
         self.seqnum += 1L
@@ -273,39 +274,39 @@ class RSAAuthenticator(Authenticator):
         """
         try:
             # Can we do this without memcpy?
-            #print >>sys.stderr,"ECDSAAuth: verify",len(piece)
+            #print >>sys.stderr,time.asctime(),'-', "ECDSAAuth: verify",len(piece)
             extra = piece[-self.our_sigsize():-self.our_sigsize()+self.EXTRA_SIZE]
             sig = piece[-self.our_sigsize()+self.EXTRA_SIZE:]
             content = piece[:-self.our_sigsize()]
             #if DEBUG:
-            #    print >>sys.stderr,"RSAAuth: verify piece",index,"sig",`sig`
-            #    print >>sys.stderr,"RSAAuth: verify dig",sha(content).hexdigest()
+            #    print >>sys.stderr,time.asctime(),'-', "RSAAuth: verify piece",index,"sig",`sig`
+            #    print >>sys.stderr,time.asctime(),'-', "RSAAuth: verify dig",sha(content).hexdigest()
         
             ret = rsa_verify_data_pubkeyobj(content,extra,self.pubkey,sig)
             if ret:
                 (seqnum, rtstamp) = self._decode_extra(piece)
                 
                 if DEBUG:
-                    print >>sys.stderr,"RSAAuth: verify piece",index,"seq",seqnum,"ts %.5f s" % rtstamp
+                    print >>sys.stderr,time.asctime(),'-', "RSAAuth: verify piece",index,"seq",seqnum,"ts %.5f s" % rtstamp
                 
                 mod = seqnum % self.get_npieces()
                 thres = self.seqnum - self.get_npieces()/2
                 if seqnum <= thres:
-                    print >>sys.stderr,"RSAAuth: @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ failed piece",index,"old seqnum",seqnum,"<<",self.seqnum
+                    print >>sys.stderr,time.asctime(),'-', "RSAAuth: @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ failed piece",index,"old seqnum",seqnum,"<<",self.seqnum
                     return False
                 elif mod != index:
-                    print >>sys.stderr,"RSAAuth: @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ failed piece",index,"expected",mod
+                    print >>sys.stderr,time.asctime(),'-', "RSAAuth: @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ failed piece",index,"expected",mod
                     return False
                 elif self.startts is not None and rtstamp < self.startts:
-                    print >>sys.stderr,"RSAAuth: @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ failed piece",index,"older than oldest known ts",rtstamp,self.startts
+                    print >>sys.stderr,time.asctime(),'-', "RSAAuth: @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ failed piece",index,"older than oldest known ts",rtstamp,self.startts
                     return False
                 else:
                     self.seqnum = max(self.seqnum,seqnum)
                     if self.startts is None:
                         self.startts = rtstamp-300.0 # minus 5 min in case we read piece N+1 before piece N
-                        print >>sys.stderr,"RSAAuth: @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@: startts",self.startts
+                        print >>sys.stderr,time.asctime(),'-', "RSAAuth: @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@: startts",self.startts
             else:
-                print >>sys.stderr,"RSAAuth: @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ piece",index,"failed sig"
+                print >>sys.stderr,time.asctime(),'-', "RSAAuth: @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ piece",index,"failed sig"
             
             return ret
         except:
@@ -387,7 +388,7 @@ class AuthStreamWrapper:
     
     def seek(self,pos,whence=os.SEEK_SET):
         if pos == 0 and whence == os.SEEK_SET:
-            print >>sys.stderr,"authstream: seek: Ignoring seek 0 in live"
+            print >>sys.stderr,time.asctime(),'-', "authstream: seek: Ignoring seek 0 in live"
         else:
             raise ValueError("authstream does not support seek")
 
@@ -453,7 +454,7 @@ class VariableReadAuthStreamWrapper:
         if len(self.buffer) == 0:
             # Must read fixed size blocks from authwrapper
             data = self.inputstream.read(self.piecelen)
-            #print >>sys.stderr,"varread: Got",len(data),"want",nwant
+            #print >>sys.stderr,time.asctime(),'-', "varread: Got",len(data),"want",nwant
             if len(data) == 0:
                 return data
             self.buffer = data
@@ -462,16 +463,16 @@ class VariableReadAuthStreamWrapper:
         tosend = min(nwant,lenb)
             
         if tosend == lenb:
-            #print >>sys.stderr,"varread: zero copy 2 lenb",lenb
+            #print >>sys.stderr,time.asctime(),'-', "varread: zero copy 2 lenb",lenb
             pre = self.buffer
             post = ''
         else:
-            #print >>sys.stderr,"varread: copy",tosend,"lenb",lenb
+            #print >>sys.stderr,time.asctime(),'-', "varread: copy",tosend,"lenb",lenb
             pre = self.buffer[0:tosend]
             post = self.buffer[tosend:]
             
         self.buffer = post
-        #print >>sys.stderr,"varread: Returning",len(pre)
+        #print >>sys.stderr,time.asctime(),'-', "varread: Returning",len(pre)
         return pre
     
         

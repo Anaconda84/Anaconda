@@ -1,3 +1,4 @@
+import time 
 # Written by Arno Bakker
 # see LICENSE.txt for license information
 #
@@ -51,7 +52,7 @@ class TestCachingStream(unittest.TestCase):
             if len(data) == 0:
                 break
             self.g.write(data)
-            print >>sys.stderr,".",
+            print >>sys.stderr,time.asctime(),'-', ".",
             
         self.g.close()
         self.cmp_files()
@@ -59,11 +60,11 @@ class TestCachingStream(unittest.TestCase):
     def test_sequential_halfxblocksize(self):
         while True:
             data = self.c.read(32768)
-            print >>sys.stderr,"test: Got bytes",len(data)
+            print >>sys.stderr,time.asctime(),'-', "test: Got bytes",len(data)
             if len(data) == 0:
                 break
             self.g.write(data)
-            print >>sys.stderr,".",
+            print >>sys.stderr,time.asctime(),'-', ".",
             
         self.g.close()
         self.cmp_files()
@@ -71,11 +72,11 @@ class TestCachingStream(unittest.TestCase):
     def test_sequential_bs32767(self):
         while True:
             data = self.c.read(32767)
-            print >>sys.stderr,"test: Got bytes",len(data)
+            print >>sys.stderr,time.asctime(),'-', "test: Got bytes",len(data)
             if len(data) == 0:
                 break
             self.g.write(data)
-            print >>sys.stderr,".",
+            print >>sys.stderr,time.asctime(),'-', ".",
             
         self.g.close()
         self.cmp_files()
@@ -85,14 +86,14 @@ class TestCachingStream(unittest.TestCase):
         pos = 0
         while True:
             data = self.c.read(32767)
-            print >>sys.stderr,"test: Got bytes",len(data)
+            print >>sys.stderr,time.asctime(),'-', "test: Got bytes",len(data)
             if len(data) == 0:
                 break
             self.g.write(data)
             
             pos += len(data)
             self.c.seek(pos)
-            print >>sys.stderr,".",
+            print >>sys.stderr,time.asctime(),'-', ".",
             
         self.g.close()
         self.cmp_files()
@@ -100,24 +101,24 @@ class TestCachingStream(unittest.TestCase):
 
     def test_read1sttwice(self):
         data1 = self.c.read(32768)
-        print >>sys.stderr,"test: Got bytes",len(data1)
+        print >>sys.stderr,time.asctime(),'-', "test: Got bytes",len(data1)
         self.c.seek(0)
         data2 = self.c.read(32768)
-        print >>sys.stderr,"test: Got bytes",len(data2)
+        print >>sys.stderr,time.asctime(),'-', "test: Got bytes",len(data2)
         self.assert_(data1 == data2)
 
 
     def test_inside_1stblock(self):
         data1 = self.c.read(32768)
-        print >>sys.stderr,"test: Got bytes",len(data1)
+        print >>sys.stderr,time.asctime(),'-', "test: Got bytes",len(data1)
         self.c.seek(16384)
         data2 = self.c.read(16384)
-        print >>sys.stderr,"test: Got bytes",len(data2)
+        print >>sys.stderr,time.asctime(),'-', "test: Got bytes",len(data2)
         self.assert_(data1[16384:] == data2)
 
         self.c.seek(10000)
         data3 = self.c.read(20000)
-        print >>sys.stderr,"test: Got bytes",len(data3)
+        print >>sys.stderr,time.asctime(),'-', "test: Got bytes",len(data3)
         self.assert_(data1[10000:10000+20000] == data3)
 
 

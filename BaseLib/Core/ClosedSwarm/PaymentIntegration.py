@@ -1,3 +1,4 @@
+import time 
 # Written by Njaal Borch
 # see LICENSE.txt for license information
 #
@@ -30,7 +31,7 @@ class PaymentSystem:
     def request_code(self):
         if self.request_sent == self.mobile_number:
             import sys
-            print >> sys.stderr, "Refusing to send new request to same number"
+            print >> sys.stderr, time.asctime(),'-', "Refusing to send new request to same number"
             
         data = urllib.urlencode({"mobile": self.mobile_number, "request": "code", "swarm_id":self.swarm_id, "nosend": "off", "debug": "off"})
         
@@ -47,7 +48,7 @@ class PaymentSystem:
 
     def verify_code(self, code):
         import sys
-        print >> sys.stderr, {"request": "validate", "code": code, "mobile": self.mobile_number, "perm_id": self.perm_id, "swarm_id": self.swarm_id}
+        print >> sys.stderr, time.asctime(),'-', {"request": "validate", "code": code, "mobile": self.mobile_number, "perm_id": self.perm_id, "swarm_id": self.swarm_id}
         
         data = urllib.urlencode({"request": "validate", "code": code, "mobile": self.mobile_number, "perm_id": self.perm_id, "swarm_id": self.swarm_id})
         f = urllib.urlopen("http://daccer.for-the.biz/smps.php", data)
@@ -72,7 +73,7 @@ class PaymentSystem:
         else:
             error = ",no_error_return"
 
-        print >>sys.stderr,"Verify Code returned ",s,"with error:",error
+        print >>sys.stderr,time.asctime(),'-', "Verify Code returned ",s,"with error:",error
 
         # TODO: Check for errors and throw exceptions
         return [validation, poa, error]
@@ -166,7 +167,7 @@ class PaymentDialog(wx.Dialog):
                 return
             
         except Exception,e:
-            print >>sys.stderr,"Error contacting payment system:",e
+            print >>sys.stderr,time.asctime(),'-', "Error contacting payment system:",e
             # TODO: Handle errors properly
             return
 

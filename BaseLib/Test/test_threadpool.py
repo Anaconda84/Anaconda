@@ -1,3 +1,4 @@
+import time 
 # Written by Arno Bakker
 # see LICENSE.txt for license information
 
@@ -32,31 +33,31 @@ class TestThreadPool(unittest.TestCase):
         self.assertEquals(self.exp,self.got)
     
     def test_queueTask1(self):
-        print >>sys.stderr,"test_queueTask1:"
+        print >>sys.stderr,time.asctime(),'-', "test_queueTask1:"
         self.exp = [1]
         self.tp.queueTask(lambda:self.do_task(1))
         
     def do_task(self,val):
         self.gotlock.acquire()
-        print >>sys.stderr,"test: got task",val
+        print >>sys.stderr,time.asctime(),'-', "test: got task",val
         self.got.append(val)
         self.gotlock.release()
         
     def test_queueTask10lambda(self):
-        print >>sys.stderr,"test_queueTask10lambda:"
+        print >>sys.stderr,time.asctime(),'-', "test_queueTask10lambda:"
         self.exp = range(1,11)
         def wrapper(x):
             self.tp.queueTask(lambda:self.do_task(x))
                           
         for i in range(1,11):
-            print >>sys.stderr,"test: exp task",i
+            print >>sys.stderr,time.asctime(),'-', "test: exp task",i
             wrapper(i)
 
     #
     # Confusing lambda crap, do explicit:
     #
     def test_queueTask10explicit(self):
-        print >>sys.stderr,"test_queueTask10explicit:"
+        print >>sys.stderr,time.asctime(),'-', "test_queueTask10explicit:"
         self.exp = range(1,11)
         self.tp.queueTask(self.do_task1)
         self.tp.queueTask(self.do_task2)
@@ -71,17 +72,17 @@ class TestThreadPool(unittest.TestCase):
 
 
     def test_joinAll(self):
-        print >>sys.stderr,"test_joinall:"
+        print >>sys.stderr,time.asctime(),'-', "test_joinall:"
         self.exp = range(1,6)
-        print >>sys.stderr,"test: adding tasks"
+        print >>sys.stderr,time.asctime(),'-', "test: adding tasks"
         self.tp.queueTask(self.do_task1)
         self.tp.queueTask(self.do_task2)
         self.tp.queueTask(self.do_task3)
         self.tp.queueTask(self.do_task4)
         self.tp.queueTask(self.do_task5)
-        print >>sys.stderr,"test: join all"
+        print >>sys.stderr,time.asctime(),'-', "test: join all"
         self.tp.joinAll()
-        print >>sys.stderr,"test: adding post tasks, shouldn't get run"
+        print >>sys.stderr,time.asctime(),'-', "test: adding post tasks, shouldn't get run"
         self.tp.queueTask(self.do_task6)
         self.tp.queueTask(self.do_task7)
         self.tp.queueTask(self.do_task8)
@@ -89,18 +90,18 @@ class TestThreadPool(unittest.TestCase):
         self.tp.queueTask(self.do_task10)
 
     def test_setThreadCountPlus10(self):
-        print >>sys.stderr,"test_setThreadCountPlus10:"
-        print >>sys.stderr,"test: pre threads",self.tp.getThreadCount()
+        print >>sys.stderr,time.asctime(),'-', "test_setThreadCountPlus10:"
+        print >>sys.stderr,time.asctime(),'-', "test: pre threads",self.tp.getThreadCount()
         self.tp.setThreadCount(20)
-        print >>sys.stderr,"test: post threads",self.tp.getThreadCount()
+        print >>sys.stderr,time.asctime(),'-', "test: post threads",self.tp.getThreadCount()
         time.sleep(1)
         self.test_joinAll()
 
     def test_setThreadCountMinus8(self):
-        print >>sys.stderr,"test_setThreadCountMinus8:"
-        print >>sys.stderr,"test: pre threads",self.tp.getThreadCount()
+        print >>sys.stderr,time.asctime(),'-', "test_setThreadCountMinus8:"
+        print >>sys.stderr,time.asctime(),'-', "test: pre threads",self.tp.getThreadCount()
         self.tp.setThreadCount(2)
-        print >>sys.stderr,"test: post threads",self.tp.getThreadCount()
+        print >>sys.stderr,time.asctime(),'-', "test: post threads",self.tp.getThreadCount()
         time.sleep(1)
         self.test_joinAll()
 

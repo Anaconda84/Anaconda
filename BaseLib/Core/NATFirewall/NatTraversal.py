@@ -1,3 +1,4 @@
+import time 
 from time import strftime
 from traceback import print_exc
 import socket
@@ -8,7 +9,7 @@ DEBUG = False
 def coordinateHolePunching(peer1, peer2, holePunchingAddr):
 
     if DEBUG:
-        print >> sys.stderr, "NatTraversal: coordinateHolePunching at", holePunchingAddr
+        print >> sys.stderr, time.asctime(),'-', "NatTraversal: coordinateHolePunching at", holePunchingAddr
 
     # Set up the sockets
     try :
@@ -22,12 +23,12 @@ def coordinateHolePunching(peer1, peer2, holePunchingAddr):
             udpsock.close()
 
         if DEBUG:
-            print >> sys.stderr, "NatTraversal: Could not open socket: %s" % (strerror)
+            print >> sys.stderr, time.asctime(),'-', "NatTraversal: Could not open socket: %s" % (strerror)
 
         return
 
     if DEBUG:
-        print >> sys.stderr, "NatTraversal: waiting for connection..."
+        print >> sys.stderr, time.asctime(),'-', "NatTraversal: waiting for connection..."
 
     # Receive messages
     peeraddr2 = None
@@ -39,7 +40,7 @@ def coordinateHolePunching(peer1, peer2, holePunchingAddr):
                 continue
             else:
                 if DEBUG:
-                    print >> sys.stderr, "NatTraversal:", strftime("%Y/%m/%d %H:%M:%S"), "...connected from: ", peeraddr1
+                    print >> sys.stderr, time.asctime(),'-', "NatTraversal:", strftime("%Y/%m/%d %H:%M:%S"), "...connected from: ", peeraddr1
                 if peeraddr2 == None:
                     peeraddr2 = peeraddr1
                 elif peeraddr2 != peeraddr1:        
@@ -53,7 +54,7 @@ def coordinateHolePunching(peer1, peer2, holePunchingAddr):
 
         except socket.timeout, error:
             if DEBUG:
-                print >> sys.stderr, "NatTraversal: timeout with peers", error
+                print >> sys.stderr, time.asctime(),'-', "NatTraversal: timeout with peers", error
             udpsock.close()
             break
 
@@ -71,7 +72,7 @@ def tryConnect(coordinator):
     udpsock.sendto("ping",coordinator)
     udpsock.sendto("ping",coordinator)
     if DEBUG:
-        print >> sys.stderr, "NatTraversal: sending ping to ", coordinator
+        print >> sys.stderr, time.asctime(),'-', "NatTraversal: sending ping to ", coordinator
 
     # Wait for response from the coordinator
 
@@ -82,23 +83,23 @@ def tryConnect(coordinator):
             data, addr = udpsock.recvfrom(1024)
         except socket.timeout, (strerror):
             if DEBUG:
-                print >> sys.stderr, "NatTraversal: timeout with coordinator"
+                print >> sys.stderr, time.asctime(),'-', "NatTraversal: timeout with coordinator"
             return "ERR"
 
         if addr == coordinator:
             if DEBUG:
-                print >> sys.stderr, "NatTraversal: received", data, "from coordinator"
+                print >> sys.stderr, time.asctime(),'-', "NatTraversal: received", data, "from coordinator"
             break
 
         if DEBUG:
-            print >> sys.stderr, "NatTraversal: received", data, "from", addr
+            print >> sys.stderr, time.asctime(),'-', "NatTraversal: received", data, "from", addr
             
     #success = False
     #try:
     #    host, port = data.split(":")
     #except:
     #    print_exc()
-    #    print >> sys.stderr, "NatCheckMsgHandler: error in received data:", data
+    #    print >> sys.stderr, time.asctime(),'-', "NatCheckMsgHandler: error in received data:", data
     #    return success
     # peer = (host, int(port))
     # for i in range(3):
@@ -111,8 +112,8 @@ def tryConnect(coordinator):
 
     #     except socket.timeout, (strerror):
     #         if DEBUG:
-    #             print >> sys.stderr, "NatTraversal: first timeout", strerror
-    #             print >> sys.stderr, "NatTraversal: resend"
+    #             print >> sys.stderr, time.asctime(),'-', "NatTraversal: first timeout", strerror
+    #             print >> sys.stderr, time.asctime(),'-', "NatTraversal: resend"
 
     #     else:
     #         success = True
@@ -122,7 +123,7 @@ def tryConnect(coordinator):
         host, port = data.split(":")
     except:
         print_exc()
-        print >> sys.stderr, "NatCheckMsgHandler: error in received data:", data
+        print >> sys.stderr, time.asctime(),'-', "NatCheckMsgHandler: error in received data:", data
         return "ERR"
 
     peer = (host, int(port))
@@ -139,8 +140,8 @@ def tryConnect(coordinator):
             data, addr = udpsock.recvfrom(1024)
         except socket.timeout, (strerror):
             if DEBUG:
-                print >> sys.stderr, "NatTraversal: first timeout", strerror
-                print >> sys.stderr, "NatTraversal: resend"
+                print >> sys.stderr, time.asctime(),'-', "NatTraversal: first timeout", strerror
+                print >> sys.stderr, time.asctime(),'-', "NatTraversal: resend"
 
             udpsock.sendto("hello", peer)
             udpsock.sendto("hello", peer)
@@ -150,7 +151,7 @@ def tryConnect(coordinator):
                 data, addr = udpsock.recvfrom(1024)
             except socket.timeout, (strerror):
                 if DEBUG:
-                    print >> sys.stderr, "NatTraversal: second timeout", strerror
+                    print >> sys.stderr, time.asctime(),'-', "NatTraversal: second timeout", strerror
 
                 return "NO"
 
@@ -171,7 +172,7 @@ def tryConnect(coordinator):
     udpsock.close()
         
     if DEBUG:
-        print >> sys.stderr, "NatTraversal: message from", addr, "is", data
+        print >> sys.stderr, time.asctime(),'-', "NatTraversal: message from", addr, "is", data
 
     return "YES"
 

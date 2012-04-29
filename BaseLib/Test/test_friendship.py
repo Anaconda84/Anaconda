@@ -1,3 +1,4 @@
+import time 
 # Written by Arno Bakker
 # see LICENSE.txt for license information
 
@@ -42,7 +43,7 @@ class TestFriendship(TestAsServer):
     
     def setUp(self):
         """ override TestAsServer """
-        print >>sys.stderr,"test: *** setup friendship"
+        print >>sys.stderr,time.asctime(),'-', "test: *** setup friendship"
         TestAsServer.setUp(self)
 
         self.usercallbackexpected = True
@@ -75,13 +76,13 @@ class TestFriendship(TestAsServer):
         self.destss.bind(('', self.destport))
         self.destss.listen(1)
 
-        print >>sys.stderr,"test: my   permid",show_permid_short(self.mypermid)
-        print >>sys.stderr,"test: his  permid",show_permid_short(self.hispermid)
-        print >>sys.stderr,"test: dest permid",show_permid_short(self.destpermid)
+        print >>sys.stderr,time.asctime(),'-', "test: my   permid",show_permid_short(self.mypermid)
+        print >>sys.stderr,time.asctime(),'-', "test: his  permid",show_permid_short(self.hispermid)
+        print >>sys.stderr,time.asctime(),'-', "test: dest permid",show_permid_short(self.destpermid)
 
     def tearDown(self):
         """ override TestAsServer """
-        print >>sys.stderr,"test: *** tear down friendship"
+        print >>sys.stderr,time.asctime(),'-', "test: *** tear down friendship"
         TestAsServer.tearDown(self)
         self.assert_((not self.usercallbackexpected) or (self.usercallbackreceived))
         time.sleep(10)
@@ -102,7 +103,7 @@ class TestFriendship(TestAsServer):
         self.assert_(fs == FS_MUTUAL)
 
     def approve_usercallback(self,permid,params):
-        print >>sys.stderr,"test: Got user callback"
+        print >>sys.stderr,time.asctime(),'-', "test: Got user callback"
         self.usercallbackreceived = True
         self.session.send_friendship_message(permid,RESP,approved=True)
 
@@ -119,7 +120,7 @@ class TestFriendship(TestAsServer):
         self.assert_(fs == FS_I_DENIED)
 
     def deny_usercallback(self,permid,params):
-        print >>sys.stderr,"test: Got user callback"
+        print >>sys.stderr,time.asctime(),'-', "test: Got user callback"
         self.usercallbackreceived = True
         self.session.send_friendship_message(permid,RESP,approved=False)
 
@@ -140,7 +141,7 @@ class TestFriendship(TestAsServer):
 
         frienddb = self.session.open_dbhandler(NTFY_FRIENDS)
         frienddb.setFriendState(self.mypermid,FS_I_INVITED)
-        print >>sys.stderr,"test: already invited, setting",show_permid_short(self.mypermid)
+        print >>sys.stderr,time.asctime(),'-', "test: already invited, setting",show_permid_short(self.mypermid)
 
         self.usercallbackexpected = False
         self.subtest_good_friendship_req(REQ,mresp=1)
@@ -167,7 +168,7 @@ class TestFriendship(TestAsServer):
 
         frienddb = self.session.open_dbhandler(NTFY_FRIENDS)
         frienddb.setFriendState(self.mypermid,FS_MUTUAL)
-        print >>sys.stderr,"test: already invited, setting",show_permid_short(self.mypermid)
+        print >>sys.stderr,time.asctime(),'-', "test: already invited, setting",show_permid_short(self.mypermid)
 
         self.usercallbackexpected = False
         self.subtest_good_friendship_req(RESP,mresp=1,expectreply=False)
@@ -188,11 +189,11 @@ class TestFriendship(TestAsServer):
         self.subtest_good_friendship_req(REQ,mresp=1,socover=True)
         
     def approve_check_icon_usercallback(self,permid,params):
-        print >>sys.stderr,"test: Got user callback"
+        print >>sys.stderr,time.asctime(),'-', "test: Got user callback"
         
         peerdb = self.session.open_dbhandler(NTFY_PEERS)
         img = peerdb.getPeerIcon(self.mypermid)
-        print >>sys.stderr,"test: My img is",`img`
+        print >>sys.stderr,time.asctime(),'-', "test: My img is",`img`
         self.assert_(img[0] is not None)
         
         self.usercallbackreceived = True
@@ -200,7 +201,7 @@ class TestFriendship(TestAsServer):
 
 
     def subtest_good_friendship_req(self,mtype,fwd=None,mresp=None,socover=False,expectreply=True):
-        print >>sys.stderr,"test: good FRIENDSHIP",mtype,fwd
+        print >>sys.stderr,time.asctime(),'-', "test: good FRIENDSHIP",mtype,fwd
         s = OLConnection(self.my_keypair,'localhost',self.hisport)
         
         if socover:
@@ -216,7 +217,7 @@ class TestFriendship(TestAsServer):
             while True:
                 resp = s.recv()
                 self.assert_(len(resp) > 0)
-                print >>sys.stderr,"test: good FRIENDSHIP: Got reply",getMessageName(resp[0])
+                print >>sys.stderr,time.asctime(),'-', "test: good FRIENDSHIP: Got reply",getMessageName(resp[0])
                 if resp[0] == FRIENDSHIP:
                     break
                 elif resp[0] == SOCIAL_OVERLAP:
@@ -225,10 +226,10 @@ class TestFriendship(TestAsServer):
                     self.assert_(False)
         except socket.timeout:
             if expectreply:
-                print >> sys.stderr,"test: Timeout, bad, peer didn't reply with FRIENDSHIP message"
+                print >> sys.stderr,time.asctime(),'-', "test: Timeout, bad, peer didn't reply with FRIENDSHIP message"
                 self.assert_(False)
             else:
-                print >> sys.stderr,"test: Timeout, good, wasn't expecting a reply"
+                print >> sys.stderr,time.asctime(),'-', "test: Timeout, good, wasn't expecting a reply"
                 self.assert_(True)
 
         if expectreply:
@@ -272,7 +273,7 @@ class TestFriendship(TestAsServer):
         self.subtest_good_friendship_fwd_dest3rdp(FWD,fwd=RESP,mresp=1)
 
     def subtest_good_friendship_fwd_dest3rdp(self,mtype,fwd=None,mresp=None):
-        print >>sys.stderr,"test: good FRIENDSHIP dest = 3rd party",mtype,fwd
+        print >>sys.stderr,time.asctime(),'-', "test: good FRIENDSHIP dest = 3rd party",mtype,fwd
         s = OLConnection(self.my_keypair,'localhost',self.hisport)
         msg = self.create_good_friendship_payload(mtype,fwd,mresp,source=self.mypermid,dest=self.destpermid)
         s.send(msg)
@@ -285,7 +286,7 @@ class TestFriendship(TestAsServer):
             while True:
                 resp = s.recv()
                 self.assert_(len(resp) > 0)
-                print >>sys.stderr,"test: good FRIENDSHIP fwd: Dest got reply",getMessageName(resp[0])
+                print >>sys.stderr,time.asctime(),'-', "test: good FRIENDSHIP fwd: Dest got reply",getMessageName(resp[0])
                 if resp[0] == FRIENDSHIP:
                     break
                 elif resp[0] == SOCIAL_OVERLAP:
@@ -293,7 +294,7 @@ class TestFriendship(TestAsServer):
                 else:
                     self.assert_(False)
         except socket.timeout:
-            print >> sys.stderr,"test: Timeout, bad, peer didn't connect to FWD dest"
+            print >> sys.stderr,time.asctime(),'-', "test: Timeout, bad, peer didn't connect to FWD dest"
             self.assert_(False)
 
         self.check_friendship(resp[1:],FWD,fwd,mresp,source=self.mypermid,dest=self.destpermid)
@@ -319,7 +320,7 @@ class TestFriendship(TestAsServer):
 
 
     def subtest_good_friendship_fwd_req_desthim(self,mtype,fwd=None,mresp=None):
-        print >>sys.stderr,"test: good FRIENDSHIP dest = him",mtype,fwd
+        print >>sys.stderr,time.asctime(),'-', "test: good FRIENDSHIP dest = him",mtype,fwd
         s = OLConnection(self.my_keypair,'localhost',self.hisport)
         msg = self.create_good_friendship_payload(mtype,fwd,mresp,source=self.destpermid,dest=self.hispermid)
         s.send(msg)
@@ -332,7 +333,7 @@ class TestFriendship(TestAsServer):
             while True:
                 resp = s.recv()
                 self.assert_(len(resp) > 0)
-                print >>sys.stderr,"test: good FRIENDSHIP fwd: Dest got reply",getMessageName(resp[0])
+                print >>sys.stderr,time.asctime(),'-', "test: good FRIENDSHIP fwd: Dest got reply",getMessageName(resp[0])
                 if resp[0] == FRIENDSHIP:
                     break
                 elif resp[0] == SOCIAL_OVERLAP:
@@ -340,7 +341,7 @@ class TestFriendship(TestAsServer):
                 else:
                     self.assert_(False)
         except socket.timeout:
-            print >> sys.stderr,"test: Timeout, bad, peer didn't connect to FWD dest"
+            print >> sys.stderr,time.asctime(),'-', "test: Timeout, bad, peer didn't connect to FWD dest"
             self.assert_(False)
 
         self.check_friendship(resp[1:],RESP,fwd,mresp)
@@ -371,12 +372,12 @@ class TestFriendship(TestAsServer):
 
         frienddb = self.session.open_dbhandler(NTFY_FRIENDS)
         fs = frienddb.getFriendState(self.destpermid)
-        print >>sys.stderr,"FS AFTER IS",fs
+        print >>sys.stderr,time.asctime(),'-', "FS AFTER IS",fs
         self.assert_(fs == FS_HE_INVITED)
 
 
     def subtest_good_friendship_fwd_resp_desthim(self,mtype,fwd=None,mresp=None):
-        print >>sys.stderr,"test: good FRIENDSHIP dest = him",mtype,fwd
+        print >>sys.stderr,time.asctime(),'-', "test: good FRIENDSHIP dest = him",mtype,fwd
         s = OLConnection(self.my_keypair,'localhost',self.hisport)
         msg = self.create_good_friendship_payload(mtype,fwd,mresp,source=self.destpermid,dest=self.hispermid)
         s.send(msg)
@@ -389,7 +390,7 @@ class TestFriendship(TestAsServer):
             while True:
                 resp = s.recv()
                 self.assert_(len(resp) > 0)
-                print >>sys.stderr,"test: good FRIENDSHIP fwd: Dest got reply",getMessageName(resp[0])
+                print >>sys.stderr,time.asctime(),'-', "test: good FRIENDSHIP fwd: Dest got reply",getMessageName(resp[0])
                 if resp[0] == FRIENDSHIP:
                     self.assert_(False)
                     break
@@ -398,7 +399,7 @@ class TestFriendship(TestAsServer):
                 else:
                     self.assert_(False)
         except socket.timeout:
-            print >> sys.stderr,"test: Timeout, good"
+            print >> sys.stderr,time.asctime(),'-', "test: Timeout, good"
             self.assert_(True)
 
 
@@ -434,12 +435,12 @@ class TestFriendship(TestAsServer):
         self.config_db()
 
         # Send request to offline peer
-        print >>sys.stderr,"test: SESSION send msg"
+        print >>sys.stderr,time.asctime(),'-', "test: SESSION send msg"
         self.session.send_friendship_message(self.mypermid,REQ)
         time.sleep(1) # make sure message is saved
 
         # Shutdown session, to provoke forwarding
-        print >>sys.stderr,"test: SESSION Shutdown"
+        print >>sys.stderr,time.asctime(),'-', "test: SESSION Shutdown"
         self.session.shutdown()
         
         # See if he forwards to us
@@ -472,7 +473,7 @@ class TestFriendship(TestAsServer):
         
 
     def subtest_good_friendship_fwd_fromhim(self,mtype,fwd=None,mresp=None):
-        print >>sys.stderr,"test: Expecting good FRIENDSHIP fwd from him",mtype,fwd
+        print >>sys.stderr,time.asctime(),'-', "test: Expecting good FRIENDSHIP fwd from him",mtype,fwd
 
         # He should try to forward the request to us, his friend
         try:
@@ -482,7 +483,7 @@ class TestFriendship(TestAsServer):
             while True:
                 resp = s.recv()
                 self.assert_(len(resp) > 0)
-                print >>sys.stderr,"test: good FRIENDSHIP fwd: Dest got reply",getMessageName(resp[0])
+                print >>sys.stderr,time.asctime(),'-', "test: good FRIENDSHIP fwd: Dest got reply",getMessageName(resp[0])
                 if resp[0] == FRIENDSHIP:
                     break
                 elif resp[0] == SOCIAL_OVERLAP:
@@ -490,7 +491,7 @@ class TestFriendship(TestAsServer):
                 else:
                     self.assert_(False)
         except socket.timeout:
-            print >> sys.stderr,"test: Timeout, bad, peer didn't connect to FWD dest"
+            print >> sys.stderr,time.asctime(),'-', "test: Timeout, bad, peer didn't connect to FWD dest"
             self.assert_(False)
 
         self.check_friendship(resp[1:],mtype,fwd,mresp,source=self.hispermid,dest=self.mypermid)
@@ -527,7 +528,7 @@ class TestFriendship(TestAsServer):
 
 
     def subtest_good_friendship_req_fromhim(self,mtype,fwd=None,mresp=None):
-        print >>sys.stderr,"test: good FRIENDSHIP req from him",mtype,fwd
+        print >>sys.stderr,time.asctime(),'-', "test: good FRIENDSHIP req from him",mtype,fwd
 
         # He should try to forward the request to us, his friend
         try:
@@ -537,17 +538,17 @@ class TestFriendship(TestAsServer):
             while True:
                 resp = s.recv()
                 self.assert_(len(resp) > 0)
-                print >>sys.stderr,"test: good FRIENDSHIP fwd: Dest got reply",getMessageName(resp[0])
+                print >>sys.stderr,time.asctime(),'-', "test: good FRIENDSHIP fwd: Dest got reply",getMessageName(resp[0])
                 if resp[0] == FRIENDSHIP:
                     break
                 elif resp[0] == SOCIAL_OVERLAP:
                     d = bdecode(resp[1:])
-                    print >>sys.stderr,"test: SOCIAL OVERLAP",`d`
+                    print >>sys.stderr,time.asctime(),'-', "test: SOCIAL OVERLAP",`d`
                     pass
                 else:
                     self.assert_(False)
         except socket.timeout:
-            print >> sys.stderr,"test: Timeout, bad, peer didn't connect to FWD dest"
+            print >> sys.stderr,time.asctime(),'-', "test: Timeout, bad, peer didn't connect to FWD dest"
             self.assert_(False)
 
         self.check_friendship(resp[1:],mtype,fwd,mresp,source=self.hispermid,dest=self.mypermid)
@@ -613,7 +614,7 @@ class TestFriendship(TestAsServer):
         else:
             d = data
         
-        print >>sys.stderr,"test: Got FRIENDSHIP",`d`,type(d)
+        print >>sys.stderr,time.asctime(),'-', "test: Got FRIENDSHIP",`d`,type(d)
         
         self.assert_(type(d) == DictType)
         self.assert_('msg type' in d)
@@ -624,7 +625,7 @@ class TestFriendship(TestAsServer):
             self.assert_('response' in d)
             self.assert_(type(d['response']) == IntType)
             
-            print >>sys.stderr,"test: COMPARE",`d['response']`,`resp`
+            print >>sys.stderr,time.asctime(),'-', "test: COMPARE",`d['response']`,`resp`
             
             self.assert_(d['response'] == resp)
         elif mtype == FWD:
@@ -708,7 +709,7 @@ class TestFriendship(TestAsServer):
             self.make_bad_source,
             self.make_bad_dest]
         for method in methods:
-            print >> sys.stderr,"\ntest: ",method,
+            print >> sys.stderr,time.asctime(),'-', "\ntest: ",method,
             self._test_bad(method)
         
 
@@ -736,7 +737,7 @@ class TestFriendship(TestAsServer):
         return d
 
     def _test_bad(self,gen_friendship_func):
-        print >>sys.stderr,"test: bad friendship",gen_friendship_func
+        print >>sys.stderr,time.asctime(),'-', "test: bad friendship",gen_friendship_func
         s = OLConnection(self.my_keypair,'localhost',self.hisport)
         msg = gen_friendship_func()
         s.send(msg)

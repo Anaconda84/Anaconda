@@ -1,3 +1,4 @@
+import time 
 # Written by ABC authors and Arno Bakker
 # see LICENSE.txt for license information
 
@@ -33,15 +34,15 @@ class Win32RegChecker:
         try:
             # test that shell/open association with ABC exist
             if DEBUG:
-                print >>sys.stderr,"win32regcheck: Opening",key_name,value_name
+                print >>sys.stderr,time.asctime(),'-', "win32regcheck: Opening",key_name,value_name
             full_key = _winreg.OpenKey(hkey, key_name, 0, _winreg.KEY_READ)
             
             if DEBUG:
-                print >>sys.stderr,"win32regcheck: Open returned",full_key
+                print >>sys.stderr,time.asctime(),'-', "win32regcheck: Open returned",full_key
             
             value_data, value_type = _winreg.QueryValueEx(full_key, value_name)
             if DEBUG:
-                print >>sys.stderr,"win32regcheck: Read",value_data,value_type
+                print >>sys.stderr,time.asctime(),'-', "win32regcheck: Read",value_data,value_type
             _winreg.CloseKey(full_key)
                     
             return value_data
@@ -60,22 +61,22 @@ class Win32RegChecker:
         try:
             toclose = []
             keyparts = key_name.split('\\')
-            print >>sys.stderr,"win32regcheck: keyparts",keyparts
+            print >>sys.stderr,time.asctime(),'-', "win32regcheck: keyparts",keyparts
             for keypart in keyparts:
                 if keypart == '':
                     continue
                 if DEBUG:
-                    print >>sys.stderr,"win32regcheck: Opening",keypart
+                    print >>sys.stderr,time.asctime(),'-', "win32regcheck: Opening",keypart
                 full_key = _winreg.OpenKey(lasthkey, keypart, 0, _winreg.KEY_READ)
                 lasthkey = full_key
                 toclose.append(full_key)
             
             if DEBUG:
-                print >>sys.stderr,"win32regcheck: Open returned",full_key
+                print >>sys.stderr,time.asctime(),'-', "win32regcheck: Open returned",full_key
             
             value_data, value_type = _winreg.QueryValueEx(full_key, value_name)
             if DEBUG:
-                print >>sys.stderr,"win32regcheck: Read",value_data,value_type
+                print >>sys.stderr,time.asctime(),'-', "win32regcheck: Read",value_data,value_type
             for hkey in toclose:
                 _winreg.CloseKey(hkey)
                     

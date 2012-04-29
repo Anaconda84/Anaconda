@@ -1,3 +1,4 @@
+import time 
 # Written by Njaal Borch
 # see LICENSE.txt for license information
 
@@ -388,7 +389,7 @@ class ClosedSwarm:
         if self.poa: # Allow nodes to support CS but not have a POA (e.g. if they are seeding)
             if self.poa.get_torrent_pub_key() not in self.torrent_pubkeys:
                 import sys
-                print >> sys.stderr, "Bad POA for this torrent (wrong torrent key!)"
+                print >> sys.stderr, time.asctime(),'-', "Bad POA for this torrent (wrong torrent key!)"
                 self.poa = None
                 
     def is_remote_node_authorized(self):
@@ -524,8 +525,8 @@ class ClosedSwarm:
         try:
             pub = pub_key_from_der(poa.node_pub_key)
         except:
-            print >> sys.stderr, "The node_pub_key is no good"
-            print >> sys.stderr, poa.node_pub_key
+            print >> sys.stderr, time.asctime(),'-', "The node_pub_key is no good"
+            print >> sys.stderr, time.asctime(),'-', poa.node_pub_key
             raise Exception("Node's public key is no good...")
             
         if not pub.verify_dsa_asn1(digest, sig):
@@ -569,7 +570,7 @@ class ClosedSwarm:
 
         if lst[0] != CS_POA_EXCHANGE_A:
             import sys
-            print >> sys.stderr, "Not CS_POA_EXCHANGE_A"
+            print >> sys.stderr, time.asctime(),'-', "Not CS_POA_EXCHANGE_A"
             raise BadMessageException("Expected POA EXCHANGE")
 
         try:
@@ -579,7 +580,7 @@ class ClosedSwarm:
         except Exception, e:
             self.remote_node_authorized = False
             import sys
-            print >> sys.stderr, "POA could not be validated:",e
+            print >> sys.stderr, time.asctime(),'-', "POA could not be validated:",e
             #raise e // The remote node failed, but we can still make it!
 
         if i_am_seeding:

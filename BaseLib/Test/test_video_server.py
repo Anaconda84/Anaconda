@@ -1,3 +1,4 @@
+import time 
 # Written by Arno Bakker
 # see LICENSE.txt for license information
 
@@ -33,17 +34,17 @@ class TestVideoHTTPServer(unittest.TestCase):
          
     def tearDown(self):
         """ unittest test tear down code """
-        print >>sys.stderr,"test: Tear down, sleeping 10 s"
+        print >>sys.stderr,time.asctime(),'-', "test: Tear down, sleeping 10 s"
         time.sleep(10)
     
     def videoservthread_error_callback(self,e,url):
         """ Called by HTTP serving thread """
-        print >>sys.stderr,"test: ERROR",e,url
+        print >>sys.stderr,time.asctime(),'-', "test: ERROR",e,url
         self.assert_(False)
         
     def videoservthread_set_status_callback(self,status):
         """ Called by HTTP serving thread """
-        print >>sys.stderr,"test: STATUS",status
+        print >>sys.stderr,time.asctime(),'-', "test: STATUS",status
     
 
     #
@@ -83,7 +84,7 @@ class TestVideoHTTPServer(unittest.TestCase):
         return head
 
     def range_test(self,firstbyte,lastbyte,sourcesize,setset=False):
-        print >>sys.stderr,"test: range_test:",firstbyte,lastbyte,sourcesize,"setset",setset
+        print >>sys.stderr,time.asctime(),'-', "test: range_test:",firstbyte,lastbyte,sourcesize,"setset",setset
         self.register_file_stream()
         
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -117,7 +118,7 @@ class TestVideoHTTPServer(unittest.TestCase):
         # the amount of bytes actually requested. (Content-length)
         expsize = explastbyte - expfirstbyte + 1
 
-        print >>sys.stderr,"test: Expecting first",expfirstbyte,"last",explastbyte,"size",sourcesize
+        print >>sys.stderr,time.asctime(),'-', "test: Expecting first",expfirstbyte,"last",explastbyte,"size",sourcesize
         s.send(head)
         
         # Parse header
@@ -125,10 +126,10 @@ class TestVideoHTTPServer(unittest.TestCase):
         while True:
             line = self.readline(s)
             
-            print >>sys.stderr,"test: Got line",`line`
+            print >>sys.stderr,time.asctime(),'-', "test: Got line",`line`
             
             if len(line)==0:
-                print >>sys.stderr,"test: server closed conn"
+                print >>sys.stderr,time.asctime(),'-', "test: server closed conn"
                 self.assert_(False)
                 return
             
@@ -158,7 +159,7 @@ class TestVideoHTTPServer(unittest.TestCase):
         
         data = s.recv(expsize)
         if len(data) == 0:
-            print >>sys.stderr,"test: server closed conn2"
+            print >>sys.stderr,time.asctime(),'-', "test: server closed conn2"
             self.assert_(False)
             return
         else:
@@ -178,7 +179,7 @@ class TestVideoHTTPServer(unittest.TestCase):
                 self.assert_(len(data) == 0)
         
             except socket.timeout:
-                print >> sys.stderr,"test: Timeout, video server didn't respond with requested bytes, possibly bug in Python impl of HTTP"
+                print >> sys.stderr,time.asctime(),'-', "test: Timeout, video server didn't respond with requested bytes, possibly bug in Python impl of HTTP"
                 print_exc()
 
     def readline(self,s):

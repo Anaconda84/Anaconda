@@ -1,3 +1,4 @@
+import time 
 # Written by Jie Yang
 # see LICENSE.txt for license information
 
@@ -62,7 +63,7 @@ def init(config, db_exception_handler = None):
         sqlite_db_path = ':memory:'
     else:   
         sqlite_db_path = os.path.join(config_dir, DB_DIR_NAME, DB_FILE_NAME)
-    print >>sys.stderr,"cachedb: init: SQL FILE",sqlite_db_path        
+    print >>sys.stderr,time.asctime(),'-', "cachedb: init: SQL FILE",sqlite_db_path        
 
     icon_dir = os.path.abspath(config['peer_icon_path'])
 
@@ -101,22 +102,22 @@ def print_exc_plus():
         tb = tb.tb_next
 
     print_exc()
-    print >> sys.stderr, "Locals by frame, innermost last"
+    print >> sys.stderr, time.asctime(),'-', "Locals by frame, innermost last"
 
     for frame in stack:
         print >> sys.stderr
-        print >> sys.stderr, "Frame %s in %s at line %s" % (frame.f_code.co_name,
+        print >> sys.stderr, time.asctime(),'-', "Frame %s in %s at line %s" % (frame.f_code.co_name,
                                              frame.f_code.co_filename,
                                              frame.f_lineno)
         for key, value in frame.f_locals.items():
-            print >> sys.stderr, "\t%20s = " % key,
+            print >> sys.stderr, time.asctime(),'-', "\t%20s = " % key,
             #We have to be careful not to cause a new error in our error
             #printer! Calling str() on an unknown object could cause an
             #error we don't want.
             try:                   
-                print >> sys.stderr, value
+                print >> sys.stderr, time.asctime(),'-', value
             except:
-                print >> sys.stderr, "<ERROR WHILE PRINTING VALUE>"
+                print >> sys.stderr, time.asctime(),'-', "<ERROR WHILE PRINTING VALUE>"
 
 class safe_dict(dict): 
     def __init__(self, *args, **kw): 
@@ -211,7 +212,7 @@ class SQLiteCacheDBBase:
         thread_name = threading.currentThread().getName()
         curs = self.cursor_table
         cur = curs.get(thread_name, None)    # return [cur, cur, lib] or None
-        #print >> sys.stderr, '-------------- getCursor::', len(curs), time(), curs.keys()
+        #print >> sys.stderr, time.asctime(),'-', '-------------- getCursor::', len(curs), time(), curs.keys()
         if cur is None and create:
             self.openDB(self.class_variables['db_path'], self.class_variables['busytimeout'])    # create a new db obj for this thread
             cur = curs.get(thread_name)
@@ -228,7 +229,7 @@ class SQLiteCacheDBBase:
 
         # already opened a db in this thread, reuse it
         thread_name = threading.currentThread().getName()
-        #print >>sys.stderr,"sqlcachedb: openDB",dbfile_path,thread_name
+        #print >>sys.stderr,time.asctime(),'-', "sqlcachedb: openDB",dbfile_path,thread_name
         if thread_name in self.cursor_table:
             #assert dbfile_path == None or self.class_variables['db_path'] == dbfile_path
             return self.cursor_table[thread_name]
@@ -360,7 +361,7 @@ class SQLiteCacheDBBase:
         except Exception, exception:
             if isinstance(exception, Warning):
                 # user friendly warning to log the creation of a new database
-                print >>sys.stderr, exception
+                print >>sys.stderr, time.asctime(),'-', exception
 
             else:
                 # user unfriendly exception message because something went wrong
@@ -427,7 +428,7 @@ class SQLiteCacheDBBase:
 
         if SHOW_ALL_EXECUTE or self.show_execute:
             thread_name = threading.currentThread().getName()
-            print >> sys.stderr, '===', thread_name, '===\n', sql, '\n-----\n', args, '\n======\n'
+            print >> sys.stderr, time.asctime(),'-', '===', thread_name, '===\n', sql, '\n-----\n', args, '\n======\n'
         try:
             if args is None:
                 return cur.execute(sql)
@@ -437,9 +438,9 @@ class SQLiteCacheDBBase:
             if True:
                 print_exc()
                 print_stack()
-                print >> sys.stderr, "cachedb: execute error:", Exception, msg 
+                print >> sys.stderr, time.asctime(),'-', "cachedb: execute error:", Exception, msg 
                 thread_name = threading.currentThread().getName()
-                print >> sys.stderr, '===', thread_name, '===\nSQL Type:', type(sql), '\n-----\n', sql, '\n-----\n', args, '\n======\n'
+                print >> sys.stderr, time.asctime(),'-', '===', thread_name, '===\nSQL Type:', type(sql), '\n-----\n', sql, '\n-----\n', args, '\n======\n'
                 #return None
                 # ARNODB: this is incorrect, it should reraise the exception
                 # such that _transaction can rollback or recommit. 
@@ -525,7 +526,7 @@ class SQLiteCacheDBBase:
         is not honoured for some reason. After the initial errors,
         they no longer occur.
         """
-        print >>sys.stderr,"sqlcachedb: commit_retry: after",str(e),repr(sql)
+        print >>sys.stderr,time.asctime(),'-', "sqlcachedb: commit_retry: after",str(e),repr(sql)
         
         if str(e).startswith("BusyError"):
             try:
@@ -554,7 +555,7 @@ class SQLiteCacheDBBase:
             # what the error is when an attempt is made to roll back
             # an automatically rolled back transaction.
             m = "cachedb: ROLLBACK ERROR "+threading.currentThread().getName()+' '+str(e)
-            #print >> sys.stderr, 'SQLite Database', m
+            #print >> sys.stderr, time.asctime(),'-', 'SQLite Database', m
             raise Exception, m
    
         
@@ -677,7 +678,7 @@ class SQLiteCacheDBBase:
         else:
             arg = None
 
-        # print >> sys.stderr, 'SQL: %s %s' % (sql, arg)
+        # print >> sys.stderr, time.asctime(),'-', 'SQL: %s %s' % (sql, arg)
         return self.fetchone(sql,arg)
     
     def getAll(self, table_name, value_name, where=None, group_by=None, having=None, order_by=None, limit=None, offset=None, conj='and', **kw):
@@ -737,7 +738,7 @@ class SQLiteCacheDBBase:
         try:
             return self.fetchall(sql, arg) or []
         except Exception, msg:
-            print >> sys.stderr, "sqldb: Wrong getAll sql statement:", sql
+            print >> sys.stderr, time.asctime(),'-', "sqldb: Wrong getAll sql statement:", sql
             raise Exception, msg
     
     # ----- Tribler DB operations ----
@@ -807,7 +808,7 @@ class SQLiteCacheDBBase:
         assert len(infohash) == INFOHASH_LENGTH, "INFOHASH has invalid length: %d" % len(infohash)
         if infohash in self.infohash_id:
             if check_dup:
-                print >> sys.stderr, 'sqldb: infohash to insert already exists', `infohash`
+                print >> sys.stderr, time.asctime(),'-', 'sqldb: infohash to insert already exists', `infohash`
             return
         
         infohash_str = bin2str(infohash)
@@ -1125,7 +1126,7 @@ on SubtitlesHave(received_ts);
                 if len(records) == 0:
                     # upgradation is complete and hence delete the temp file
                     os.remove(tmpfilename) 
-                    if DEBUG: print >> sys.stderr, "DB Upgradation: temp-file deleted", tmpfilename
+                    if DEBUG: print >> sys.stderr, time.asctime(),'-', "DB Upgradation: temp-file deleted", tmpfilename
                     return 
                     
                 for torrent_id, name, torrent_file_name in records:
@@ -1154,7 +1155,7 @@ on SubtitlesHave(received_ts);
                         values = [(keyword, torrent_id) for keyword in keywords]
                         self.executemany(u"INSERT OR REPLACE INTO InvertedIndex VALUES(?, ?)", values, commit=False)
                         if DEBUG:
-                            print >> sys.stderr, "DB Upgradation: Extending the InvertedIndex table with", len(values), "new keywords for", torrent_name
+                            print >> sys.stderr, time.asctime(),'-', "DB Upgradation: Extending the InvertedIndex table with", len(values), "new keywords for", torrent_name
 
                 # now commit, after parsing the batch of torrents
                 self.commit()
@@ -1171,11 +1172,11 @@ on SubtitlesHave(received_ts);
             # ensure the temp-file is created, if it is not already
             try:
                 open(tmpfilename, "w")
-                if DEBUG: print >> sys.stderr, "DB Upgradation: temp-file successfully created"
+                if DEBUG: print >> sys.stderr, time.asctime(),'-', "DB Upgradation: temp-file successfully created"
             except:
-                if DEBUG: print >> sys.stderr, "DB Upgradation: failed to create temp-file"
+                if DEBUG: print >> sys.stderr, time.asctime(),'-', "DB Upgradation: failed to create temp-file"
             
-            if DEBUG: print >> sys.stderr, "Upgrading DB .. inserting into InvertedIndex"
+            if DEBUG: print >> sys.stderr, time.asctime(),'-', "Upgrading DB .. inserting into InvertedIndex"
             from BaseLib.Utilities.TimedTaskQueue import TimedTaskQueue
             from sets import Set
             from BaseLib.Core.Search.SearchManager import split_into_keywords
@@ -1196,7 +1197,7 @@ class SQLiteCacheDB(SQLiteCacheDBV5):
             try:
                 if cls.__single is None:
                     cls.__single = cls(*args, **kw)
-                    #print >>sys.stderr,"SqliteCacheDB: getInstance: created is",cls,cls.__single
+                    #print >>sys.stderr,time.asctime(),'-', "SqliteCacheDB: getInstance: created is",cls,cls.__single
             finally:
                 cls.lock.release()
         return cls.__single

@@ -1,3 +1,4 @@
+import time 
 # Written by Vincent Heinink and Rameez Rahman
 # see LICENSE.txt for license information
 #
@@ -25,7 +26,7 @@ def validInfohash(infohash):
     r = isinstance(infohash, str) and len(infohash) == 20
     if not r:
         if DEBUG:
-            print >>sys.stderr, "Invalid infohash: type(infohash) ==", str(type(infohash))+\
+            print >>sys.stderr, time.asctime(),'-', "Invalid infohash: type(infohash) ==", str(type(infohash))+\
             ", infohash ==", `infohash`
     return r
 
@@ -34,7 +35,7 @@ def validPermid(permid):
     r = type(permid) == str and len(permid) <= 125
     if not r:
         if DEBUG:
-            print >>sys.stderr, "Invalid permid: type(permid) ==", str(type(permid))+\
+            print >>sys.stderr, time.asctime(),'-', "Invalid permid: type(permid) ==", str(type(permid))+\
             ", permid ==", `permid`
     return r
 
@@ -47,41 +48,41 @@ def validTimestamp(timestamp):
     r = timestamp is not None and type(timestamp) == int and timestamp > 0 and timestamp <= now() + TIMESTAMP_IN_FUTURE
     if not r:
         if DEBUG:
-            print >>sys.stderr, "Invalid timestamp"
+            print >>sys.stderr, time.asctime(),'-', "Invalid timestamp"
     return r
 
 def validVoteCastMsg(data):
     """ Returns True if VoteCastMsg is valid, ie, be of type [(mod_id,vote)] """
     if data is None:
-        print >> sys.stderr, "data is None"
+        print >> sys.stderr, time.asctime(),'-', "data is None"
         return False
      
     if not type(data) == DictType:
-        print >> sys.stderr, "data is not Dictionary"
+        print >> sys.stderr, time.asctime(),'-', "data is not Dictionary"
         return False
     
     for key,value in data.items():
         #if DEBUG: 
-        #    print >>sys.stderr, "validvotecastmsg: ", repr(record)
+        #    print >>sys.stderr, time.asctime(),'-', "validvotecastmsg: ", repr(record)
         if not validPermid(key):
             if DEBUG:
-                print >> sys.stderr, "not valid permid: ", repr(key) 
+                print >> sys.stderr, time.asctime(),'-', "not valid permid: ", repr(key) 
             return False
         if not ('vote' in value and 'time_stamp' in value):
             if DEBUG:
-                print >> sys.stderr, "validVoteCastMsg: key missing, got", value.keys()
+                print >> sys.stderr, time.asctime(),'-', "validVoteCastMsg: key missing, got", value.keys()
             return False
         if not type(value['vote']) == int:
             if DEBUG:
-                print >> sys.stderr, "Vote is not int: ", repr(value['vote']) 
+                print >> sys.stderr, time.asctime(),'-', "Vote is not int: ", repr(value['vote']) 
             return False
         if not(value['vote']==2 or value['vote']==-1):
             if DEBUG:
-                print >> sys.stderr, "Vote is not -1 or 2: ", repr(value['vote']) 
+                print >> sys.stderr, time.asctime(),'-', "Vote is not -1 or 2: ", repr(value['vote']) 
             return False
         if not type(value['time_stamp']) == int:
             if DEBUG:
-                print >> sys.stderr, "time_stamp is not int: ", repr(value['time_stamp']) 
+                print >> sys.stderr, time.asctime(),'-', "time_stamp is not int: ", repr(value['time_stamp']) 
             return False    
     return True
 
@@ -97,7 +98,7 @@ def validChannelCastMsg(channelcast_data):
     for signature, ch in channelcast_data.items():
         if not isinstance(ch,dict):
             if DEBUG:
-                print >>sys.stderr,"validChannelCastMsg: value not dict"
+                print >>sys.stderr,time.asctime(),'-', "validChannelCastMsg: value not dict"
             return False
         
         # 08-04-2010 We accept both 6 and 7 fields to allow
@@ -106,22 +107,22 @@ def validChannelCastMsg(channelcast_data):
         length = len(ch)
         if not 6 <= length <= 7:
             if DEBUG:
-                print >>sys.stderr,"validChannelCastMsg: #keys!=7"
+                print >>sys.stderr,time.asctime(),'-', "validChannelCastMsg: #keys!=7"
             return False
         if not ('publisher_id' in ch and 'publisher_name' in ch and 'infohash' in ch and 'torrenthash' in ch \
                 and 'torrentname' in ch and 'time_stamp' in ch):
             if DEBUG:
-                print >>sys.stderr,"validChannelCastMsg: key missing"
+                print >>sys.stderr,time.asctime(),'-', "validChannelCastMsg: key missing"
             return False
         
         if length == 7:
             if 'rich_metadata' not in ch: #enriched Channelcast
                 if DEBUG:
-                    print >>sys.stderr,"validChannelCastMsg: key missing"
+                    print >>sys.stderr,time.asctime(),'-', "validChannelCastMsg: key missing"
                     return False
             else:
                 if not validMetadataEntry(ch['rich_metadata']):
-                    print >> sys.stderr, "validChannelCastMsg: invalid rich metadata"
+                    print >> sys.stderr, time.asctime(),'-', "validChannelCastMsg: invalid rich metadata"
                     return False
                 
         
@@ -130,14 +131,14 @@ def validChannelCastMsg(channelcast_data):
                 and validInfohash(ch['infohash']) and validInfohash(ch['torrenthash'])
                 and isinstance(ch['torrentname'],str) and validTimestamp(ch['time_stamp'])):
             if DEBUG:
-                print >>sys.stderr,"validChannelCastMsg: something not valid"
+                print >>sys.stderr,time.asctime(),'-', "validChannelCastMsg: something not valid"
             return False
         # now, verify signature
         # Nitin on Feb 5, 2010: Signature is validated using binary forms of permid, infohash, torrenthash fields
         l = (ch['publisher_id'],ch['infohash'], ch['torrenthash'], ch['time_stamp'])
         if not verify_data(bencode(l),ch['publisher_id'],signature):
             if DEBUG:
-                print >>sys.stderr, "validChannelCastMsg: verification failed!"
+                print >>sys.stderr, time.asctime(),'-', "validChannelCastMsg: verification failed!"
             return False
     return True
      

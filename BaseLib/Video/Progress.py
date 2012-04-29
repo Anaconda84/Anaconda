@@ -1,3 +1,4 @@
+import time 
 # Written by Arno Bakker, Jan David Mol
 # see LICENSE.txt for license information
 
@@ -34,7 +35,7 @@ class BufferInfo:
     def complete( self, piece ):
         bucket = int(float(piece) / self.bucketsize)
         
-        #print >>sys.stderr,"BUCKET",bucket,"piece",piece,"bucksize",self.bucketsize
+        #print >>sys.stderr,time.asctime(),'-', "BUCKET",bucket,"piece",piece,"bucksize",self.bucketsize
         # If there is a multi-file torrent that has been partially downloaded before we go
         # to VOD, it can happen that pieces outside the range of the file selected are
         # reported as complete here.
@@ -249,13 +250,13 @@ class ProgressSlider(wx.Panel):
         pos = event.GetPosition()
         if event.ButtonDown():
             if self.onSliderButton(pos):
-                print >> sys.stderr, 'ProgressSlider: Start drag'
+                print >> sys.stderr, time.asctime(),'-', 'ProgressSlider: Start drag'
                 self.dragging = True
             elif self.onSlider(pos): # click somewhere on the slider
                 self.setSliderPosition(pos,True)
         elif event.ButtonUp():
             if self.dragging:
-                print >> sys.stderr, 'ProgressSlider: End drag'
+                print >> sys.stderr, time.asctime(),'-', 'ProgressSlider: End drag'
                 self.setSliderPosition(pos, True)
             self.dragging = False
         elif event.Dragging():
@@ -288,8 +289,8 @@ class ProgressSlider(wx.Panel):
         if ready:
             #theEvent = wx.ScrollEvent(pos=self.progress)
             #self.GetEventHandler().ProcessEvent(theEvent)
-            #print >> sys.stderr, 'Posted event'
-            print >> sys.stderr, 'ProgressSlider: Set progress to : %f' % self.progress
+            #print >> sys.stderr, time.asctime(),'-', 'Posted event'
+            print >> sys.stderr, time.asctime(),'-', 'ProgressSlider: Set progress to : %f' % self.progress
             self.sliderChangedAction()
             
     def sliderChangedAction(self):
@@ -314,7 +315,7 @@ class ProgressSlider(wx.Panel):
             last_buffered_piece += 1
         
         self.videobuffer = last_buffered_piece/float(len(pieces_complete)) 
-        #print >> sys.stderr, 'progress: %d/%d pieces continuous buffer (frac %f)' % \
+        #print >> sys.stderr, time.asctime(),'-', 'progress: %d/%d pieces continuous buffer (frac %f)' % \
         #    (last_buffered_piece, len(pieces_complete), self.videobuffer)
         
                     
@@ -328,7 +329,7 @@ class ProgressSlider(wx.Panel):
             self.Refresh()
         
     def GetValue(self):
-        print >>sys.stderr, 'ProgressSlider: %f, Range (%f, %f)' % (self.progress, self.range[0], self.range[1])
+        print >>sys.stderr, time.asctime(),'-', 'ProgressSlider: %f, Range (%f, %f)' % (self.progress, self.range[0], self.range[1])
         return self.progress * (self.range[1] - self.range[0])+ self.range[0]
 
     def SetRange(self, a,b):
@@ -463,13 +464,13 @@ class VolumeSlider(wx.Panel):
         pos = event.GetPosition()
         if event.ButtonDown():
             if self.onSliderButton(pos):
-                print >> sys.stderr, 'VolumeSlider: Start drag'
+                print >> sys.stderr, time.asctime(),'-', 'VolumeSlider: Start drag'
                 self.dragging = True
             elif self.onSlider(pos): # click somewhere on the slider
                 self.setSliderPosition(pos,True)
         elif event.ButtonUp():
             if self.dragging:
-                print >> sys.stderr, 'VolumeSlider: End drag'
+                print >> sys.stderr, time.asctime(),'-', 'VolumeSlider: End drag'
                 self.setSliderPosition(pos, True)
             self.dragging = False
         elif event.Dragging():
@@ -502,8 +503,8 @@ class VolumeSlider(wx.Panel):
         if ready:
             #theEvent = wx.ScrollEvent(pos=self.progress)
             #self.GetEventHandler().ProcessEvent(theEvent)
-            #print >> sys.stderr, 'Posted event'
-            print >> sys.stderr, 'VolumeSlider: Set progress to : %f' % self.progress
+            #print >> sys.stderr, time.asctime(),'-', 'Posted event'
+            print >> sys.stderr, time.asctime(),'-', 'VolumeSlider: Set progress to : %f' % self.progress
             self.sliderChangedAction()
             
     def sliderChangedAction(self):
@@ -516,7 +517,7 @@ class VolumeSlider(wx.Panel):
             self.Refresh()
         
     def GetValue(self):
-        print >>sys.stderr, 'VolumeSlider: %f, Range (%f, %f)' % (self.progress, self.range[0], self.range[1])
+        print >>sys.stderr, time.asctime(),'-', 'VolumeSlider: %f, Range (%f, %f)' % (self.progress, self.range[0], self.range[1])
         return self.progress * (self.range[1] - self.range[0])+ self.range[0]
 
     def SetRange(self, a,b):

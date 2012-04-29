@@ -20,7 +20,7 @@ from BaseLib.Core.simpledefs import NTFY_ACT_DISK_FULL, NTFY_SUBTITLE_CONTENTS, 
     NTFY_UPDATE
 import os
 import sys
-
+import time 
 
 
 
@@ -108,11 +108,11 @@ class SubtitlesHandler(object):
                     os.mkdir(self.subs_dir)
                 except:
                     msg = u"Cannot create collecting dir %s " % self.subs_dir
-                    print >> sys.stderr, "Error: %s" % msg
+                    print >> sys.stderr, time.asctime(),'-', "Error: %s" % msg
                     raise IOError(msg)
         else:
             msg = u"Configuration dir %s does not exists" % self.subs_dir
-            print >> sys.stderr, "Error: %s" % msg
+            print >> sys.stderr, time.asctime(),'-', "Error: %s" % msg
             raise IOError(msg)
         
         
@@ -129,7 +129,7 @@ class SubtitlesHandler(object):
         
         freeSpace = self.diskManager.getAvailableSpace()
         if DEBUG:
-            print >> sys.stderr, SUBS_LOG_PREFIX + "Avaialble %d MB for subtitle collecting" % (freeSpace / (2 ** 20))
+            print >> sys.stderr, time.asctime(),'-', SUBS_LOG_PREFIX + "Avaialble %d MB for subtitle collecting" % (freeSpace / (2 ** 20))
         
         #event notifier
         self._notifier = Notifier.getInstance()
@@ -191,7 +191,7 @@ class SubtitlesHandler(object):
 
         
         if DEBUG:
-            print >> sys.stderr, SUBS_LOG_PREFIX + "preparing to send GET_SUBS to " + \
+            print >> sys.stderr, time.asctime(),'-', SUBS_LOG_PREFIX + "preparing to send GET_SUBS to " + \
                   utilities.show_permid_short(permid)
         
 
@@ -220,7 +220,7 @@ class SubtitlesHandler(object):
             
         if len(languages) == 0:
             if DEBUG:
-                print >> sys.stderr, SUBS_LOG_PREFIX + " no subtitles to request."
+                print >> sys.stderr, time.asctime(),'-', SUBS_LOG_PREFIX + " no subtitles to request."
             return
             
         
@@ -284,21 +284,21 @@ class SubtitlesHandler(object):
                     
                 else:
                     if DEBUG:
-                        print >> sys.stderr, SUBS_LOG_PREFIX + "File not available for " + \
+                        print >> sys.stderr, time.asctime(),'-', SUBS_LOG_PREFIX + "File not available for " + \
                               "channel %s, infohash %s, lang %s" % \
                               (show_permid_short(channel_id), bin2str(infohash),
                               lang)
                     self.subtitlesDb.updateSubtitlePath(channel_id,infohash,lang,None)
             else:
                 if DEBUG:
-                    print >> sys.stderr, SUBS_LOG_PREFIX + "Subtitle not available for " + \
+                    print >> sys.stderr, time.asctime(),'-', SUBS_LOG_PREFIX + "Subtitle not available for " + \
                           "channel %s, infohash %s, lang %s" % \
                           (show_permid_short(channel_id), bin2str(infohash),
                           lang)
         
         if len(contentsList) == 0: #pathlist is empty
             if DEBUG:
-                print >> sys.stderr, SUBS_LOG_PREFIX + "None of the requested subtitles " + \
+                print >> sys.stderr, time.asctime(),'-', SUBS_LOG_PREFIX + "None of the requested subtitles " + \
                       " was available. No answer will be sent to %s" % \
                       show_permid_short(permid)
             return True
@@ -320,14 +320,14 @@ class SubtitlesHandler(object):
                                                        relativeName)
         except IOError,e:
             if DEBUG:
-                print >> sys.stderr, SUBS_LOG_PREFIX + "Error reading from subs file %s: %s" % \
+                print >> sys.stderr, time.asctime(),'-', SUBS_LOG_PREFIX + "Error reading from subs file %s: %s" % \
                  (relativeName, e)
             fileContent = None
             
         if fileContent is not None and len(fileContent) <= MAX_SUBTITLE_SIZE:
             return fileContent
         else:
-            print >> sys.stderr, "Warning: Subtitle %s dropped. Bigger then %d" % \
+            print >> sys.stderr, time.asctime(),'-', "Warning: Subtitle %s dropped. Bigger then %d" % \
                 (relativeName, MAX_SUBTITLE_SIZE)
             return None
                 
@@ -344,7 +344,7 @@ class SubtitlesHandler(object):
         """
         if exception is not None:
             if DEBUG:
-                print >> sys.stderr, SUBS_LOG_PREFIX + "Failed to send metadata to %s: %s" % \
+                print >> sys.stderr, time.asctime(),'-', SUBS_LOG_PREFIX + "Failed to send metadata to %s: %s" % \
                       (show_permid_short(permid), str(exception))
         
     
@@ -393,25 +393,25 @@ class SubtitlesHandler(object):
                 filepaths[lang] = filename
             except IOError,e:
                 if DEBUG:
-                    print >> sys.stderr, SUBS_LOG_PREFIX + "Unable to save subtitle for "\
+                    print >> sys.stderr, time.asctime(),'-', SUBS_LOG_PREFIX + "Unable to save subtitle for "\
                           "channel %s and infohash %s to file: %s" % \
                           (show_permid_short(channel_id), str(infohash), e)
                 continue
             except Exception,e:
                 if DEBUG:
-                    print >> sys.stderr, "Unexpected error copying subtitle On Disk: " + str(e)
+                    print >> sys.stderr, time.asctime(),'-', "Unexpected error copying subtitle On Disk: " + str(e)
                 raise e
             
             subToUpdate = metadataDTO.getSubtitle(lang)
             if subToUpdate is None:
-                print >> sys.stderr, "Warning:" + SUBS_LOG_PREFIX + "Subtitles database inconsistency."
+                print >> sys.stderr, time.asctime(),'-', "Warning:" + SUBS_LOG_PREFIX + "Subtitles database inconsistency."
                 #is it ok to throw a runtime error or should I gracefully fail?
                 raise MetadataDBException("Subtitles database inconsistency!")
             
             subToUpdate.path = filename
             if not subToUpdate.verifyChecksum():
                 if DEBUG:
-                    print >> sys.stderr, "Received a subtitle having invalid checsum from %s" % \
+                    print >> sys.stderr, time.asctime(),'-', "Received a subtitle having invalid checsum from %s" % \
                          show_permid_short(permid)
                 subToUpdate.path = None
                 
@@ -425,7 +425,7 @@ class SubtitlesHandler(object):
             self.subtitlesDb.commit()
         
         if DEBUG:    
-            print >> sys.stderr, "Subtitle written on disk and informations on database."
+            print >> sys.stderr, time.asctime(),'-', "Subtitle written on disk and informations on database."
         
         self._scheduleUserCallbacks(callbacks)
         
@@ -479,7 +479,7 @@ class SubtitlesHandler(object):
         Currently it just prints a cool debug message.
         """
         if DEBUG:
-            print >> sys.stderr, SUBS_LOG_PREFIX + "Subtitle is in at" + filename
+            print >> sys.stderr, time.asctime(),'-', SUBS_LOG_PREFIX + "Subtitle is in at" + filename
         
         if self._notifier is not None:
             self.notifier.notify(NTFY_SUBTITLE_CONTENTS, NTFY_UPDATE,
@@ -490,7 +490,7 @@ class SubtitlesHandler(object):
         """
         Notifies the LaunchMany instance that the disk is full.
         """
-        print >> sys.stderr, "Warning: " + SUBS_LOG_PREFIX + "GET_SUBS: Disk full!"
+        print >> sys.stderr, time.asctime(),'-', "Warning: " + SUBS_LOG_PREFIX + "GET_SUBS: Disk full!"
         drive, rdir = os.path.splitdrive(os.path.abspath(self.subs_dir))
         if not drive:
             drive = rdir
@@ -549,18 +549,18 @@ class SubtitlesHandler(object):
         
         if self.diskManager.isFilenOnDisk(self.subs_dir, filename):
             if DEBUG:
-                print >> sys.stderr, "Overwriting previous subtitle %s" % filename
+                print >> sys.stderr, time.asctime(),'-', "Overwriting previous subtitle %s" % filename
             try:
                 deleted = self.diskManager.deleteContent(self.subs_dir, filename)
             except DiskManagerException,e:
                 if DEBUG:
-                    print >> sys.stderr, "Unable to remove subtitle %s" % filename
+                    print >> sys.stderr, time.asctime(),'-', "Unable to remove subtitle %s" % filename
                 raise RichMetadataException("Unable to remove subtile %s to overwrite: %s"\
                                             % (filename, str(e)))
             
             if not deleted:
                 if DEBUG: 
-                    print >> sys.stderr, "Unable to remove subtitle %s" % filename
+                    print >> sys.stderr, time.asctime(),'-', "Unable to remove subtitle %s" % filename
                 raise RichMetadataException("Old subtitle %s is write protected"% filename)
         
         

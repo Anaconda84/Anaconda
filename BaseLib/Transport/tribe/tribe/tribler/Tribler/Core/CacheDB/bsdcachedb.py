@@ -1,3 +1,4 @@
+import time 
 # Written by Jie Yang
 # see LICENSE.txt for license information
 #
@@ -209,7 +210,7 @@ def setDBPath(db_dir = ''):
         try: 
             os.mkdir(db_dir)
         except os.error, msg:
-            print >> sys.stderr, "bsdcachedb: cannot set db path:", msg
+            print >> sys.stderr, time.asctime(),'-', "bsdcachedb: cannot set db path:", msg
             db_dir = '.'
     return db_dir
 
@@ -222,7 +223,7 @@ def open_db2(filename, db_dir='', filetype=db.DB_BTREE):    # backup
     try:
         d = dbshelve.open(path, filetype=filetype)
     except Exception, msg:
-        print >> sys.stderr, "bsdcachedb: cannot open dbshelve on", path, msg
+        print >> sys.stderr, time.asctime(),'-', "bsdcachedb: cannot open dbshelve on", path, msg
         d = dbshelve.open(filename, filetype=filetype)
     return d
 
@@ -283,7 +284,7 @@ class BasicDB:    # Should we use delegation instead of inheritance?
                 if name not in self.threadnames:
                     self.threadnames[name] = 0
                 self.threadnames[name] += 1
-                print >> sys.stderr, "bsdcachedb: put", len(self.threadnames), name, \
+                print >> sys.stderr, time.asctime(),'-', "bsdcachedb: put", len(self.threadnames), name, \
                     self.threadnames[name], time(), self.__class__.__name__
             if not value and type(value) == dict:
                 raise Exception('Warning someone tries to insert empty data in db: %s:%s'% (key, value))
@@ -298,7 +299,7 @@ class BasicDB:    # Should we use delegation instead of inheritance?
             return dbutils.DeadlockWrap(self._data.has_key, key, max_retries=MAX_RETRIES)
             #return self._data.has_key(key)
         except Exception, e:
-            print >> sys.stderr, "bsdcachedb: _has_key EXCEPTION BY",currentThread().getName(), Exception, e, self.db_name, `key`
+            print >> sys.stderr, time.asctime(),'-', "bsdcachedb: _has_key EXCEPTION BY",currentThread().getName(), Exception, e, self.db_name, `key`
             return False
     
     def _get(self, key, value=None):    # read
@@ -306,11 +307,11 @@ class BasicDB:    # Should we use delegation instead of inheritance?
             return dbutils.DeadlockWrap(self._data.get, key, value, max_retries=MAX_RETRIES)
             #return self._data.get(key, value)
 #        except db.DBRunRecoveryError, e:
-#            print >> sys.stderr, "bsdcachedb: Sorry, meet DBRunRecoveryError at get, have to remove the whole database", self.db_name
+#            print >> sys.stderr, time.asctime(),'-', "bsdcachedb: Sorry, meet DBRunRecoveryError at get, have to remove the whole database", self.db_name
 #            self.report_exception(e)
 #            self._recover_db()    # have to clear the whole database
         except Exception,e:
-            print >> sys.stderr, "bsdcachedb: _get EXCEPTION BY",currentThread().getName(), Exception, e, self.db_name, `key`, value
+            print >> sys.stderr, time.asctime(),'-', "bsdcachedb: _get EXCEPTION BY",currentThread().getName(), Exception, e, self.db_name, `key`, value
             if value is not None:
                 return value
             self.report_exception(e)
@@ -321,14 +322,14 @@ class BasicDB:    # Should we use delegation instead of inheritance?
 #        path = os.path.join(self.db_dir, self.db_name)
 #        try:
 #            self._data.close()
-#            print >> sys.stderr, "bsdcachedb: closed and removing database", path
+#            print >> sys.stderr, time.asctime(),'-', "bsdcachedb: closed and removing database", path
 #            os.remove(path)
-#            print >> sys.stderr, "bsdcachedb: removed database", path
+#            print >> sys.stderr, time.asctime(),'-', "bsdcachedb: removed database", path
 #            self._data, self.db_dir = open_db(self.db_name, self.db_dir, filetype=self.filetype)    # reopen
-#            print >> sys.stderr, "bsdcachedb: database is removed and reopened successfully", path
+#            print >> sys.stderr, time.asctime(),'-', "bsdcachedb: database is removed and reopened successfully", path
 #        except Exception, msg:
 #            print_exc()
-#            print >> sys.stderr, "bsdcachedb: cannot remove the database", path, Exception, msg
+#            print >> sys.stderr, time.asctime(),'-', "bsdcachedb: cannot remove the database", path, Exception, msg
 #===============================================================================
             
     def _updateItem(self, key, data):
@@ -349,7 +350,7 @@ class BasicDB:    # Should we use delegation instead of inheritance?
                 if name not in self.threadnames:
                     self.threadnames[name] = 0
                 self.threadnames[name] += 1
-                print >> sys.stderr, "bsdcachedb: del", len(self.threadnames), name, \
+                print >> sys.stderr, time.asctime(),'-', "bsdcachedb: del", len(self.threadnames), name, \
                     self.threadnames[name], time(), self.__class__.__name__
                 
             dbutils.DeadlockWrap(self._data.delete, key, max_retries=MAX_RETRIES)
@@ -361,11 +362,11 @@ class BasicDB:    # Should we use delegation instead of inheritance?
         try:
             dbutils.DeadlockWrap(self._data.sync, max_retries=MAX_RETRIES)
 #        except db.DBRunRecoveryError, e:
-#            print >> sys.stderr, "bsdcachedb: Sorry, meet DBRunRecoveryError at sync, have to remove the whole database", self.db_name
+#            print >> sys.stderr, time.asctime(),'-', "bsdcachedb: Sorry, meet DBRunRecoveryError at sync, have to remove the whole database", self.db_name
 #            self.report_exception(e)
 #            self._recover_db()    # have to clear the whole database
         except Exception, e:
-            #print >> sys.stderr, "bsdcachedb: synchronize db error", self.db_name, Exception, e
+            #print >> sys.stderr, time.asctime(),'-', "bsdcachedb: synchronize db error", self.db_name, Exception, e
             self.report_exception(e)
             
     def _clear(self):
@@ -378,7 +379,7 @@ class BasicDB:    # Should we use delegation instead of inheritance?
             return dbutils.DeadlockWrap(self._data.keys, max_retries=MAX_RETRIES)
             #return self._data.keys()
         except Exception,e:
-            print >> sys.stderr, "bsdcachedb: _keys EXCEPTION BY", currentThread().getName(), self.db_name
+            print >> sys.stderr, time.asctime(),'-', "bsdcachedb: _keys EXCEPTION BY", currentThread().getName(), self.db_name
             #print_exc()
             self.report_exception(e)
             return []
@@ -397,7 +398,7 @@ class BasicDB:    # Should we use delegation instead of inheritance?
             #return len(self._data)
         except:
             print_exc()
-            print >> sys.stderr, "bsdcachedb: bsdcachedb.BasicDB._size error", self.__class__.__name__
+            print >> sys.stderr, time.asctime(),'-', "bsdcachedb: bsdcachedb.BasicDB._size error", self.__class__.__name__
             return 0
 
     def _iteritems(self):
@@ -405,17 +406,17 @@ class BasicDB:    # Should we use delegation instead of inheritance?
             return dbutils.DeadlockWrap(self._data.iteritems, max_retries=MAX_RETRIES)
         except:
             print_exc()
-            print >> sys.stderr, "bsdcachedb: bsdcachedb.BasicDB._iteritems error", self.__class__.__name__
+            print >> sys.stderr, time.asctime(),'-', "bsdcachedb: bsdcachedb.BasicDB._iteritems error", self.__class__.__name__
     
     def close(self):
         if DEBUG:
-            print >> sys.stderr, "bsdcachedb: Closing database",self.db_name,currentThread().getName()
+            print >> sys.stderr, time.asctime(),'-', "bsdcachedb: Closing database",self.db_name,currentThread().getName()
         if self.opened:
             try:
                 self._sync()
                 dbutils.DeadlockWrap(self._data.close, max_retries=MAX_RETRIES)
                 if DEBUG:
-                    print >> sys.stderr, "bsdcachedb: Done waiting for database close",self.db_name,currentThread().getName()
+                    print >> sys.stderr, time.asctime(),'-', "bsdcachedb: Done waiting for database close",self.db_name,currentThread().getName()
                 #self._data.close()
             except:
                 print_exc()
@@ -541,7 +542,7 @@ class MyDB(BasicDB):
     def addFriend(self, permid):
         if isValidPermid(permid):
             if not 'friends' in self._keys():
-                print >> sys.stderr, "bsdcachedb: addFriend key error", self._keys()
+                print >> sys.stderr, time.asctime(),'-', "bsdcachedb: addFriend key error", self._keys()
             fr = self._get('friends')
             fr.add(permid)
             self._put('friends', fr)
@@ -733,7 +734,7 @@ class TorrentDB(BasicDB):
             if self._has_key(infohash):
                 _item = self.getItem(infohash)
                 if not _item:
-                    print >> sys.stderr, "bsdcachedb: Error in bsdcachedb.TorrentDB.updateItem: database inconsistant!", self._has_key(infohash), self.getItem(infohash)
+                    print >> sys.stderr, time.asctime(),'-', "bsdcachedb: Error in bsdcachedb.TorrentDB.updateItem: database inconsistant!", self._has_key(infohash), self.getItem(infohash)
                     return
                 _item.update(item)
                 self._updateItem(infohash, _item)

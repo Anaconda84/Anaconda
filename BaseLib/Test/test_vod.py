@@ -1,3 +1,4 @@
+import time 
 # Written by Arno Bakker
 # see LICENSE.txt for license information
 #
@@ -53,7 +54,7 @@ class TestVideoOnDemand(TestAsServer):
         
         
     def tearDown(self):
-        print >>sys.stderr,"Test: Sleep before tear down"
+        print >>sys.stderr,time.asctime(),'-', "Test: Sleep before tear down"
         time.sleep(10)
 
         TestAsServer.tearDown(self)
@@ -86,8 +87,8 @@ class TestVideoOnDemand(TestAsServer):
     def states_callback(self,dslist):
         ds = dslist[0]
         d = ds.get_download()
-    #    print >>sys.stderr,`d.get_def().get_name()`,dlstatus_strings[ds.get_status()],ds.get_progress(),"%",ds.get_error(),"up",ds.get_current_speed(UPLOAD),"down",ds.get_current_speed(DOWNLOAD)
-        print >>sys.stderr, '%s %s %5.2f%% %s up %8.2fKB/s down %8.2fKB/s' % \
+    #    print >>sys.stderr,time.asctime(),'-', `d.get_def().get_name()`,dlstatus_strings[ds.get_status()],ds.get_progress(),"%",ds.get_error(),"up",ds.get_current_speed(UPLOAD),"down",ds.get_current_speed(DOWNLOAD)
+        print >>sys.stderr, time.asctime(),'-', '%s %s %5.2f%% %s up %8.2fKB/s down %8.2fKB/s' % \
                 (d.get_def().get_name(), \
                 dlstatus_strings[ds.get_status()], \
                 ds.get_progress() * 100, \
@@ -104,14 +105,14 @@ class TestVideoOnDemand(TestAsServer):
             return
         self.vodstarted = True
         
-        print >>sys.stderr,"Test: vod_event_callback",event,params
+        print >>sys.stderr,time.asctime(),'-', "Test: vod_event_callback",event,params
         if event == VODEVENT_START:
             stream = params['stream']
 
             # Read last piece
             lastpieceoff = ((self.contentlen-1) / self.piecelen) * self.piecelen
             lastpiecesize = self.contentlen - lastpieceoff
-            print >>sys.stderr,"Test: stream: lastpieceoff",lastpieceoff,lastpiecesize
+            print >>sys.stderr,time.asctime(),'-', "Test: stream: lastpieceoff",lastpieceoff,lastpiecesize
             self.stream_read(stream,lastpieceoff,lastpiecesize,self.piecelen)
 
             # Read second,3rd,4th byte, only
@@ -125,12 +126,12 @@ class TestVideoOnDemand(TestAsServer):
             lastsize = 1
             self.stream_read(stream,lastoff,lastsize,self.piecelen)
 
-            print >>sys.stderr,"Test: stream: Passed?"
+            print >>sys.stderr,time.asctime(),'-', "Test: stream: Passed?"
 
     def stream_read(self,stream,off,size,blocksize):
             stream.seek(off)
             data = stream.read(blocksize)
-            print >>sys.stderr,"Test: stream: Got data",len(data)
+            print >>sys.stderr,time.asctime(),'-', "Test: stream: Got data",len(data)
             self.assertEquals(len(data),size)
             self.assertEquals(data,self.content[off:off+size])
             
@@ -140,7 +141,7 @@ class TestVideoOnDemand(TestAsServer):
         self.piecelen = 10
         self.create_torrent()
         
-        print >>sys.stderr,"Test: Letting network thread create Download, sleeping"
+        print >>sys.stderr,time.asctime(),'-', "Test: Letting network thread create Download, sleeping"
         time.sleep(5)
         
         dlist = self.session.get_downloads()
@@ -156,7 +157,7 @@ class TestVideoOnDemand(TestAsServer):
         self.assertEqual(vs.last_piece,9)
         self.assertEqual(vs.movie_numpieces,10)
 
-        print >>sys.stderr,"Test: status: Passed? ****************************************************************"
+        print >>sys.stderr,time.asctime(),'-', "Test: status: Passed? ****************************************************************"
 
             
     def singtest_100(self):
@@ -164,7 +165,7 @@ class TestVideoOnDemand(TestAsServer):
         self.piecelen = 10
         self.create_torrent()
         
-        print >>sys.stderr,"Test: Letting network thread create Download, sleeping"
+        print >>sys.stderr,time.asctime(),'-', "Test: Letting network thread create Download, sleeping"
         time.sleep(5)
         
         dlist = self.session.get_downloads()
@@ -180,7 +181,7 @@ class TestVideoOnDemand(TestAsServer):
         self.assertEqual(vs.last_piece,9)
         self.assertEqual(vs.movie_numpieces,10)
 
-        print >>sys.stderr,"Test: status: Passed? ****************************************************************"
+        print >>sys.stderr,time.asctime(),'-', "Test: status: Passed? ****************************************************************"
 
 
     def singtest_101(self):
@@ -188,7 +189,7 @@ class TestVideoOnDemand(TestAsServer):
         self.piecelen = 10
         self.create_torrent()
         
-        print >>sys.stderr,"Test: Letting network thread create Download, sleeping"
+        print >>sys.stderr,time.asctime(),'-', "Test: Letting network thread create Download, sleeping"
         time.sleep(5)
         
         dlist = self.session.get_downloads()
@@ -204,7 +205,7 @@ class TestVideoOnDemand(TestAsServer):
         self.assertEqual(vs.last_piece,10)
         self.assertEqual(vs.movie_numpieces,11)
         
-        print >>sys.stderr,"Test: status: Passed? ****************************************************************"
+        print >>sys.stderr,time.asctime(),'-', "Test: status: Passed? ****************************************************************"
 
 
 

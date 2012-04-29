@@ -1,3 +1,4 @@
+import time 
 # Written by Bram Cohen, Arno Bakker
 # see LICENSE.txt for license information
 
@@ -76,7 +77,7 @@ class StorageWrapper:
             piece_from_live_source_func = lambda i,d: None, 
             backfunc = None, 
             config = {}, unpauseflag = fakeflag(True)):
-        if DEBUG: print >>sys.stderr, "StorageWrapper: __init__: wrapped around", storage.files
+        if DEBUG: print >>sys.stderr, time.asctime(),'-', "StorageWrapper: __init__: wrapped around", storage.files
         self.videoinfo = videoinfo
         self.storage = storage
         self.request_size = long(request_size)
@@ -188,7 +189,7 @@ class StorageWrapper:
 
     def initialize(self, donefunc, statusfunc = None):
         if DEBUG:
-            print >>sys.stderr,"StorageWrapper: initialize: enter, backfunc is",self.backfunc
+            print >>sys.stderr,time.asctime(),'-', "StorageWrapper: initialize: enter, backfunc is",self.backfunc
         
         self.initialize_done = donefunc
         if statusfunc is None:
@@ -238,13 +239,13 @@ class StorageWrapper:
     def _initialize(self):
         
         if DEBUG:
-            print >>sys.stderr,"StorageWrapper: _initialize: enter"
+            print >>sys.stderr,time.asctime(),'-', "StorageWrapper: _initialize: enter"
         if not self.unpauseflag.isSet():
             self.backfunc(self._initialize, 1)
             return
 
         if DEBUG:
-            print >>sys.stderr,"StorageWrapper: _initialize: next is",self.initialize_next
+            print >>sys.stderr,time.asctime(),'-', "StorageWrapper: _initialize: next is",self.initialize_next
 
         if self.initialize_next:
             x = self.initialize_next()
@@ -259,7 +260,7 @@ class StorageWrapper:
                 return
             msg, done, init, next = self.initialize_tasks.pop(0)
             if DEBUG:
-                print >>sys.stderr,"StorageWrapper: _initialize performing task",msg
+                print >>sys.stderr,time.asctime(),'-', "StorageWrapper: _initialize performing task",msg
             if init():
                 self.initialize_status(activity = msg, fractionDone = done)
                 self.initialize_next = next
@@ -269,18 +270,18 @@ class StorageWrapper:
     def init_hashcheck(self):
         if self.flag.isSet():
             if DEBUG:
-                print >>sys.stderr,"StorageWrapper: init_hashcheck: FLAG IS SET"
+                print >>sys.stderr,time.asctime(),'-', "StorageWrapper: init_hashcheck: FLAG IS SET"
             return False
         self.check_list = []
         if not self.hashes or self.amount_left == 0:
             self.check_total = 0
             self.finished()
             if DEBUG:
-                print >>sys.stderr,"StorageWrapper: init_hashcheck: Download finished"
+                print >>sys.stderr,time.asctime(),'-', "StorageWrapper: init_hashcheck: Download finished"
             return False
 
         if DEBUG:
-            print >>sys.stderr,"StorageWrapper: init_hashcheck: self.places",`self.places`
+            print >>sys.stderr,time.asctime(),'-', "StorageWrapper: init_hashcheck: self.places",`self.places`
 
         self.check_targets = {}
         got = {}
@@ -362,7 +363,7 @@ class StorageWrapper:
 
                 if DEBUG:
                     if s != self.hashes[i]:
-                        print >>sys.stderr,"StorageWrapper: hashcheckfunc: piece corrupt",i
+                        print >>sys.stderr,time.asctime(),'-', "StorageWrapper: hashcheckfunc: piece corrupt",i
 
                 # Merkle: If we didn't read the hashes from persistent storage then
                 # we can't check anything. Exception is the case where we are the
@@ -616,7 +617,7 @@ class StorageWrapper:
     def new_request(self, index):
         
         if DEBUG:
-            print >>sys.stderr,"StorageWrapper: new_request",index,"#"
+            print >>sys.stderr,time.asctime(),'-', "StorageWrapper: new_request",index,"#"
         
         # returns (begin, length)
         if self.inactive_requests[index] == 1: # number 1, not letter L
@@ -879,7 +880,7 @@ class StorageWrapper:
             if self.live_streaming:
                 # TODO: figure out how to use the Download.BadDataGuard
                 # cf. the culprit business above.
-                print >>sys.stderr,"////////////////////////////////////////////////////////////// kicking peer"
+                print >>sys.stderr,time.asctime(),'-', "////////////////////////////////////////////////////////////// kicking peer"
                 raise ValueError("Arno quick fix: Unauth data unacceptable")
                 
             return False
@@ -909,7 +910,7 @@ class StorageWrapper:
     def request_lost(self, index, begin, length):
         
         if DEBUG:
-            print >>sys.stderr,"StorageWrapper: request_lost",index,"#"
+            print >>sys.stderr,time.asctime(),'-', "StorageWrapper: request_lost",index,"#"
         
         assert not (begin, length) in self.inactive_requests[index]
         insort(self.inactive_requests[index], (begin, length))

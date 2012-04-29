@@ -1,3 +1,4 @@
+import time 
 # Written by Pawel Garbacki
 # see LICENSE.txt for license information
 
@@ -79,8 +80,8 @@ class Helper:
 
     def test(self):
         result = self.reserve_piece(10,None)
-        print >> sys.stderr,"reserve piece returned: " + str(result)
-        print >> sys.stderr,"Test passed"
+        print >> sys.stderr,time.asctime(),'-', "reserve piece returned: " + str(result)
+        print >> sys.stderr,time.asctime(),'-', "Test passed"
 
     def _reserve_piece(self, piece):
         self.reserved_pieces[piece] = True
@@ -142,19 +143,19 @@ class Helper:
                 pieces_to_send.append(piece)
 
         if DEBUG:
-            print >> sys.stderr,"helper: reserve_pieces: result is",result,"to_send is",pieces_to_send
+            print >> sys.stderr,time.asctime(),'-', "helper: reserve_pieces: result is",result,"to_send is",pieces_to_send
 
         if pieces_to_send == []:
             return result
         if self.coordinator is not None:
             if DEBUG:
-                print >>sys.stderr,"helper: reserve_pieces: I am coordinator, calling self.coordinator.reserve_pieces"
+                print >>sys.stderr,time.asctime(),'-', "helper: reserve_pieces: I am coordinator, calling self.coordinator.reserve_pieces"
             new_reserved_pieces = self.coordinator.network_reserve_pieces(pieces_to_send, all_or_nothing)
             for piece in new_reserved_pieces:
                 self._reserve_piece(piece)
         else:
             if DEBUG:
-                print >>sys.stderr,"helper: reserve_pieces: sending remote reservation request"
+                print >>sys.stderr,time.asctime(),'-', "helper: reserve_pieces: sending remote reservation request"
             self.send_or_queue_reservation(sdownload,pieces_to_send,result)
             return []
 
@@ -185,7 +186,7 @@ class Helper:
         """
         if sdownload not in self.continuations:
             if DEBUG:
-                print >> sys.stderr,"helper: Queuing reservation for",pieces_to_send
+                print >> sys.stderr,time.asctime(),'-', "helper: Queuing reservation for",pieces_to_send
             self.continuations.append(sdownload)
             sdownload.helper_set_freezing(True)
         if len(self.continuations) > 0:
@@ -201,9 +202,9 @@ class Helper:
             self.last_req_time = int(time())
             if DEBUG:
                 if self.outstanding is None:
-                    print >> sys.stderr,"helper: Sending reservation for",pieces_to_send,"because none"
+                    print >> sys.stderr,time.asctime(),'-', "helper: Sending reservation for",pieces_to_send,"because none"
                 else:
-                    print >> sys.stderr,"helper: Sending reservation for",pieces_to_send,"because timeout"
+                    print >> sys.stderr,time.asctime(),'-', "helper: Sending reservation for",pieces_to_send,"because timeout"
             sdownload = self.continuations.pop(0)
             if self.outstanding is not None: # allow bypassed conn to restart
                 self.outstanding.helper_set_freezing(False)
@@ -218,10 +219,10 @@ class Helper:
         """
         if self.outstanding is None:
             if DEBUG:
-                print >> sys.stderr,"helper: notify: No continuation waiting???"
+                print >> sys.stderr,time.asctime(),'-', "helper: notify: No continuation waiting???"
         else:
             if DEBUG:
-                print >> sys.stderr,"helper: notify: Waking downloader"
+                print >> sys.stderr,time.asctime(),'-', "helper: notify: Waking downloader"
             sdownload = self.outstanding
             self.outstanding = None # must be not before calling self.restart!
             self.restart(sdownload)
@@ -263,16 +264,16 @@ class Helper:
             payload = self.torrent_hash + all_or_nothing + bencode(pieces)
 
             if DEBUG:
-                print >> sys.stderr,"helper: RESERVE_PIECES: Sending!!!!!!!!!!!!!",show_permid_short(permid)
+                print >> sys.stderr,time.asctime(),'-', "helper: RESERVE_PIECES: Sending!!!!!!!!!!!!!",show_permid_short(permid)
 
             self.overlay_bridge.send(permid, RESERVE_PIECES + payload,self.olthread_reserve_pieces_send_callback)
         elif DEBUG:
-            print >> sys.stderr,"helper: RESERVE_PIECES: error connecting to",show_permid_short(permid),exc
+            print >> sys.stderr,time.asctime(),'-', "helper: RESERVE_PIECES: error connecting to",show_permid_short(permid),exc
 
     def olthread_reserve_pieces_send_callback(self,exc,permid):
         if exc is not None:
             if DEBUG:
-                print >> sys.stderr,"helper: RESERVE_PIECES: error sending to",show_permid_short(permid),exc
+                print >> sys.stderr,time.asctime(),'-', "helper: RESERVE_PIECES: error sending to",show_permid_short(permid),exc
 
 
     #
@@ -286,7 +287,7 @@ class Helper:
 
     def handle_pieces_reserved(self,pieces):
         if DEBUG:
-            print >> sys.stderr,"helper: Coordinator replied",pieces
+            print >> sys.stderr,time.asctime(),'-', "helper: Coordinator replied",pieces
         try:
             for piece in pieces:
                 if piece > 0:
@@ -297,12 +298,12 @@ class Helper:
 
         except Exception,e:
             print_exc()
-            print >> sys.stderr,"helper: Exception in handle_pieces_reserved",e
+            print >> sys.stderr,time.asctime(),'-', "helper: Exception in handle_pieces_reserved",e
 
     def start_data_connection(self):
         # Do this always, will return quickly when connection already exists
         dns = (self.coordinator_ip, self.coordinator_port)
         if DEBUG:
-            print >> sys.stderr,"helper: Starting data connection to coordinator",dns
+            print >> sys.stderr,time.asctime(),'-', "helper: Starting data connection to coordinator",dns
         self.encoder.start_connection(dns,id = None,coord_con = True)
       

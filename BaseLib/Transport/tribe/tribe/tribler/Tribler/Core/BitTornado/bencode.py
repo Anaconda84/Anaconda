@@ -1,3 +1,4 @@
+import time 
 # Written by Petru Paler, Uoti Urpala, Ross Cohen and John Hoffman
 # see LICENSE.txt for license information
 
@@ -276,7 +277,7 @@ def encode_dict(x, r):
         try:
             r.extend((str(len(k)), ':', k))
         except:
-            print >> sys.stderr, "k: %s" % k
+            print >> sys.stderr, time.asctime(),'-', "k: %s" % k
             raise
             
         encode_func[type(v)](v, r)
@@ -300,7 +301,7 @@ def bencode(x):
     try:
         encode_func[type(x)](x, r)
     except:
-        print >>sys.stderr,"bencode: *** error *** could not encode type %s (value: %s)" % (type(x), x)
+        print >>sys.stderr,time.asctime(),'-', "bencode: *** error *** could not encode type %s (value: %s)" % (type(x), x)
         print_stack()
         
         print_exc()
@@ -309,7 +310,7 @@ def bencode(x):
         return ''.join(r)
     except:
         if DEBUG:
-            print >>sys.stderr,"bencode: join error",x
+            print >>sys.stderr,time.asctime(),'-', "bencode: join error",x
             for elem in r:
                 print "elem",elem,"has type",type(elem)
             print_exc()

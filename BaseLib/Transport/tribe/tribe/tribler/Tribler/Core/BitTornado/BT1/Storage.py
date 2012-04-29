@@ -1,3 +1,4 @@
+import time 
 # Written by Bram Cohen
 # see LICENSE.txt for license information
 
@@ -290,7 +291,7 @@ class Storage:
         r = PieceBuffer()
         for file, pos, end in self._intervals(pos, amount):
             if DEBUG:
-                print >>sys.stderr,'reading '+file+' from '+str(pos)+' to '+str(end)+' amount '+str(amount)
+                print >>sys.stderr,time.asctime(),'-', 'reading '+file+' from '+str(pos)+' to '+str(end)+' amount '+str(amount)
             try:
                 self.lock.acquire()
                 h = self._get_file_handle(file, False)

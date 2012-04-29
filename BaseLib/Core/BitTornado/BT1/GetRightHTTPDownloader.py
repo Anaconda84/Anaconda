@@ -1,3 +1,4 @@
+import time 
 # Written by John Hoffman
 # see LICENSE.txt for license information
 
@@ -188,7 +189,7 @@ class SingleDownload(SingleDownloadHelperInterface):
         self.error = None
         self.received_data = None
         try:
-            #print >>sys.stderr, 'HTTP piece ', self.index
+            #print >>sys.stderr, time.asctime(),'-', 'HTTP piece ', self.index
             if self.proxyhost is None:
                 realurl = self.url
             else: 
@@ -339,7 +340,7 @@ class SingleDownload(SingleDownloadHelperInterface):
         '''
         
         if DEBUG:
-            print >>sys.stderr,"GetRightHTTPDownloader: START"
+            print >>sys.stderr,time.asctime(),'-', "GetRightHTTPDownloader: START"
         self.video_support_speed = 0.001 * ( ( 10 ** level ) - 1 )
         if not self.video_support_enabled:
             self.video_support_enabled = True
@@ -352,7 +353,7 @@ class SingleDownload(SingleDownloadHelperInterface):
 
     def stop_video_support( self ):
         if DEBUG:
-            print >>sys.stderr,"GetRightHTTPDownloader: STOP"
+            print >>sys.stderr,time.asctime(),'-', "GetRightHTTPDownloader: STOP"
         if not self.video_support_enabled:
             return
         self.video_support_enabled = False

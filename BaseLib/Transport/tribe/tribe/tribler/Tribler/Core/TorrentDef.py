@@ -1,3 +1,4 @@
+import time 
 # Written by Arno Bakker 
 # see LICENSE.txt for license information
 """ Definition of a torrent, that is, a collection of files or a live stream. """
@@ -97,7 +98,7 @@ class TorrentDef(Serializable,Copyable):
         bdata = stream.read()
         stream.close()
         data = bdecode(bdata)
-        #print >>sys.stderr,data
+        #print >>sys.stderr,time.asctime(),'-', data
         return TorrentDef._create(data)
     _read = staticmethod(_read)
         
@@ -119,7 +120,7 @@ class TorrentDef(Serializable,Copyable):
             # Elsewhere: must use TorrentDef.get_infohash() to allow P2PURLs.
             t.infohash = sha(bencode(metainfo['info'])).digest()
         
-        #print >>sys.stderr,"INFOHASH",`t.infohash`
+        #print >>sys.stderr,time.asctime(),'-', "INFOHASH",`t.infohash`
 
         return t
     
@@ -632,13 +633,13 @@ class TorrentDef(Serializable,Copyable):
             pl = float(self.get_piece_length())
             length = float(self.input['bps']*secs)
 
-            print >>sys.stderr,"TorrentDef: finalize",length,pl
+            print >>sys.stderr,time.asctime(),'-', "TorrentDef: finalize",length,pl
             diff = length % pl
             add = (pl - diff) % pl
             newlen = int(length + add)
 
                 
-            #print >>sys.stderr,"CHECK INFO LENGTH",secs,newlen
+            #print >>sys.stderr,time.asctime(),'-', "CHECK INFO LENGTH",secs,newlen
 
             d = self.input['files'][0]
             d['length'] = newlen

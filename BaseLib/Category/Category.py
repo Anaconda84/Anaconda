@@ -1,3 +1,4 @@
+import time 
 # written by Yuan Yuan, Jelle Roozenburg
 # see LICENSE.txt for license information
 
@@ -40,7 +41,7 @@ class Category:
         
         
         if DEBUG:
-            print >>sys.stderr,"category: Categories defined by user",self.getCategoryNames()
+            print >>sys.stderr,time.asctime(),'-', "category: Categories defined by user",self.getCategoryNames()
         
         
     # return Category instance    
@@ -87,7 +88,7 @@ class Category:
 # #                del data
 #                 return True
 #         if DEBUG:
-#             print >>sys.stderr,'torrcoll: Checking of %d torrents costs: %f s' % (len(data), time() - begin)
+#             print >>sys.stderr,time.asctime(),'-', 'torrcoll: Checking of %d torrents costs: %f s' % (len(data), time() - begin)
 #         return False
         
 #     # recalculate category of all torrents, remove torrents from db if not existed
@@ -184,7 +185,7 @@ class Category:
         try:
             name = torrent['category'][0]
         except:
-            print >> sys.stderr, 'Torrent: %s has no valid category' % `torrent['content_name']`
+            print >> sys.stderr, time.asctime(),'-', 'Torrent: %s has no valid category' % `torrent['content_name']`
             return False
         for category in [{'name':'other', 'rank':1}]+self.category_info:
             rank = category['rank']
@@ -192,7 +193,7 @@ class Category:
                 break
             if name.lower() == category['name'].lower():
                 return True
-        #print >> sys.stderr, 'Category: %s was not in %s' % (name.lower(), [a['name'].lower()  for a in self.category_info if a['rank'] != -1])
+        #print >> sys.stderr, time.asctime(),'-', 'Category: %s was not in %s' % (name.lower(), [a['name'].lower()  for a in self.category_info if a['rank'] != -1])
         return False
     
     def getCategoryRank(self,cat):
@@ -226,7 +227,7 @@ class Category:
             if self.xxx_filter.isXXXTorrent(files_list, display_name, torrent_dict.get('announce'), torrent_dict.get('comment')):
                 return ['xxx']
         except:
-            print >> sys.stderr, 'Category: Exception in explicit terms filter in torrent: %s' % torrent_dict
+            print >> sys.stderr, time.asctime(),'-', 'Category: Exception in explicit terms filter in torrent: %s' % torrent_dict
             print_exc()
         
         # filename_list ready
@@ -336,7 +337,7 @@ class Category:
                 b=old
             if self.utility is None:
                 return
-            #print >> sys.stderr , b
+            #print >> sys.stderr , time.asctime(),'-', b
             if b:
                 self.utility.config.Write('family_filter', '1')
             else:

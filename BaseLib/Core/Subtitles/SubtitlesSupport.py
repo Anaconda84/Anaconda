@@ -1,3 +1,4 @@
+import time 
 # Written by Andrea Reale
 # see LICENSE.txt for license information
 
@@ -178,7 +179,7 @@ class SubtitlesSupport(object):
             msg = "Infohash %s not found in my channel. Rejecting subtitle" \
                     % base64infohash
             if DEBUG:
-                print >> sys.stderr, msg
+                print >> sys.stderr, time.asctime(),'-', msg
             raise RichMetadataException(msg)
         
         try:
@@ -189,7 +190,7 @@ class SubtitlesSupport(object):
                                                             lang)   
         except Exception,e:
             if DEBUG:
-                print >> sys.stderr, "Failed to read and copy subtitle to appropriate folder: %s" % str(e)
+                print >> sys.stderr, time.asctime(),'-', "Failed to read and copy subtitle to appropriate folder: %s" % str(e)
 
 
         
@@ -212,7 +213,7 @@ class SubtitlesSupport(object):
             msg = "Inconsistency found. The subtitle was"\
                                         "not published"
             if DEBUG:
-                print >> sys.stderr, msg
+                print >> sys.stderr, time.asctime(),'-', msg
             raise RichMetadataException(msg)
         
         metadataDTO.addSubtitle(newSubtitle)
@@ -276,7 +277,7 @@ class SubtitlesSupport(object):
                 #delete the existing subtitle and ask for a new
                 #one
                 if DEBUG:
-                    print >> sys.stderr, "Subtitle is locally available but has invalid" \
+                    print >> sys.stderr, time.asctime(),'-', "Subtitle is locally available but has invalid" \
                           "checksum. Issuing another download"
                 subtitleInfo.path = None
         
@@ -333,7 +334,7 @@ class SubtitlesSupport(object):
         for subtitleInfo in listOfSubInfos:
             if subtitleInfo.checksum is None:
                 if DEBUG:
-                    print >> sys.stderr, "No checksum for subtitle %s. Skipping it in the request"\
+                    print >> sys.stderr, time.asctime(),'-', "No checksum for subtitle %s. Skipping it in the request"\
                         % subtitleInfo
                 continue
             
@@ -346,7 +347,7 @@ class SubtitlesSupport(object):
                     #delete the existing subtitle and ask for a new
                     #one
                     if DEBUG:
-                        print >> sys.stderr, "Subtitle is locally available but has invalid" \
+                        print >> sys.stderr, time.asctime(),'-', "Subtitle is locally available but has invalid" \
                               "checksum. Issuing another download"
                     subtitleInfo.path = None
                     
@@ -404,7 +405,7 @@ class SubtitlesSupport(object):
             
             if not bitmask > 0:
                 if DEBUG:
-                    print >> sys.stderr, "Will not send a request for 0 subtitles"
+                    print >> sys.stderr, time.asctime(),'-', "Will not send a request for 0 subtitles"
                 return
                 
             peers_to_query = self._peersHaveManager.getPeersHaving(channel, infohash, bitmask)

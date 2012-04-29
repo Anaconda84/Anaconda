@@ -1,3 +1,4 @@
+import time 
 # Written by Arno Bakker
 # see LICENSE.txt for license information
 #
@@ -53,7 +54,7 @@ class SimpleServer(BaseHTTPServer.BaseHTTPRequestHandler):
 
     def do_GET(self):
         
-        print >>sys.stderr,"test: tracker: Got GET request",self.path
+        print >>sys.stderr,time.asctime(),'-', "test: tracker: Got GET request",self.path
 
         p = []
         p1 = {'peer id':self.server.myid,'ip':self.server.myip,'port':self.server.myport}
@@ -84,9 +85,9 @@ class TestConnectOverlay(TestAsServer):
     def setUp(self):
         """ override TestAsServer """
         TestAsServer.setUp(self)
-        print >>sys.stderr,"test: Giving MyLaunchMany time to startup"
+        print >>sys.stderr,time.asctime(),'-', "test: Giving MyLaunchMany time to startup"
         time.sleep(5)
-        print >>sys.stderr,"test: MyLaunchMany should have started up"
+        print >>sys.stderr,time.asctime(),'-', "test: MyLaunchMany should have started up"
 
     def setUpPreSession(self):
         """ override TestAsServer """
@@ -132,7 +133,7 @@ class TestConnectOverlay(TestAsServer):
 
     def tearDown(self):
         """ override TestAsServer """
-        print >> sys.stderr,"test: *** TEARDOWN"
+        print >> sys.stderr,time.asctime(),'-', "test: *** TEARDOWN"
         TestAsServer.tearDown(self)
         self.mytracker.shutdown()
         self.myss.close()
@@ -153,7 +154,7 @@ class TestConnectOverlay(TestAsServer):
         s.send(extmsg)
         resp = s.recv()
         self.assert_(len(resp) > 0)
-        print >> sys.stderr,"test: Data conn replies",getMessageName(resp[0])
+        print >> sys.stderr,time.asctime(),'-', "test: Data conn replies",getMessageName(resp[0])
         
         # 2. Tribler should now try to establish an overlay connection with us
         self.myss.settimeout(10.0)

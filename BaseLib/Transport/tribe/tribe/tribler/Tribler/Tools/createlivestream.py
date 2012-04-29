@@ -1,3 +1,4 @@
+import time 
 # Written by Arno Bakker 
 # see LICENSE.txt for license information
 #
@@ -30,7 +31,7 @@ argsdef = [('name', '', 'name of the stream'),
 
 def state_callback(ds):
     d = ds.get_download()
-    print >>sys.stderr,`d.get_def().get_name()`,dlstatus_strings[ds.get_status()],ds.get_progress(),"%",ds.get_error(),"up",ds.get_current_speed(UPLOAD),"down",ds.get_current_speed(DOWNLOAD)
+    print >>sys.stderr,time.asctime(),'-', `d.get_def().get_name()`,dlstatus_strings[ds.get_status()],ds.get_progress(),"%",ds.get_error(),"up",ds.get_current_speed(UPLOAD),"down",ds.get_current_speed(DOWNLOAD)
 
     return (1.0,False)
 
@@ -38,7 +39,7 @@ def vod_ready_callback(d,mimetype,stream,filename):
     """ Called by the Session when the content of the Download is ready
      
     Called by Session thread """
-    print >>sys.stderr,"main: VOD ready callback called ###########################################################",mimetype
+    print >>sys.stderr,time.asctime(),'-', "main: VOD ready callback called ###########################################################",mimetype
 
 def get_usage(defs):
     return parseargs.formatDefinitions(defs,80)
@@ -64,8 +65,8 @@ if __name__ == "__main__":
 
     config, fileargs = parseargs.parseargs(sys.argv, argsdef, presets = {})
     
-    print >>sys.stderr,"config is",config
-    print >>sys.stderr,"fileargs is",fileargs
+    print >>sys.stderr,time.asctime(),'-', "config is",config
+    print >>sys.stderr,time.asctime(),'-', "fileargs is",fileargs
     
     if config['name'] == '':
         print "Usage:  ",get_usage(argsdef)
@@ -107,7 +108,7 @@ if __name__ == "__main__":
             authcfg = ECDSALiveSourceAuthConfig()
             authcfg.save(authfilename)
 
-    print >>sys.stderr,"main: Source auth pubkey",`authcfg.get_pubkey()`
+    print >>sys.stderr,time.asctime(),'-', "main: Source auth pubkey",`authcfg.get_pubkey()`
 
 
     tdef = TorrentDef()
@@ -135,7 +136,7 @@ if __name__ == "__main__":
         tdef.save(torrentfilename)
 
     #tdef2 = TorrentDef.load(torrentfilename)
-    #print >>sys.stderr,"main: Source auth pubkey2",`tdef2.metainfo['info']['live']`
+    #print >>sys.stderr,time.asctime(),'-', "main: Source auth pubkey2",`tdef2.metainfo['info']['live']`
 
     dscfg = DownloadStartupConfig()
     dscfg.set_dest_dir(config['destdir'])

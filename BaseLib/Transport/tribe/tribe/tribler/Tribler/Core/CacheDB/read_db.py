@@ -1,3 +1,4 @@
+import time 
 # Written by Jie Yang
 # see LICENSE.txt for license information
 
@@ -95,10 +96,10 @@ class DBReader:
                 print "  "*level, show
     
     def openFile(self, db_path):
-        print >> sys.stderr, "Try to open coded", repr(db_path)
+        print >> sys.stderr, time.asctime(),'-', "Try to open coded", repr(db_path)
         data = self.openDB(db_path)
-        print >> sys.stderr, "Open Type:", self.open_type_list[self.open_type]
-        print >> sys.stderr, "File Size:", len(`data`)
+        print >> sys.stderr, time.asctime(),'-', "Open Type:", self.open_type_list[self.open_type]
+        print >> sys.stderr, time.asctime(),'-', "File Size:", len(`data`)
         #self.loadTreeData(db_path, data)
         print 'open db:', repr(db_path)
         print
@@ -115,7 +116,7 @@ class DBReader:
             self.print_dict(unpack, 1)
             item = data.next()
             num += 1
-        print >> sys.stderr, "Opened items", num
+        print >> sys.stderr, time.asctime(),'-', "Opened items", num
             
         #print data
             
@@ -138,7 +139,7 @@ class DBReader:
         return d
         
     def _openDB(self, db_path, open_type):
-        print >> sys.stderr, "..Try to open by", self.open_type_list[open_type]
+        print >> sys.stderr, time.asctime(),'-', "..Try to open by", self.open_type_list[open_type]
         d = None
         if open_type == 1:    # 'bsddb.dbshelve'
             db_types = [db.DB_BTREE, db.DB_HASH]

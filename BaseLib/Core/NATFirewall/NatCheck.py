@@ -1,3 +1,4 @@
+import time 
 # Written by Lucia D'Acunto
 # see LICENSE.txt for license information
 
@@ -22,14 +23,14 @@ def Test1(udpsock, serveraddr):
     try:
         reply, rcvaddr = udpsock.recvfrom(BUFSIZ)
     except socket.timeout:
-        if DEBUG: print >> sys.stderr, "NATCheck:", "Connection attempt to %s timed out" % (serveraddr,)
+        if DEBUG: print >> sys.stderr, time.asctime(),'-', "NATCheck:", "Connection attempt to %s timed out" % (serveraddr,)
         return retVal
 
     except ValueError, (strerror):
-        if DEBUG: print >> sys.stderr, "NATCheck:", "Could not receive data: %s" % (strerror)
+        if DEBUG: print >> sys.stderr, time.asctime(),'-', "NATCheck:", "Could not receive data: %s" % (strerror)
         return retVal
     except socket.error, (errno, strerror):
-        if DEBUG: print >> sys.stderr, "NATCheck:", "Could not receive data: %s" % (strerror)
+        if DEBUG: print >> sys.stderr, time.asctime(),'-', "NATCheck:", "Could not receive data: %s" % (strerror)
         return retVal
 
     ex_ip, ex_port = reply.split(":")
@@ -56,13 +57,13 @@ def Test2(udpsock, serveraddr):
     try:
         reply, rcvaddr = udpsock.recvfrom(BUFSIZ)
     except socket.timeout:        
-        #if DEBUG: print >> sys.stderr, "NATCheck:", "Connection attempt to %s timed out" % (serveraddr,)
+        #if DEBUG: print >> sys.stderr, time.asctime(),'-', "NATCheck:", "Connection attempt to %s timed out" % (serveraddr,)
         return retVal
     except ValueError, (strerror):
-        if DEBUG: print >> sys.stderr, "NATCheck:", "Could not receive data: %s" % (strerror)
+        if DEBUG: print >> sys.stderr, time.asctime(),'-', "NATCheck:", "Could not receive data: %s" % (strerror)
         return retVal
     except socket.error, (errno, strerror):
-        if DEBUG: print >> sys.stderr, "NATCheck:", "Could not receive data: %s" % (strerror)
+        if DEBUG: print >> sys.stderr, time.asctime(),'-', "NATCheck:", "Could not receive data: %s" % (strerror)
         return retVal
 
     retVal["resp"] = True
@@ -86,13 +87,13 @@ def Test3(udpsock, serveraddr):
     try:
         reply, rcvaddr = udpsock.recvfrom(BUFSIZ)
     except socket.timeout:
-        #if DEBUG: print >> sys.stderr, "NATCheck:", "Connection attempt to %s timed out" % (serveraddr,)
+        #if DEBUG: print >> sys.stderr, time.asctime(),'-', "NATCheck:", "Connection attempt to %s timed out" % (serveraddr,)
         return retVal
     except ValueError, (strerror):
-        if DEBUG: print >> sys.stderr, "NATCheck:", "Could not receive data: %s" % (strerror)
+        if DEBUG: print >> sys.stderr, time.asctime(),'-', "NATCheck:", "Could not receive data: %s" % (strerror)
         return retVal
     except socket.error, (errno, strerror):
-        if DEBUG: print >> sys.stderr, "NATCheck:", "Could not receive data: %s" % (strerror)
+        if DEBUG: print >> sys.stderr, time.asctime(),'-', "NATCheck:", "Could not receive data: %s" % (strerror)
         return retVal
 
     ex_ip, ex_port = reply.split(":")
@@ -121,7 +122,7 @@ def GetNATType(in_port, serveraddr1, serveraddr2):
     try:
         udpsock.bind(('',in_port))
     except socket.error, err:
-        print >> sys.stderr, "Couldn't bind a udp socket on port %d : %s" % (in_port, err)
+        print >> sys.stderr, time.asctime(),'-', "Couldn't bind a udp socket on port %d : %s" % (in_port, err)
         return (nat_type, ex_ip, ex_port, in_ip)
     try:
         # Get the internal IP address
@@ -130,9 +131,9 @@ def GetNATType(in_port, serveraddr1, serveraddr2):
         s.connect(connectaddr)
         in_ip = s.getsockname()[0]
         del s
-        if DEBUG: print >> sys.stderr, "NATCheck: getting the internal ip address by connecting to tribler.org:80", in_ip
+        if DEBUG: print >> sys.stderr, time.asctime(),'-', "NATCheck: getting the internal ip address by connecting to tribler.org:80", in_ip
     except socket.error, err:
-        print >> sys.stderr, "Couldn't connect to %s:%i" % (connectaddr[0], connectaddr[1])
+        print >> sys.stderr, time.asctime(),'-', "Couldn't connect to %s:%i" % (connectaddr[0], connectaddr[1])
         return (nat_type, ex_ip, ex_port, in_ip)
 
     """
@@ -142,7 +143,7 @@ def GetNATType(in_port, serveraddr1, serveraddr2):
     # Do Test I
     ret = Test1(udpsock, serveraddr1)
 
-    if DEBUG: print >> sys.stderr, "NATCheck:", "Test I reported: " + str(ret)
+    if DEBUG: print >> sys.stderr, time.asctime(),'-', "NATCheck:", "Test I reported: " + str(ret)
 
     if ret["resp"] == False:
         nat_type[1] = "Blocked"
@@ -153,21 +154,21 @@ def GetNATType(in_port, serveraddr1, serveraddr2):
 
         if ret["ex_ip"] == in_ip: # No NAT: check for firewall
 
-            if DEBUG: print >> sys.stderr, "NATCheck:", "No NAT"
+            if DEBUG: print >> sys.stderr, time.asctime(),'-', "NATCheck:", "No NAT"
 
             # Do Test II
             ret = Test2(udpsock, serveraddr1)
-            if DEBUG: print >> sys.stderr, "NATCheck:", "Test II reported: " + str(ret)
+            if DEBUG: print >> sys.stderr, time.asctime(),'-', "NATCheck:", "Test II reported: " + str(ret)
 
             if ret["resp"] == True:
                 nat_type[0] = 0
                 nat_type[1] = "Open Internet"
             else:
-                if DEBUG: print >> sys.stderr, "NATCheck:", "There is a Firewall"
+                if DEBUG: print >> sys.stderr, time.asctime(),'-', "NATCheck:", "There is a Firewall"
 
                 # Do Test III
                 ret = Test3(udpsock, serveraddr1)
-                if DEBUG: print >> sys.stderr, "NATCheck:", "Test III reported: " + str(ret)
+                if DEBUG: print >> sys.stderr, time.asctime(),'-', "NATCheck:", "Test III reported: " + str(ret)
 
                 if ret["resp"] == True:
                     nat_type[0] = 2
@@ -177,24 +178,24 @@ def GetNATType(in_port, serveraddr1, serveraddr2):
                     nat_type[1] = "Port Restricted Cone Firewall"
 
         else: # There is a NAT
-            if DEBUG: print >> sys.stderr, "NATCheck:", "There is a NAT"
+            if DEBUG: print >> sys.stderr, time.asctime(),'-', "NATCheck:", "There is a NAT"
 
             # Do Test II
             ret = Test2(udpsock, serveraddr1)
-            if DEBUG: print >> sys.stderr, "NATCheck:", "Test II reported: " + str(ret)
+            if DEBUG: print >> sys.stderr, time.asctime(),'-', "NATCheck:", "Test II reported: " + str(ret)
             if ret["resp"] == True:
                 nat_type[0] = 1
                 nat_type[1] = "Full Cone NAT"
             else:
                 #Do Test I using a different echo server
                 ret = Test1(udpsock, serveraddr2)
-                if DEBUG: print >> sys.stderr, "NATCheck:", "Test I reported: " + str(ret)
+                if DEBUG: print >> sys.stderr, time.asctime(),'-', "NATCheck:", "Test I reported: " + str(ret)
 
                 if ex_ip == ret["ex_ip"] and ex_port == ret["ex_port"]: # Public address is constant: consistent translation
 
                     # Do Test III
                     ret = Test3(udpsock, serveraddr1)
-                    if DEBUG: print >> sys.stderr, "NATCheck:", "Test III reported: " + str(ret)
+                    if DEBUG: print >> sys.stderr, time.asctime(),'-', "NATCheck:", "Test III reported: " + str(ret)
 
                     if ret["resp"] == True:
                         nat_type[0] = 2

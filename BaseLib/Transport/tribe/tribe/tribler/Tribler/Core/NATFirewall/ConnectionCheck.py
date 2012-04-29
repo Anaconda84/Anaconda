@@ -1,3 +1,4 @@
+import time 
 import sys
 from time import sleep
 import thread
@@ -36,9 +37,9 @@ class ConnectionCheck:
 
         if DEBUG:
             if self._running:
-                print >>sys.stderr, "natcheckmsghandler: the thread is already running"
+                print >>sys.stderr, time.asctime(),'-', "natcheckmsghandler: the thread is already running"
             else:
-                print >>sys.stderr, "natcheckmsghandler: starting the thread"
+                print >>sys.stderr, time.asctime(),'-', "natcheckmsghandler: starting the thread"
             
         if not self._running:
             thread.start_new_thread(self.run, ())
@@ -72,9 +73,9 @@ class ConnectionCheck:
         Find out NAT type and public address and port
         """        
         nat_type, ex_ip, ex_port, in_ip = GetNATType(in_port, server1, server2)
-        if DEBUG: print >> sys.stderr, "NATCheck:", "NAT Type: " + nat_type[1]
-        if DEBUG: print >> sys.stderr, "NATCheck:", "Public Address: " + ex_ip + ":" + str(ex_port)
-        if DEBUG: print >> sys.stderr, "NATCheck:", "Private Address: " + in_ip + ":" + str(in_port)
+        if DEBUG: print >> sys.stderr, time.asctime(),'-', "NATCheck:", "NAT Type: " + nat_type[1]
+        if DEBUG: print >> sys.stderr, time.asctime(),'-', "NATCheck:", "Public Address: " + ex_ip + ":" + str(ex_port)
+        if DEBUG: print >> sys.stderr, time.asctime(),'-', "NATCheck:", "Private Address: " + in_ip + ":" + str(in_port)
         return nat_type, ex_ip, ex_port, in_ip
 
     def get_nat_type(self, callback=None):
@@ -118,7 +119,7 @@ class ConnectionCheck:
         pingback_servers = self.session.get_pingback_servers()
         random.shuffle(pingback_servers)
 
-        if DEBUG: print >> sys.stderr, "NATCheck:", 'Starting ConnectionCheck on %s %s %s' % (in_port, stun1, stun2)
+        if DEBUG: print >> sys.stderr, time.asctime(),'-', "NATCheck:", 'Starting ConnectionCheck on %s %s %s' % (in_port, stun1, stun2)
 
         performed_nat_type_notification = False
 
@@ -136,13 +137,13 @@ class ConnectionCheck:
 
             if nat_type[0] > 0:
                 for pingback in pingback_servers:
-                    if DEBUG: print >> sys.stderr, "NatCheck: pingback is:", pingback
+                    if DEBUG: print >> sys.stderr, time.asctime(),'-', "NatCheck: pingback is:", pingback
                     self.nat_timeout = self.timeout_check(pingback)
                     if self.nat_timeout <= 0: break
-                if DEBUG: print >> sys.stderr, "NATCheck: Nat UDP timeout is: ", str(self.nat_timeout)
+                if DEBUG: print >> sys.stderr, time.asctime(),'-', "NATCheck: Nat UDP timeout is: ", str(self.nat_timeout)
 
             self.nat_params = [nat_type[1], nat_type[0], self.nat_timeout, ex_ip, int(ex_port), in_ip, in_port]
-            if DEBUG: print >> sys.stderr, "NATCheck:", str(self.nat_params)
+            if DEBUG: print >> sys.stderr, time.asctime(),'-', "NATCheck:", str(self.nat_params)
 
             # notify any callbacks interested in sending a natcheck_reply message
             for reply_callback in self.natcheck_reply_callbacks:

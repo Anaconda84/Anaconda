@@ -1,3 +1,4 @@
+import time 
 # Written by Njaal Borch
 # see LICENSE.txt for license information
 
@@ -305,7 +306,7 @@ class ClosedSwarm:
         if self.poa: # Allow nodes to support CS but not have a POA (e.g. if they are seeding)
             if self.poa.get_torrent_pub_key() not in self.torrent_pubkeys:
                 import sys
-                print >> sys.stderr,"Bad POA for this torrent (wrong torrent key!)"
+                print >> sys.stderr,time.asctime(),'-', "Bad POA for this torrent (wrong torrent key!)"
                 self.poa = None
         
     def is_remote_node_authorized(self):
@@ -423,8 +424,8 @@ class ClosedSwarm:
 
         if poa.get_torrent_pub_key() not in self.torrent_pubkeys:
             import sys
-            print >>sys.stderr,"Pub key:",poa.get_torrent_pub_key()
-            print >>sys.stderr,"Torrent keys:",self.torrent_pubkeys
+            print >>sys.stderr,time.asctime(),'-', "Pub key:",poa.get_torrent_pub_key()
+            print >>sys.stderr,time.asctime(),'-', "Torrent keys:",self.torrent_pubkeys
             raise InvalidPOAException("Bad POA for this torrent")
 
         # Check the signature
@@ -488,7 +489,7 @@ class ClosedSwarm:
         except Exception,e:
             self.remote_node_authorized = False
             #import sys
-            #print >>sys.stderr, "Error validating POA from A",e
+            #print >>sys.stderr, time.asctime(),'-', "Error validating POA from A",e
 
         if i_am_seeding:
             return None
@@ -562,7 +563,7 @@ class ClosedSwarm:
         remote_poa = POA.deserialize(poa)
         if not remote_poa.get_torrent_pub_key() in self.torrent_pubkeys:
             import sys
-            print >>sys.stderr,"Pub key:",remote_poa.get_torrent_pub_key(),"not in",self.torrent_pubkeys
+            print >>sys.stderr,time.asctime(),'-', "Pub key:",remote_poa.get_torrent_pub_key(),"not in",self.torrent_pubkeys
             
             raise InvalidPOAException("Bad POA for this swarm")
         

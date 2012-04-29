@@ -1,3 +1,4 @@
+import time 
 # Written by Arno Bakker 
 # see LICENSE.txt for license information
 
@@ -8,17 +9,17 @@ from BaseLib.Video.VideoServer import VideoHTTPServer
 
 
 def state_callback(d,ds):
-    print >>sys.stderr,"main: Stats",dlstatus_strings[ds.get_status()],ds.get_progress(),"%",ds.get_error()
+    print >>sys.stderr,time.asctime(),'-', "main: Stats",dlstatus_strings[ds.get_status()],ds.get_progress(),"%",ds.get_error()
 
 def vod_ready_callback(d,event,params):
-    print >>sys.stderr,"main: VOD ready callback called",currentThread().getName(),"###########################################################",params["mimetype"]
+    print >>sys.stderr,time.asctime(),'-', "main: VOD ready callback called",currentThread().getName(),"###########################################################",params["mimetype"]
 
     """
     f = open("video.avi","wb")
     while True:
         data = stream.read()
-        print >>sys.stderr,"main: VOD ready callback: reading",type(data)
-        print >>sys.stderr,"main: VOD ready callback: reading",len(data)
+        print >>sys.stderr,time.asctime(),'-', "main: VOD ready callback: reading",type(data)
+        print >>sys.stderr,time.asctime(),'-', "main: VOD ready callback: reading",len(data)
         if len(data) == 0:
             break
         f.write(data)

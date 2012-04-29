@@ -1,3 +1,4 @@
+import time 
 # Written by Arno Bakker 
 # see LICENSE.txt for license information
 
@@ -83,7 +84,7 @@ class TriblerLaunchMany(Thread):
                     randomizer = config['random_port'])
         
         if DEBUG:
-            print >>sys.stderr,"tlm: Got listen port", self.listen_port
+            print >>sys.stderr,time.asctime(),'-', "tlm: Got listen port", self.listen_port
         
         self.multihandler = MultiHandler(self.rawserver, self.sessdoneflag)
         self.shutdownstarttime = None
@@ -104,7 +105,7 @@ class TriblerLaunchMany(Thread):
                 config['nickname']  = socket.gethostname()
                 
             if DEBUG:
-                print >>sys.stderr,'tlm: Reading Session state from',config['state_dir']
+                print >>sys.stderr,time.asctime(),'-', 'tlm: Reading Session state from',config['state_dir']
                 
             cachedb.init(config, self.rawserver_fatalerrorfunc)
             
@@ -309,7 +310,7 @@ class TriblerLaunchMany(Thread):
                 pstate = self.load_download_pstate_noexc(infohash)
                 if pstate is not None:
                     if DEBUG:
-                        print >>sys.stderr,"tlm: add: pstate is",dlstatus_strings[pstate['dlstate']['status']],pstate['dlstate']['progress']
+                        print >>sys.stderr,time.asctime(),'-', "tlm: add: pstate is",dlstatus_strings[pstate['dlstate']['status']],pstate['dlstate']['progress']
             
             # Store in list of Downloads, always. 
             self.downloads[infohash] = d
@@ -318,7 +319,7 @@ class TriblerLaunchMany(Thread):
             if self.torrent_db != None and self.mypref_db != None:
                 raw_filename = tdef.get_name_as_unicode()
                 save_name = get_readable_torrent_name(infohash, raw_filename)
-                #print >> sys.stderr, 'tlm: add', save_name, self.session.sessconfig
+                #print >> sys.stderr, time.asctime(),'-', 'tlm: add', save_name, self.session.sessconfig
                 torrent_dir = self.session.sessconfig['torrent_collecting_dir']
                 save_path = os.path.join(torrent_dir, save_name)
                 if not os.path.exists(save_path):    # save the torrent to the common torrent dir
@@ -398,13 +399,13 @@ class TriblerLaunchMany(Thread):
     def rawserver_fatalerrorfunc(self,e):
         """ Called by network thread """
         if DEBUG:
-            print >>sys.stderr,"tlm: RawServer fatal error func called",e
+            print >>sys.stderr,time.asctime(),'-', "tlm: RawServer fatal error func called",e
         print_exc()
 
     def rawserver_nonfatalerrorfunc(self,e):
         """ Called by network thread """
         if DEBUG:
-            print >>sys.stderr,"tlm: RawServer non fatal error func called",e
+            print >>sys.stderr,time.asctime(),'-', "tlm: RawServer non fatal error func called",e
         print_exc()
         # Could log this somewhere, or phase it out
 
@@ -468,7 +469,7 @@ class TriblerLaunchMany(Thread):
         
         Called by network thread """
         if DEBUG:
-            print >>sys.stderr,"tlm: hashcheck_done, success",success
+            print >>sys.stderr,time.asctime(),'-', "tlm: hashcheck_done, success",success
         if success:
             self.sdownloadtohashcheck.hashcheck_done()
         if self.hashcheck_queue:
@@ -548,11 +549,11 @@ class TriblerLaunchMany(Thread):
             pstate = self.load_download_pstate(filename)
             
             if DEBUG:
-                print >>sys.stderr,"tlm: load_checkpoint: pstate is",dlstatus_strings[pstate['dlstate']['status']],pstate['dlstate']['progress']
+                print >>sys.stderr,time.asctime(),'-', "tlm: load_checkpoint: pstate is",dlstatus_strings[pstate['dlstate']['status']],pstate['dlstate']['progress']
                 if pstate['engineresumedata'] is None:
-                    print >>sys.stderr,"tlm: load_checkpoint: resumedata None"
+                    print >>sys.stderr,time.asctime(),'-', "tlm: load_checkpoint: resumedata None"
                 else:
-                    print >>sys.stderr,"tlm: load_checkpoint: resumedata len",len(pstate['engineresumedata'])
+                    print >>sys.stderr,time.asctime(),'-', "tlm: load_checkpoint: resumedata len",len(pstate['engineresumedata'])
             
             tdef = TorrentDef.load_from_dict(pstate['metainfo'])
             
@@ -573,7 +574,7 @@ class TriblerLaunchMany(Thread):
         #
         dllist = self.downloads.values()
         if DEBUG:
-            print >>sys.stderr,"tlm: checkpointing",len(dllist)
+            print >>sys.stderr,time.asctime(),'-', "tlm: checkpointing",len(dllist)
         
         network_checkpoint_callback_lambda = lambda:self.network_checkpoint_callback(dllist,stop,checkpoint,gracetime)
         self.rawserver.add_task(network_checkpoint_callback_lambda,0.0)
@@ -589,7 +590,7 @@ class TriblerLaunchMany(Thread):
                 # for storage.
                 #
                 if DEBUG:
-                    print >>sys.stderr,"tlm: network checkpointing:",`d.get_def().get_name()`
+                    print >>sys.stderr,time.asctime(),'-', "tlm: network checkpointing:",`d.get_def().get_name()`
                 if stop:
                     (infohash,pstate) = d.network_stop(False,False)
                 else:
@@ -606,7 +607,7 @@ class TriblerLaunchMany(Thread):
                 now = timemod.time()
                 diff = now - self.shutdownstarttime
                 if diff < gracetime:
-                    print >>sys.stderr,"tlm: shutdown: delaying for early shutdown tasks",gracetime-diff
+                    print >>sys.stderr,time.asctime(),'-', "tlm: shutdown: delaying for early shutdown tasks",gracetime-diff
                     delay = gracetime-diff 
                     network_shutdown_callback_lambda = lambda:self.network_shutdown()
                     self.rawserver.add_task(network_shutdown_callback_lambda,delay)
@@ -637,9 +638,9 @@ class TriblerLaunchMany(Thread):
             mainlineDHT.deinit()
             
             ts = enumerate()
-            print >>sys.stderr,"tlm: Number of threads still running",len(ts)
+            print >>sys.stderr,time.asctime(),'-', "tlm: Number of threads still running",len(ts)
             for t in ts:
-                print >>sys.stderr,"tlm: Thread still running",t.getName(),"daemon",t.isDaemon(), "instance:", t
+                print >>sys.stderr,time.asctime(),'-', "tlm: Thread still running",t.getName(),"daemon",t.isDaemon(), "instance:", t
         except:
             print_exc()
         
@@ -654,7 +655,7 @@ class TriblerLaunchMany(Thread):
         filename = os.path.join(self.session.get_downloads_pstate_dir(),basename)
         
         if DEBUG:
-            print >>sys.stderr,"tlm: network checkpointing: to file",filename
+            print >>sys.stderr,time.asctime(),'-', "tlm: network checkpointing: to file",filename
         f = open(filename,"wb")
         pickle.dump(pstate,f)
         f.close()
@@ -688,7 +689,7 @@ class TriblerLaunchMany(Thread):
             import cProfile
             cProfile.runctx( "self._run()", globals(), locals(), filename=fname )
             import pstats
-            print >>sys.stderr,"profile: data for %s" % self.getName()
+            print >>sys.stderr,time.asctime(),'-', "profile: data for %s" % self.getName()
             pstats.Stats(fname,stream=sys.stderr).sort_stats("cumulative").print_stats(20)
         else:
             self._run()
@@ -704,7 +705,7 @@ class TriblerLaunchMany(Thread):
         Called by network thread """ 
         
         if DEBUG:
-            print >>sys.stderr,"tlm: start_upnp()"
+            print >>sys.stderr,time.asctime(),'-', "tlm: start_upnp()"
         self.set_activity(NTFY_ACT_UPNP)
         self.upnp_thread = UPnPThread(self.upnp_type,self.locally_guessed_ext_ip,self.listen_port,self.upnp_failed_callback,self.upnp_got_ext_ip_callback)
         self.upnp_thread.start()
@@ -718,7 +719,7 @@ class TriblerLaunchMany(Thread):
         """ Called by UPnP thread TODO: determine how to pass to API user 
             In principle this is a non fatal error. But it is one we wish to
             show to the user """
-        print >>sys.stderr,"UPnP mode "+str(upnp_type)+" request to firewall failed with error "+str(error_type)+" Try setting a different mode in Preferences. Listen port was "+str(listenport)+", protocol"+listenproto,exc
+        print >>sys.stderr,time.asctime(),'-', "UPnP mode "+str(upnp_type)+" request to firewall failed with error "+str(error_type)+" Try setting a different mode in Preferences. Listen port was "+str(listenport)+", protocol"+listenproto,exc
 
     def upnp_got_ext_ip_callback(self,ip):
         """ Called by UPnP thread """
@@ -737,7 +738,7 @@ class TriblerLaunchMany(Thread):
         self.sesslock.acquire()
         self.yourip_ext_ip = ip
         if DEBUG:
-            print >> sys.stderr,"tlm: yourip_got_ext_ip_callback: others think my IP address is",ip
+            print >> sys.stderr,time.asctime(),'-', "tlm: yourip_got_ext_ip_callback: others think my IP address is",ip
         self.sesslock.release()
 
 
@@ -783,7 +784,7 @@ class TriblerLaunchMany(Thread):
         
     def set_activity(self,type, str = '', arg2=None):
         """ Called by overlay + network thread """
-        #print >>sys.stderr,"tlm: set_activity",type,str,arg2
+        #print >>sys.stderr,time.asctime(),'-', "tlm: set_activity",type,str,arg2
         self.session.uch.notify(NTFY_ACTIVITIES, NTFY_INSERT, type, str, arg2)
 
         
@@ -791,7 +792,7 @@ class TriblerLaunchMany(Thread):
         """ Called by network thread """
 
         if DEBUG:
-            print >>sys.stderr,"tlm: network_vod_event_callback: event %s, params %s" % (event,params)
+            print >>sys.stderr,time.asctime(),'-', "tlm: network_vod_event_callback: event %s, params %s" % (event,params)
         
         # Call Session threadpool to call user's callback
         try:        
@@ -806,7 +807,7 @@ class TriblerLaunchMany(Thread):
             ntorrents = self.overlay_apps.metadata_handler.num_torrents
             if ntorrents > 0:
                 self.torrent_checking_period = min(max(86400/ntorrents, 15), 300)
-        #print >> sys.stderr, "torrent_checking_period", self.torrent_checking_period
+        #print >> sys.stderr, time.asctime(),'-', "torrent_checking_period", self.torrent_checking_period
         #self.torrent_checking_period = 1    ### DEBUG, remove it before release!!    
 
     def run_torrent_check(self):
@@ -842,7 +843,7 @@ class TriblerLaunchMany(Thread):
         
     def network_h4xor_reset(self):
         from BaseLib.Core.BitTornado.BT1.Encrypter import incompletecounter
-        print >>sys.stderr,"tlm: h4x0r Resetting outgoing TCP connection rate limiter",incompletecounter.c,"==="
+        print >>sys.stderr,time.asctime(),'-', "tlm: h4x0r Resetting outgoing TCP connection rate limiter",incompletecounter.c,"==="
         incompletecounter.c = 0
 
 
@@ -873,7 +874,7 @@ class TriblerLaunchMany(Thread):
         
         self.rawserver.start_listening_udp(self.mc_sock, self.mc_channel)
 
-        print >>sys.stderr,"mcast: Sending node announcement"
+        print >>sys.stderr,time.asctime(),'-', "mcast: Sending node announcement"
         params = [self.session.get_listen_port(), self.secure_overlay.olproto_ver_current]
         self.mc_channel.sendAnnounce(params)
         

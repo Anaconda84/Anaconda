@@ -9,6 +9,7 @@ import codecs
 import hashlib
 import os.path
 import sys
+import time 
 
 DEBUG = False
 
@@ -167,7 +168,7 @@ class SubtitleInfo(object):
             return hasher.digest()
         
         except IOError:
-            print >> sys.stderr, "Warning: Unable to open " + self.path + " for reading"
+            print >> sys.stderr, time.asctime(),'-', "Warning: Unable to open " + self.path + " for reading"
  
         
     

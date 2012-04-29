@@ -1,3 +1,4 @@
+import time 
 # Written by Fabian van der Werf and Arno Bakker
 # see LICENSE.txt for license information
 
@@ -18,7 +19,7 @@ VLC_MAXVOLUME = 200
 
 def check_threading():
     if currentThread().getName() != "MainThread":
-        print >>sys.stderr,"VLCWrapper: Thread violation!"
+        print >>sys.stderr,time.asctime(),'-', "VLCWrapper: Thread violation!"
         print_stack()
 
 class VLCWrapper:
@@ -80,11 +81,11 @@ class VLCWrapper:
         xid = wxwindow.GetHandle()
         if xid == 0:
             if DEBUG:
-                print >>sys.stderr,"VLCWrapper: set_window: WARNING: window not yet materialized, XID=0"
+                print >>sys.stderr,time.asctime(),'-', "VLCWrapper: set_window: WARNING: window not yet materialized, XID=0"
             return
         
         if DEBUG:
-            print >>sys.stderr,"VLCWrapper: set_window, XID=",xid
+            print >>sys.stderr,time.asctime(),'-', "VLCWrapper: set_window, XID=",xid
             
         if sys.platform == 'darwin':
             # pylint: disable-msg=E1101
@@ -180,7 +181,7 @@ class VLCWrapper:
             params += ["--no-video-title-show"]
             params += ["--no-osd"]
 
-        #print >>sys.stderr,"VLCWrapper: get_vlc_mediactrl: params",params
+        #print >>sys.stderr,time.asctime(),'-', "VLCWrapper: get_vlc_mediactrl: params",params
             
         media = self.vlc.MediaControl(params)
 
@@ -195,7 +196,7 @@ class VLCWrapper:
             self._init_vlc()
 
         check_threading()
-        print >>sys.stderr,"VLCWrapper: load:",url,streaminfo
+        print >>sys.stderr,time.asctime(),'-', "VLCWrapper: load:",url,streaminfo
         
         #self.media.exit()
         #self.media = self.get_vlc_mediactrl()
@@ -212,7 +213,7 @@ class VLCWrapper:
             self.videorawserv.set_inputstream(streaminfo,sid)
                
             if DEBUG:
-                print >>sys.stderr,"VLCWrapper: load: stream",sid,"size",streaminfo['length']
+                print >>sys.stderr,time.asctime(),'-', "VLCWrapper: load: stream",sid,"size",streaminfo['length']
             length = streaminfo['length']
             if length is None:
                 length = -1
@@ -220,13 +221,13 @@ class VLCWrapper:
             self.media.set_raw_callbacks(self.videorawserv.ReadDataCallback,self.videorawserv.SeekDataCallback,length,sid)
         else:
             if DEBUG:
-                print >>sys.stderr,"VLCWrapper: load: calling playlist_add_item"
+                print >>sys.stderr,time.asctime(),'-', "VLCWrapper: load: calling playlist_add_item"
             if self.VLC_MEDIACONTROL_API_VERSION == "0.2":
                 self.media.set_mrl(url)
             else:
                 self.media.playlist_add_item(url)
 
-        #print >>sys.stderr,"VLCWrapper: load: after list is",self.media.playlist_get_list()
+        #print >>sys.stderr,time.asctime(),'-', "VLCWrapper: load: after list is",self.media.playlist_get_list()
 
 
     def start(self,abspos=0):
@@ -236,9 +237,9 @@ class VLCWrapper:
         check_threading()
         if DEBUG:
             if self.VLC_MEDIACONTROL_API_VERSION == "0.2":
-                print >>sys.stderr,"VLCWrapper: start: item is",self.media.get_mrl()
+                print >>sys.stderr,time.asctime(),'-', "VLCWrapper: start: item is",self.media.get_mrl()
             else:
-                print >>sys.stderr,"VLCWrapper: start: list is",self.media.playlist_get_list()    
+                print >>sys.stderr,time.asctime(),'-', "VLCWrapper: start: list is",self.media.playlist_get_list()    
         pos = self.vlc.Position()
         pos.origin = self.vlc.AbsolutePosition
         pos.key = self.vlc.MediaTime
@@ -252,7 +253,7 @@ class VLCWrapper:
 
         check_threading()
         if DEBUG:
-            print >>sys.stderr,"VLCWrapper: stop"
+            print >>sys.stderr,time.asctime(),'-', "VLCWrapper: stop"
         self.media.stop()
 
     def pause(self):
@@ -261,7 +262,7 @@ class VLCWrapper:
 
         check_threading()
         if DEBUG:
-            print >>sys.stderr,"VLCWrapper: pause"
+            print >>sys.stderr,time.asctime(),'-', "VLCWrapper: pause"
         self.media.pause()
 
     def resume(self):
@@ -270,7 +271,7 @@ class VLCWrapper:
 
         check_threading()
         if DEBUG:
-            print >>sys.stderr,"VLCWrapper: resume"
+            print >>sys.stderr,time.asctime(),'-', "VLCWrapper: resume"
         self.media.resume()
 
 
@@ -322,7 +323,7 @@ class VLCWrapper:
 
         check_threading()
         if DEBUG:
-            print >>sys.stderr,"VLCWrapper: sound_set_volume"
+            print >>sys.stderr,time.asctime(),'-', "VLCWrapper: sound_set_volume"
         vol = int(frac * VLC_MAXVOLUME)
         self.media.sound_set_volume(vol)
 
@@ -342,7 +343,7 @@ class VLCWrapper:
 
         check_threading()
         if DEBUG:
-            print >>sys.stderr,"VLCWrapper set_fullscreen"
+            print >>sys.stderr,time.asctime(),'-', "VLCWrapper set_fullscreen"
         if b:
             self.media.set_fullscreen(1)
         else:
@@ -354,7 +355,7 @@ class VLCWrapper:
 
         check_threading()
         if DEBUG:
-            print >>sys.stderr,"VLCWrapper: playlist_get_list"
+            print >>sys.stderr,time.asctime(),'-', "VLCWrapper: playlist_get_list"
         if self.VLC_MEDIACONTROL_API_VERSION == "0.2":
             return [self.media.get_mrl()]
         else:
@@ -366,7 +367,7 @@ class VLCWrapper:
 
         check_threading()
         if DEBUG:
-            print >>sys.stderr,"VLCWrapper: playlist_clear"
+            print >>sys.stderr,time.asctime(),'-', "VLCWrapper: playlist_clear"
 
         if self.VLC_MEDIACONTROL_API_VERSION == "0.2":
             #raise RuntimeError("VLC MediaControlAPI 0.2 doesn't support playlist ops")

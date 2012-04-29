@@ -1,3 +1,4 @@
+import time 
 # Written by Arno Bakker
 # see LICENSE.txt for license information
 
@@ -25,7 +26,7 @@ class OverlapMsgHandler:
 
     def register(self, overlay_bridge, launchmany):
         if DEBUG:
-            print >> sys.stderr,"socnet: bootstrap: overlap"
+            print >> sys.stderr,time.asctime(),'-', "socnet: bootstrap: overlap"
         self.mypermid = launchmany.session.get_permid()
         self.session = launchmany.session
         self.peer_db = launchmany.peer_db 
@@ -42,7 +43,7 @@ class OverlapMsgHandler:
         except:
             print_exc()
             if DEBUG:
-                print >> sys.stderr,"socnet: SOCIAL_OVERLAP: error becoding"
+                print >> sys.stderr,time.asctime(),'-', "socnet: SOCIAL_OVERLAP: error becoding"
             return False
 
         if not isValidDict(oldict,permid):
@@ -62,7 +63,7 @@ class OverlapMsgHandler:
         if self.peer_db.hasPeer(permid):
             save_ssocnet_peer(self,permid,oldict,False,False,False)
         elif DEBUG:
-            print >> sys.stderr,"socnet: overlap: peer unknown?! Weird, we just established connection"
+            print >> sys.stderr,time.asctime(),'-', "socnet: overlap: peer unknown?! Weird, we just established connection"
 
         # 6. Reply
         if not (permid in self.recentpeers.keys()):
@@ -75,7 +76,7 @@ class OverlapMsgHandler:
             if (t+MIN_OVERLAP_WAIT) > time():
                 newdict[permid2] = t
             #elif DEBUG:
-            #    print >> sys.stderr,"socnet: overlap: clean recent: not keeping",show_permid_short(permid2)
+            #    print >> sys.stderr,time.asctime(),'-', "socnet: overlap: clean recent: not keeping",show_permid_short(permid2)
                 
         self.recentpeers = newdict
 
@@ -94,9 +95,9 @@ class OverlapMsgHandler:
                 self.recentpeers[permid] = time()
                 self.reply_to_overlap(permid)
             elif DEBUG:
-                print >> sys.stderr,"socnet: overlap: active: he should initiate"
+                print >> sys.stderr,time.asctime(),'-', "socnet: overlap: active: he should initiate"
         elif DEBUG:
-            print >> sys.stderr,"socnet: overlap: active: peer recently contacted already"
+            print >> sys.stderr,time.asctime(),'-', "socnet: overlap: active: peer recently contacted already"
 
     #
     # General
@@ -122,10 +123,10 @@ class OverlapMsgHandler:
         oldict = {}
         oldict['persinfo'] = persinfo
 
-        #print >> sys.stderr, 'Overlap: Sending oldict: %s' % `oldict`
+        #print >> sys.stderr, time.asctime(),'-', 'Overlap: Sending oldict: %s' % `oldict`
                             
         #if DEBUG:
-        #    print >> sys.stderr,"socnet: overlap: active: sending hashdict"
+        #    print >> sys.stderr,time.asctime(),'-', "socnet: overlap: active: sending hashdict"
         #    self.print_hashdict(oldict['hashnetwork'])
 
         return oldict
@@ -144,7 +145,7 @@ class OverlapMsgHandler:
     def send_callback(self,exc,permid):
         if exc is not None:
             if DEBUG:
-                print >> sys.stderr,"socnet: SOCIAL_OVERLAP: error sending to",show_permid_short(permid),exc
+                print >> sys.stderr,time.asctime(),'-', "socnet: SOCIAL_OVERLAP: error sending to",show_permid_short(permid),exc
 
     #
     # Internal methods
@@ -154,22 +155,22 @@ class OverlapMsgHandler:
 def isValidDict(oldict,source_permid):
     if not isinstance(oldict, dict):
         if DEBUG:
-            print >> sys.stderr,"socnet: SOCIAL_OVERLAP: not a dict"
+            print >> sys.stderr,time.asctime(),'-', "socnet: SOCIAL_OVERLAP: not a dict"
         return False
     k = oldict.keys()        
 
     if DEBUG:
-        print >> sys.stderr,"socnet: SOCIAL_OVERLAP: keys",k
+        print >> sys.stderr,time.asctime(),'-', "socnet: SOCIAL_OVERLAP: keys",k
 
     if not ('persinfo' in k) or not isValidPersinfo(oldict['persinfo'],False):
         if DEBUG:
-            print >> sys.stderr,"socnet: SOCIAL_OVERLAP: key 'persinfo' missing or value wrong type in dict"
+            print >> sys.stderr,time.asctime(),'-', "socnet: SOCIAL_OVERLAP: key 'persinfo' missing or value wrong type in dict"
         return False
 
     for key in k:
         if key not in ['persinfo']:
             if DEBUG:
-                print >> sys.stderr,"socnet: SOCIAL_OVERLAP: unknown key",key,"in dict"
+                print >> sys.stderr,time.asctime(),'-', "socnet: SOCIAL_OVERLAP: unknown key",key,"in dict"
             return False
 
     return True
@@ -179,41 +180,41 @@ def isValidDict(oldict,source_permid):
 def isValidPersinfo(persinfo,signed):
     if not isinstance(persinfo,dict):
         if DEBUG:
-            print >> sys.stderr,"socnet: SOCIAL_*: persinfo: not a dict"
+            print >> sys.stderr,time.asctime(),'-', "socnet: SOCIAL_*: persinfo: not a dict"
         return False
 
     k = persinfo.keys()
-    #print >> sys.stderr,"socnet: SOCIAL_*: persinfo: keys are",k
+    #print >> sys.stderr,time.asctime(),'-', "socnet: SOCIAL_*: persinfo: keys are",k
     if not ('name' in k) or not isinstance(persinfo['name'],str):
         if DEBUG:
-            print >> sys.stderr,"socnet: SOCIAL_*: persinfo: key 'name' missing or value wrong type"
+            print >> sys.stderr,time.asctime(),'-', "socnet: SOCIAL_*: persinfo: key 'name' missing or value wrong type"
         return False
 
     if 'icontype' in k and not isValidIconType(persinfo['icontype']):
         if DEBUG:
-            print >> sys.stderr,"socnet: SOCIAL_*: persinfo: key 'icontype' value wrong type"
+            print >> sys.stderr,time.asctime(),'-', "socnet: SOCIAL_*: persinfo: key 'icontype' value wrong type"
         return False
 
     if 'icondata' in k and not isValidIconData(persinfo['icondata']):
         if DEBUG:
-            print >> sys.stderr,"socnet: SOCIAL_*: persinfo: key 'icondata' value wrong type"
+            print >> sys.stderr,time.asctime(),'-', "socnet: SOCIAL_*: persinfo: key 'icondata' value wrong type"
         return False
 
     if ('icontype' in k and not ('icondata' in k)) or ('icondata' in k and not ('icontype' in k)):
         if DEBUG:
-            print >> sys.stderr,"socnet: SOCIAL_*: persinfo: key 'icontype' without 'icondata' or vice versa"
+            print >> sys.stderr,time.asctime(),'-', "socnet: SOCIAL_*: persinfo: key 'icontype' without 'icondata' or vice versa"
         return False
 
     if signed:
         if not ('insert_time' in k) or not isinstance(persinfo['insert_time'],int):
             if DEBUG:
-                print >> sys.stderr,"socnet: SOCIAL_*: persinfo: key 'insert_time' missing or value wrong type"
+                print >> sys.stderr,time.asctime(),'-', "socnet: SOCIAL_*: persinfo: key 'insert_time' missing or value wrong type"
             return False
 
     for key in k:
         if key not in ['name','icontype','icondata','insert_time']:
             if DEBUG:
-                print >> sys.stderr,"socnet: SOCIAL_*: persinfo: unknown key",key,"in dict"
+                print >> sys.stderr,time.asctime(),'-', "socnet: SOCIAL_*: persinfo: unknown key",key,"in dict"
             return False
 
     return True
@@ -232,7 +233,7 @@ def isValidIconData(data):
         return False
     
 #    if DEBUG:
-#        print >>sys.stderr,"socnet: SOCIAL_*: persinfo: IconData length is",len(data)
+#        print >>sys.stderr,time.asctime(),'-', "socnet: SOCIAL_*: persinfo: IconData length is",len(data)
     
     return len(data) <= ICON_MAX_SIZE
 
@@ -254,16 +255,16 @@ def save_ssocnet_peer(self,permid,record,persinfo_ignore,hrwidinfo_ignore,ipinfo
         persinfo = record['persinfo']
         
         if DEBUG:
-            print >>sys.stderr,"socnet: Got persinfo",persinfo.keys()
+            print >>sys.stderr,time.asctime(),'-', "socnet: Got persinfo",persinfo.keys()
             if len(persinfo.keys()) > 1:
-                print >>sys.stderr,"socnet: Got persinfo THUMB THUMB THUMB THUMB"
+                print >>sys.stderr,time.asctime(),'-', "socnet: Got persinfo THUMB THUMB THUMB THUMB"
         
         # Arno, 2008-08-22: to avoid UnicodeDecode errors when commiting 
         # on sqlite
         name = str2unicode(persinfo['name'])
 
         if DEBUG:
-            print >> sys.stderr,"socnet: SOCIAL_OVERLAP",show_permid_short(permid),`name`
+            print >> sys.stderr,time.asctime(),'-', "socnet: SOCIAL_OVERLAP",show_permid_short(permid),`name`
         
         if self.peer_db.hasPeer(permid):
             self.peer_db.updatePeer(permid, name=name)
@@ -273,5 +274,5 @@ def save_ssocnet_peer(self,permid,record,persinfo_ignore,hrwidinfo_ignore,ipinfo
         # b. Save icon
         if 'icontype' in persinfo and 'icondata' in persinfo: 
             if DEBUG:
-                print >> sys.stderr,"socnet: saving icon for",show_permid_short(permid),`name`
+                print >> sys.stderr,time.asctime(),'-', "socnet: saving icon for",show_permid_short(permid),`name`
             self.peer_db.updatePeerIcon(permid, persinfo['icontype'],persinfo['icondata'])    

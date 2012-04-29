@@ -1,3 +1,4 @@
+import time 
 # Written by Arno Bakker, George Milescu
 # see LICENSE.txt for license information
 #
@@ -38,9 +39,9 @@ class TestDownloadHelp(TestAsServer):
     def setUp(self):
         """ override TestAsServer """
         TestAsServer.setUp(self)
-        print >>sys.stderr,"test: Giving MyLaunchMany time to startup"
+        print >>sys.stderr,time.asctime(),'-', "test: Giving MyLaunchMany time to startup"
         time.sleep(5)
-        print >>sys.stderr,"test: MyLaunchMany should have started up"
+        print >>sys.stderr,time.asctime(),'-', "test: MyLaunchMany should have started up"
 
     def setUpPreSession(self):
         """ override TestAsServer """
@@ -102,7 +103,7 @@ class TestDownloadHelp(TestAsServer):
 
     def tearDown(self):
         """ override TestAsServer """
-        print >> sys.stderr,"test: *** TEARDOWN"
+        print >> sys.stderr,time.asctime(),'-', "test: *** TEARDOWN"
         TestAsServer.tearDown(self)
         self.mytracker.shutdown()
         self.tearDownMyListenSockets()
@@ -114,11 +115,11 @@ class TestDownloadHelp(TestAsServer):
 
 
     def states_callback(self,dslist):
-        print >>sys.stderr,"stats: dslist",len(dslist)
+        print >>sys.stderr,time.asctime(),'-', "stats: dslist",len(dslist)
         for ds in dslist:
-            print >>sys.stderr,"stats: coordinator",`ds.get_coopdl_coordinator()`
-            print >>sys.stderr,"stats: helpers",`ds.get_coopdl_helpers()`
-        print >>sys.stderr, ""
+            print >>sys.stderr,time.asctime(),'-', "stats: coordinator",`ds.get_coopdl_coordinator()`
+            print >>sys.stderr,time.asctime(),'-', "stats: helpers",`ds.get_coopdl_helpers()`
+        print >>sys.stderr, time.asctime(),'-', ""
         return (0.5,False)
 
     # Creates dictionary with good commands
@@ -139,7 +140,7 @@ class TestDownloadHelp(TestAsServer):
         print "*** running singtest_good_2fast"
         print "***"
         genresdict = self.get_genresdict()
-        print >>sys.stderr,"test: good ASK_FOR_HELP"
+        print >>sys.stderr,time.asctime(),'-', "test: good ASK_FOR_HELP"
         self._test_2fast(genresdict)
     
 
@@ -149,57 +150,57 @@ class TestDownloadHelp(TestAsServer):
     def singtest_bad_2fast_dlhelp(self):
         genresdict = self.get_genresdict()
         genresdict[ASK_FOR_HELP] = (self.create_bad_dlhelp_not_infohash,False)
-        print >>sys.stderr,"test: bad dlhelp"
+        print >>sys.stderr,time.asctime(),'-', "test: bad dlhelp"
         self._test_2fast(genresdict)
         
     def singtest_bad_2fast_metadata_not_bdecodable(self):
         genresdict = self.get_genresdict()
         genresdict[METADATA] = (self.create_bad_metadata_not_bdecodable,False)
-        print >>sys.stderr,"test: bad METADATA",genresdict[METADATA][0]
+        print >>sys.stderr,time.asctime(),'-', "test: bad METADATA",genresdict[METADATA][0]
         self._test_2fast(genresdict)
 
     def singtest_bad_2fast_metadata_not_dict1(self):
         genresdict = self.get_genresdict()
         genresdict[METADATA] = (self.create_bad_metadata_not_dict1,False)
-        print >>sys.stderr,"test: bad METADATA",genresdict[METADATA][0]
+        print >>sys.stderr,time.asctime(),'-', "test: bad METADATA",genresdict[METADATA][0]
         self._test_2fast(genresdict)
 
     def singtest_bad_2fast_metadata_not_dict2(self):
         genresdict = self.get_genresdict()
         genresdict[METADATA] = (self.create_bad_metadata_not_dict2,False)
-        print >>sys.stderr,"test: bad METADATA",genresdict[METADATA][0]
+        print >>sys.stderr,time.asctime(),'-', "test: bad METADATA",genresdict[METADATA][0]
         self._test_2fast(genresdict)
 
 
     def singtest_bad_2fast_metadata_empty_dict(self):
         genresdict = self.get_genresdict()
         genresdict[METADATA] = (self.create_bad_metadata_empty_dict,False)
-        print >>sys.stderr,"test: bad METADATA",genresdict[METADATA][0]
+        print >>sys.stderr,time.asctime(),'-', "test: bad METADATA",genresdict[METADATA][0]
         self._test_2fast(genresdict)
 
     def singtest_bad_2fast_metadata_wrong_dict_keys(self):
         genresdict = self.get_genresdict()
         genresdict[METADATA] = (self.create_bad_metadata_wrong_dict_keys,False)
-        print >>sys.stderr,"test: bad METADATA",genresdict[METADATA][0]
+        print >>sys.stderr,time.asctime(),'-', "test: bad METADATA",genresdict[METADATA][0]
         self._test_2fast(genresdict)
 
     def singtest_bad_2fast_metadata_bad_torrent1(self):
         genresdict = self.get_genresdict()
         genresdict[METADATA] = (self.create_bad_metadata_bad_torrent1,False)
-        print >>sys.stderr,"test: bad METADATA",genresdict[METADATA][0]
+        print >>sys.stderr,time.asctime(),'-', "test: bad METADATA",genresdict[METADATA][0]
         self._test_2fast(genresdict)
 
 
     def singtest_bad_2fast_metadata_bad_torrent2(self):
         genresdict = self.get_genresdict()
         genresdict[METADATA] = (self.create_bad_metadata_bad_torrent2,False)
-        print >>sys.stderr,"test: bad METADATA",genresdict[METADATA][0]
+        print >>sys.stderr,time.asctime(),'-', "test: bad METADATA",genresdict[METADATA][0]
         self._test_2fast(genresdict)
 
     def singtest_bad_2fast_metadata_bad_torrent3(self):
         genresdict = self.get_genresdict()
         genresdict[METADATA] = (self.create_bad_metadata_bad_torrent3,False)
-        print >>sys.stderr,"test: bad METADATA",genresdict[METADATA][0]
+        print >>sys.stderr,time.asctime(),'-', "test: bad METADATA",genresdict[METADATA][0]
         self._test_2fast(genresdict)
 
 
@@ -219,7 +220,7 @@ class TestDownloadHelp(TestAsServer):
             resp = ol_connection.recv()
             self.assert_(resp[0] == GET_METADATA)
             self.check_get_metadata(resp[1:])
-            print >>sys.stderr,"test: Got GET_METADATA for torrent, sent_good_values"
+            print >>sys.stderr,time.asctime(),'-', "test: Got GET_METADATA for torrent, sent_good_values"
         else:
             resp = ol_connection.recv()
             self.assert_(len(resp)==0)
@@ -241,7 +242,7 @@ class TestDownloadHelp(TestAsServer):
             
             msg = UNCHOKE
             bt_connection_2.send(msg)
-            print >>sys.stderr,"test: Got data connection to us, as coordinator, sent_good_values"
+            print >>sys.stderr,time.asctime(),'-', "test: Got data connection to us, as coordinator, sent_good_values"
         else:
             resp = ol_connection.recv()
             self.assert_(len(resp)==0)
@@ -276,13 +277,13 @@ class TestDownloadHelp(TestAsServer):
         bt_connection.send(msg)
         msg = UNCHOKE
         bt_connection.send(msg)
-        print >>sys.stderr,"test: Got BT connection to us, as fake seeder, sent_good_values"
+        print >>sys.stderr,time.asctime(),'-', "test: Got BT connection to us, as fake seeder, sent_good_values"
 
         # 4. Await a RESERVE_PIECES message on the overlay connection
         resp = ol_connection.recv()
         self.assert_(resp[0] == RESERVE_PIECES)
         pieces = self.check_reserve_pieces(resp[1:])
-        print >>sys.stderr,"test: Got RESERVE_PIECES, sent_good_values"
+        print >>sys.stderr,time.asctime(),'-', "test: Got RESERVE_PIECES, sent_good_values"
 
         # 5. Reply with PIECES_RESERVED
         (generate_data, sent_good_values) = genresdict[PIECES_RESERVED]
@@ -297,7 +298,7 @@ class TestDownloadHelp(TestAsServer):
                 print "test: Fake seeder got message",getMessageName(resp[0])
                 if resp[0] == REQUEST:
                     self.check_request(resp[1:],pieces)
-                    print >>sys.stderr,"test: Fake seeder got REQUEST for reserved piece, sent_good_values"
+                    print >>sys.stderr,time.asctime(),'-', "test: Fake seeder got REQUEST for reserved piece, sent_good_values"
                     break
         else:
             resp = ol_connection.recv()

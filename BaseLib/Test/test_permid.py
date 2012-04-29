@@ -1,3 +1,4 @@
+import time 
 # Written by Arno Bakker, Jie Yang, Bram Cohen
 # see LICENSE.txt for license information
 
@@ -68,7 +69,7 @@ class TestPermIDs(TestAsServer):
         """ 
             test good challenge and response2 messages
         """
-        print >> sys.stderr,"test: good challenge/response"
+        print >> sys.stderr,time.asctime(),'-', "test: good challenge/response"
         s = BTConnection('localhost',self.hisport)
         s.read_handshake()
         [rB,chal_data] = self.create_good_challenge()
@@ -183,7 +184,7 @@ class TestPermIDs(TestAsServer):
         self._test_bad_response2(self.create_resp2_sig_by_other_keypair)
 
     def _test_bad_response2(self,gen_resp2_func):
-        print >> sys.stderr,"test: bad response2",gen_resp2_func
+        print >> sys.stderr,time.asctime(),'-', "test: bad response2",gen_resp2_func
         s = BTConnection('localhost',self.hisport)
         s.read_handshake()
         [rB,chal_data] = self.create_good_challenge()

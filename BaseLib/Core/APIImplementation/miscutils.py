@@ -1,3 +1,4 @@
+import time 
 # Written by Arno Bakker
 # see LICENSE.txt for license information
 
@@ -9,7 +10,7 @@ DEBUG = False
 
 def parse_playtime_to_secs(hhmmss):
     if DEBUG:
-        print >>sys.stderr,"miscutils: Playtime is",hhmmss
+        print >>sys.stderr,time.asctime(),'-', "miscutils: Playtime is",hhmmss
     r = re.compile("([0-9\.]+):*")
     occ = r.findall(hhmmss)
     t = None

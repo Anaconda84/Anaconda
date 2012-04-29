@@ -1,3 +1,4 @@
+import time 
 # Written by Arno Bakker 
 # see LICENSE.txt for license information
 """ Controls how a TorrentDef is downloaded (rate, where on disk, etc.) """
@@ -751,7 +752,7 @@ class DownloadConfigInterface:
             from base64 import encodestring
             self.dlconfig['poa'] = encodestring(poa.serialize()).replace("\n","")
             import sys
-            print >> sys.stderr,"POA is set:",self.dlconfig['poa']
+            print >> sys.stderr,time.asctime(),'-', "POA is set:",self.dlconfig['poa']
         
     def get_poa(self):
         if 'poa' in self.dlconfig:
@@ -759,7 +760,7 @@ class DownloadConfigInterface:
                 raise Exception("No POA specified")
             from Tribler.Core.ClosedSwarm import ClosedSwarm
             from base64 import decodestring
-            print >> sys.stderr,"get_poa:",self.dlconfig['poa']
+            print >> sys.stderr,time.asctime(),'-', "get_poa:",self.dlconfig['poa']
             poa = ClosedSwarm.POA.deserialize(decodestring(self.dlconfig['poa']))
             return poa
         return None

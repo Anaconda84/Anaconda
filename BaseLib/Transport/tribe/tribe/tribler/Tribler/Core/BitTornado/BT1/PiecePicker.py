@@ -1,3 +1,4 @@
+import time 
 # Written by Bram Cohen and Pawel Garbacki
 # see LICENSE.txt for license information
 
@@ -201,7 +202,7 @@ class PiecePicker:
 
         if self.has[piece]:
             self.has[piece] = 0
-            #print >>sys.stderr,"PiecePicker: Clearing piece",piece
+            #print >>sys.stderr,time.asctime(),'-', "PiecePicker: Clearing piece",piece
             self.numgot -= 1
 
             # undo self._remove_from_interests(piece); ripped from set_priority
@@ -411,24 +412,24 @@ class PiecePicker:
             piece = self._next(haves, wantfunc, complete_first, helper_con, willrequest = willrequest, connection = connection)
             if piece is None:
                 if DEBUG:
-                    print >> sys.stderr,"PiecePicker: next: _next returned no pieces!",
+                    print >> sys.stderr,time.asctime(),'-', "PiecePicker: next: _next returned no pieces!",
                 break
             if self.helper is None or helper_con:
                 if DEBUG:
-                    print >> sys.stderr,"PiecePicker: next: helper None or helper conn, returning",piece
+                    print >> sys.stderr,time.asctime(),'-', "PiecePicker: next: helper None or helper conn, returning",piece
                 return piece
 
             if self.helper.reserve_piece(piece,sdownload):
                 if DEBUG:
-                    print >> sys.stderr,"PiecePicker: next: helper: reserve SHOULD DL PIECE",piece
+                    print >> sys.stderr,time.asctime(),'-', "PiecePicker: next: helper: reserve SHOULD DL PIECE",piece
                 return piece
             else:
                 if DEBUG:
-                    print >> sys.stderr,"PiecePicker: next: helper.reserve_piece failed"
+                    print >> sys.stderr,time.asctime(),'-', "PiecePicker: next: helper.reserve_piece failed"
                 return None
 
             if DEBUG:
-                print >> sys.stderr,"PiecePicker: next:helper: NONE SHOULD DL PIECE",piece
+                print >> sys.stderr,time.asctime(),'-', "PiecePicker: next:helper: NONE SHOULD DL PIECE",piece
             return piece
         # Arno, 2008-05-20: 2fast code: if we got capacity to DL something,
         # ask coordinator what new pieces to dl for it.

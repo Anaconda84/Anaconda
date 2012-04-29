@@ -1,3 +1,4 @@
+import time 
 # Written by Arno Bakker
 # see LICENSE.txt for license information
 #
@@ -30,9 +31,9 @@ class TestSeeding(TestAsServer):
     def setUp(self):
         """ override TestAsServer """
         TestAsServer.setUp(self)
-        print >>sys.stderr,"test: Giving Session time to startup"
+        print >>sys.stderr,time.asctime(),'-', "test: Giving Session time to startup"
         time.sleep(5)
-        print >>sys.stderr,"test: Session should have started up"
+        print >>sys.stderr,time.asctime(),'-', "test: Session should have started up"
     
     def setUpPreSession(self):
         """ override TestAsServer """
@@ -78,7 +79,7 @@ class TestSeeding(TestAsServer):
         self.torrentfn = os.path.join(self.session.get_state_dir(),"gen.torrent")
         self.tdef.save(self.torrentfn)
         
-        print >>sys.stderr,"test: setup_seeder: name is",self.tdef.metainfo['info']['name']
+        print >>sys.stderr,time.asctime(),'-', "test: setup_seeder: name is",self.tdef.metainfo['info']['name']
 
         self.dscfg = DownloadStartupConfig()
         self.dscfg.set_dest_dir(os.getcwd())
@@ -94,7 +95,7 @@ class TestSeeding(TestAsServer):
         
     def seeder_state_callback(self,ds):
         d = ds.get_download()
-        print >>sys.stderr,"test: seeder:",dlstatus_strings[ds.get_status()],ds.get_progress()
+        print >>sys.stderr,time.asctime(),'-', "test: seeder:",dlstatus_strings[ds.get_status()],ds.get_progress()
         return (1.0,False)
 
         
@@ -108,7 +109,7 @@ class TestSeeding(TestAsServer):
         self.session2 = Session(self.config2,ignore_singleton=True)
         
         # Allow session2 to start
-        print >>sys.stderr,"test: downloader: Sleeping 3 secs to let Session2 start"
+        print >>sys.stderr,time.asctime(),'-', "test: downloader: Sleeping 3 secs to let Session2 start"
         time.sleep(3)
         
         tdef2 = TorrentDef.load(self.torrentfn)
@@ -127,7 +128,7 @@ class TestSeeding(TestAsServer):
     
     def downloader_state_callback(self,ds):
         d = ds.get_download()
-        print >>sys.stderr,"test: download:",dlstatus_strings[ds.get_status()],ds.get_progress()
+        print >>sys.stderr,time.asctime(),'-', "test: download:",dlstatus_strings[ds.get_status()],ds.get_progress()
         
         return (1.0,False)
 
@@ -145,7 +146,7 @@ class TestSeeding(TestAsServer):
 
     def subtest_connect2downloader(self):
         
-        print >> sys.stderr,"test: verifier: Connecting to seeder to check bitfield"
+        print >> sys.stderr,time.asctime(),'-', "test: verifier: Connecting to seeder to check bitfield"
         
         infohash = self.tdef.get_infohash()
         s = BTConnection('localhost',self.mylistenport,user_infohash=infohash)
@@ -155,14 +156,14 @@ class TestSeeding(TestAsServer):
             s.s.settimeout(10.0)
             resp = s.recv()
             self.assert_(len(resp) > 0)
-            print >> sys.stderr,"test: verifier: Got message",getMessageName(resp[0])
+            print >> sys.stderr,time.asctime(),'-', "test: verifier: Got message",getMessageName(resp[0])
             self.assert_(resp[0] == EXTEND)
             resp = s.recv()
             self.assert_(len(resp) > 0)
-            print >> sys.stderr,"test: verifier: Got 2nd message",getMessageName(resp[0])
+            print >> sys.stderr,time.asctime(),'-', "test: verifier: Got 2nd message",getMessageName(resp[0])
             self.assert_(resp[0] == BITFIELD)
             b = Bitfield(self.npieces,resp[1:])
-            print >> sys.stderr,"test: verifier: Bitfield is",`b.toboollist()`
+            print >> sys.stderr,time.asctime(),'-', "test: verifier: Bitfield is",`b.toboollist()`
 
             b2 = Bitfield(self.npieces)
             b2[0] = True
@@ -172,7 +173,7 @@ class TestSeeding(TestAsServer):
             time.sleep(5)
             
         except socket.timeout:
-            print >> sys.stderr,"test: verifier: Timeout, peer didn't reply"
+            print >> sys.stderr,time.asctime(),'-', "test: verifier: Timeout, peer didn't reply"
             self.assert_(False)
         s.close()
         

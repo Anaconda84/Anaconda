@@ -1,3 +1,4 @@
+import time 
 # Written by ABC authors and Arno Bakker
 # see LICENSE.txt for license information
 
@@ -1340,7 +1341,7 @@ class VideoPanel(ABCOptionPanel):
                 self.onError(mainmsg,value)
                 return
             if DEBUG:
-                print >>sys.stderr,"abcoptions: VideoPanel: Writing",key,value
+                print >>sys.stderr,time.asctime(),'-', "abcoptions: VideoPanel: Writing",key,value
             self.utility.config.Write(key,value)
 
         # videoanalyserpath is a config parameter of the Session
@@ -1469,7 +1470,7 @@ class ABCTree(wx.TreeCtrl):
             return
 
         if DEBUG:
-            print >>sys.stderr,"abcoption: <mluc> event type:", event.GetEventType()
+            print >>sys.stderr,time.asctime(),'-', "abcoption: <mluc> event type:", event.GetEventType()
         newitem = event.GetItem()
         newpanel = None
         foundnew = False

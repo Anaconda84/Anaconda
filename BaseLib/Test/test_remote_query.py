@@ -1,3 +1,4 @@
+import time 
 # Written by Arno Bakker
 # see LICENSE.txt for license information
 
@@ -180,13 +181,13 @@ class TestRemoteQuery(TestAsServer):
         """ 
             test good QUERY messages: SIMPLE
         """
-        print >>sys.stderr,"test: good QUERY SIMPLE",`keyword`
+        print >>sys.stderr,time.asctime(),'-', "test: good QUERY SIMPLE",`keyword`
         s = OLConnection(self.my_keypair,'localhost',self.hisport)
         msg = self.create_good_simple_query(keyword)
         s.send(msg)
         resp = s.recv()
         if len(resp) > 0:
-            print >>sys.stderr,"test: good QUERY: got",getMessageName(resp[0])
+            print >>sys.stderr,time.asctime(),'-', "test: good QUERY: got",getMessageName(resp[0])
         self.assert_(resp[0] == QUERY_REPLY)
         self.check_rquery_reply("SIMPLE",resp[1:],goodtorrents)
         time.sleep(10)
@@ -209,13 +210,13 @@ class TestRemoteQuery(TestAsServer):
         """ 
             test good QUERY messages: SIMPLE+METADATA
         """
-        print >>sys.stderr,"test: good QUERY SIMPLE+METADATA",`keyword`
+        print >>sys.stderr,time.asctime(),'-', "test: good QUERY SIMPLE+METADATA",`keyword`
         s = OLConnection(self.my_keypair,'localhost',self.hisport)
         msg = self.create_good_simpleplustorrents_query(keyword)
         s.send(msg)
         resp = s.recv()
         if len(resp) > 0:
-            print >>sys.stderr,"test: good QUERY: got",getMessageName(resp[0])
+            print >>sys.stderr,time.asctime(),'-', "test: good QUERY: got",getMessageName(resp[0])
         self.assert_(resp[0] == QUERY_REPLY)
         self.check_rquery_reply("SIMPLE+METADATA",resp[1:],goodtorrents)
         time.sleep(10)
@@ -238,7 +239,7 @@ class TestRemoteQuery(TestAsServer):
     def check_rquery_reply(self,querytype,data,goodtorrents):
         d = bdecode(data)
         
-        print >>sys.stderr,"test: Got reply",`d`
+        print >>sys.stderr,time.asctime(),'-', "test: Got reply",`d`
         
         self.assert_(type(d) == DictType)
         self.assert_(d.has_key('a'))
@@ -308,7 +309,7 @@ class TestRemoteQuery(TestAsServer):
 
 
     def _test_bad(self,gen_rquery_func):
-        print >>sys.stderr,"test: bad QUERY",gen_rquery_func
+        print >>sys.stderr,time.asctime(),'-', "test: bad QUERY",gen_rquery_func
         s = OLConnection(self.my_keypair,'localhost',self.hisport)
         msg = gen_rquery_func()
         s.send(msg)

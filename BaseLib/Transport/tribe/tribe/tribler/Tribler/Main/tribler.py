@@ -1,3 +1,4 @@
+import time 
 #!/usr/bin/python
 
 #########################################################################
@@ -129,7 +130,7 @@ class ABCApp(wx.App):
                 if data.find("Ubuntu 9.04") != -1:
                     ubuntu = True
                     
-            print >>sys.stderr,"tribler: Activating workaround for Ubuntu?",ubuntu
+            print >>sys.stderr,time.asctime(),'-', "tribler: Activating workaround for Ubuntu?",ubuntu
                     
             if not redirectstderrout and ubuntu:
                 # On Ubuntu 8.10 not redirecting output causes the program to quit
@@ -419,7 +420,7 @@ class ABCApp(wx.App):
         
         cfgfilename = Session.get_default_config_filename(state_dir)
         if DEBUG:
-            print >>sys.stderr,"main: Session config",cfgfilename
+            print >>sys.stderr,time.asctime(),'-', "main: Session config",cfgfilename
         try:
             self.sconfig = SessionStartupConfig.load(cfgfilename)
         except:
@@ -439,7 +440,7 @@ class ABCApp(wx.App):
                 old_collected_torrent_dir = os.path.join(state_dir, 'torrent2')
                 if not os.path.exists(torrcolldir) and os.path.isdir(old_collected_torrent_dir):
                     os.rename(old_collected_torrent_dir, torrcolldir)
-                    print >>sys.stderr,"main: Moved dir with old collected torrents to", torrcolldir
+                    print >>sys.stderr,time.asctime(),'-', "main: Moved dir with old collected torrents to", torrcolldir
                     
                 # Arno, 2008-10-23: Also copy torrents the user got himself
                 old_own_torrent_dir = os.path.join(state_dir, 'torrent')
@@ -447,7 +448,7 @@ class ABCApp(wx.App):
                     oldpath = os.path.join(old_own_torrent_dir,name)
                     newpath = os.path.join(torrcolldir,name)
                     if not os.path.exists(newpath):
-                        print >>sys.stderr,"main: Copying own torrent",oldpath,newpath
+                        print >>sys.stderr,time.asctime(),'-', "main: Copying own torrent",oldpath,newpath
                         os.rename(oldpath,newpath)
                     
                 # Internal tracker
@@ -469,7 +470,7 @@ class ABCApp(wx.App):
 
         # set port number in GuiUtility
         if DEBUG:
-            print >> sys.stderr, 'LISTEN PORT :' , s.get_listen_port()
+            print >> sys.stderr, time.asctime(),'-', 'LISTEN PORT :' , s.get_listen_port()
         port = s.get_listen_port()
         self.guiUtility.set_port_number(port)
 
@@ -579,7 +580,7 @@ class ABCApp(wx.App):
 
  
         if DEBUG:
-            print >> sys.stderr , "main: My Reputation",reputation
+            print >> sys.stderr , time.asctime(),'-', "main: My Reputation",reputation
         
         self.frame.top_bg.help.SetToolTipString(self.utility.lang.get('help') % (reputation))
 
@@ -702,22 +703,22 @@ class ABCApp(wx.App):
     def gui_states_callback(self,dslist):
         """ Called by MainThread  """
         if DEBUG: 
-            print >>sys.stderr,"main: Stats:"
+            print >>sys.stderr,time.asctime(),'-', "main: Stats:"
             
         torrentdb = self.utility.session.open_dbhandler(NTFY_TORRENTS)
         peerdb = self.utility.session.open_dbhandler(NTFY_PEERS)
         if DEBUG:
-            print >>sys.stderr,"main: Stats: Total torrents found",torrentdb.size(),"peers",peerdb.size()    
+            print >>sys.stderr,time.asctime(),'-', "main: Stats: Total torrents found",torrentdb.size(),"peers",peerdb.size()    
             
-        #print >>sys.stderr,"main: Stats: NAT",self.utility.session.get_nat_type()
+        #print >>sys.stderr,time.asctime(),'-', "main: Stats: NAT",self.utility.session.get_nat_type()
         try:
             # Print stats on Console
             for ds in dslist:
                 # safename = `ds.get_download().get_def().get_name()`
-                print >>sys.stderr,"main: Stats: %s %.1f%% %s dl %.1f ul %.1f n %d\n" % (dlstatus_strings[ds.get_status()],100.0*ds.get_progress(),safename,ds.get_current_speed(DOWNLOAD),ds.get_current_speed(UPLOAD),ds.get_num_peers())
-                # print >>sys.stderr,"main: Infohash:",`ds.get_download().get_def().get_infohash()`
+                print >>sys.stderr,time.asctime(),'-', "main: Stats: %s %.1f%% %s dl %.1f ul %.1f n %d\n" % (dlstatus_strings[ds.get_status()],100.0*ds.get_progress(),safename,ds.get_current_speed(DOWNLOAD),ds.get_current_speed(UPLOAD),ds.get_num_peers())
+                # print >>sys.stderr,time.asctime(),'-', "main: Infohash:",`ds.get_download().get_def().get_infohash()`
                 if ds.get_status() == DLSTATUS_STOPPED_ON_ERROR:
-                    print >>sys.stderr,"main: Error:",`ds.get_error()`
+                    print >>sys.stderr,time.asctime(),'-', "main: Error:",`ds.get_error()`
 
             # Find State of currently playing video
             playds = None
@@ -758,7 +759,7 @@ class ABCApp(wx.App):
                 else:
                     text = msg
                     
-                #print >>sys.stderr,"main: Messages",topmsg,msg,`playds.get_download().get_def().get_name()`
+                #print >>sys.stderr,time.asctime(),'-', "main: Messages",topmsg,msg,`playds.get_download().get_def().get_name()`
                     
                 self.videoplayer.set_player_status_and_progress(text,playds.get_pieces_complete())
             
@@ -860,7 +861,7 @@ class ABCApp(wx.App):
                 # killing any future attempts. Should see how this works with
                 # MPEGTS patch put in.
                 #
-                print >>sys.stderr,"main: OnClosingVideoFrameOrExtPlayer: vodd is live, stopping",vodd.get_def().get_name_as_unicode()
+                print >>sys.stderr,time.asctime(),'-', "main: OnClosingVideoFrameOrExtPlayer: vodd is live, stopping",vodd.get_def().get_name_as_unicode()
                 vodd.stop()
             self.restart_other_downloads(self.utility.session.get_downloads())
         #else: playing Web2 video
@@ -877,7 +878,7 @@ class ABCApp(wx.App):
     def guiservthread_checkpoint_timer(self):
         """ Periodically checkpoint Session """
         try:
-            print >>sys.stderr,"main: Checkpointing Session"
+            print >>sys.stderr,time.asctime(),'-', "main: Checkpointing Session"
             self.utility.session.checkpoint()
             self.guiserver.add_task(self.guiservthread_checkpoint_timer,SESSION_CHECKPOINT_INTERVAL)
         except:
@@ -910,11 +911,11 @@ class ABCApp(wx.App):
                 
         #self.frame.numberPersons.SetLabel('%d' % npeers)
         #self.frame.numberFiles.SetLabel('%d' % nfiles)
-        #print >> sys.stderr, "************>>>>>>>> setDBStats", npeers, nfiles
+        #print >> sys.stderr, time.asctime(),'-', "************>>>>>>>> setDBStats", npeers, nfiles
         
     def sesscb_ntfy_activities(self,subject,changeType,objectID,*args):
         # Called by SessionCallback thread
-        #print >>sys.stderr,"main: sesscb_ntfy_activities called:",subject,"ct",changeType,"oid",objectID,"a",args
+        #print >>sys.stderr,time.asctime(),'-', "main: sesscb_ntfy_activities called:",subject,"ct",changeType,"oid",objectID,"a",args
         wx.CallAfter(self.frame.setActivity,objectID,*args)
     
     def sesscb_ntfy_reachable(self,subject,changeType,objectID,msg):
@@ -961,7 +962,7 @@ class ABCApp(wx.App):
 
 
     def OnExit(self):
-        print >>sys.stderr,"main: ONEXIT"
+        print >>sys.stderr,time.asctime(),'-', "main: ONEXIT"
 
         # write all persistent data to disk
         self.seedingmanager.write_all_storage()
@@ -975,7 +976,7 @@ class ABCApp(wx.App):
         self.utility.session.shutdown(hacksessconfcheckpoint=False) 
 
         while not self.utility.session.has_shutdown():
-            print >>sys.stderr,"main ONEXIT: Waiting for Session to shutdown"
+            print >>sys.stderr,time.asctime(),'-', "main ONEXIT: Waiting for Session to shutdown"
             sleep(1)
             
         
@@ -985,14 +986,14 @@ class ABCApp(wx.App):
     
     def db_exception_handler(self,e):
         if DEBUG:
-            print >> sys.stderr,"main: Database Exception handler called",e,"value",e.args,"#"
+            print >> sys.stderr,time.asctime(),'-', "main: Database Exception handler called",e,"value",e.args,"#"
         try:
             if e.args[1] == "DB object has been closed":
                 return # We caused this non-fatal error, don't show.
             if self.error is not None and self.error.args[1] == e.args[1]:
                 return # don't repeat same error
         except:
-            print >> sys.stderr, "main: db_exception_handler error", e, type(e)
+            print >> sys.stderr, time.asctime(),'-', "main: db_exception_handler error", e, type(e)
             print_exc()
             #print_stack()
         self.error = e
@@ -1010,7 +1011,7 @@ class ABCApp(wx.App):
     def i2ithread_readlinecallback(self,ic,cmd):
         """ Called by Instance2Instance thread """
         
-        print >>sys.stderr,"main: Another instance called us with cmd",cmd
+        print >>sys.stderr,time.asctime(),'-', "main: Another instance called us with cmd",cmd
         ic.close()
         
         if cmd.startswith('START '):
@@ -1052,7 +1053,7 @@ def get_status_msgs(ds,videoplayer_mediastate,appname,said_start_playback,decode
     logmsgs = ds.get_log_messages()
     logmsg = None
     if len(logmsgs) > 0:
-        print >>sys.stderr,"main: Log",logmsgs[0]
+        print >>sys.stderr,time.asctime(),'-', "main: Log",logmsgs[0]
         logmsg = logmsgs[-1][1]
         
     preprogress = ds.get_vod_prebuffering_progress()
@@ -1065,8 +1066,8 @@ def get_status_msgs(ds,videoplayer_mediastate,appname,said_start_playback,decode
             break
         intime = eta_msg
     
-    #print >>sys.stderr,"main: playble",playable,"preprog",preprogress
-    #print >>sys.stderr,"main: ETA is",t,"secs"
+    #print >>sys.stderr,time.asctime(),'-', "main: playble",playable,"preprog",preprogress
+    #print >>sys.stderr,time.asctime(),'-', "main: ETA is",t,"secs"
     # if t > float(2 ** 30):
     #     intime = "inf"
     # elif t == 0.0:
@@ -1082,7 +1083,7 @@ def get_status_msgs(ds,videoplayer_mediastate,appname,said_start_playback,decode
     #     else:
     #         intime = "%dh:%02dm:%02ds" % (h,m,s)
             
-    #print >>sys.stderr,"main: VODStats",preprogress,playable,"%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+    #print >>sys.stderr,time.asctime(),'-', "main: VODStats",preprogress,playable,"%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
 
     if ds.get_status() == DLSTATUS_HASHCHECKING:
         genprogress = ds.get_progress()

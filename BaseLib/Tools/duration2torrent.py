@@ -1,3 +1,4 @@
+import time 
 # Written by Riccardo Petrocco
 # see LICENSE.txt for license information
 #
@@ -28,7 +29,7 @@ def get_usage(defs):
 if __name__ == "__main__":
 
     config, fileargs = parseargs.parseargs(sys.argv, argsdef, presets = {})
-    print >>sys.stderr,"config is",config
+    print >>sys.stderr,time.asctime(),'-', "config is",config
     
     if config['torrent'] == '':
         print "Usage:  ",get_usage(argsdef)

@@ -1,3 +1,4 @@
+import time 
 # Written by Jie Yang
 # see LICENSE.txt for license information
 # Note for Developers: Please write a unittest in Tribler/Test/test_sqlitecachedbhandler.py 
@@ -346,7 +347,7 @@ class PeerDBHandler(BasicDBHandler):
         if 'connected_times' in value:
             self.notifier.notify(NTFY_PEERS, NTFY_INSERT, permid)
 
-        #print >>sys.stderr,"sqldbhand: addPeer",`permid`,self._db.getPeerID(permid),`value`
+        #print >>sys.stderr,time.asctime(),'-', "sqldbhand: addPeer",`permid`,self._db.getPeerID(permid),`value`
         #print_stack()
             
             
@@ -378,7 +379,7 @@ class PeerDBHandler(BasicDBHandler):
         self._db.update(self.table_name, 'permid='+repr(bin2str(permid)), commit=commit, **argv)
         self.notifier.notify(NTFY_PEERS, NTFY_UPDATE, permid)
 
-        #print >>sys.stderr,"sqldbhand: updatePeer",`permid`,argv
+        #print >>sys.stderr,time.asctime(),'-', "sqldbhand: updatePeer",`permid`,argv
         #print_stack()
 
     def deletePeer(self, permid=None, peer_id=None, force=False, commit=True):
@@ -445,7 +446,7 @@ class PeerDBHandler(BasicDBHandler):
         #
         # ARNO: WHY DIFF WITH NORMAL getPeers??????
         # load peers for GUI
-        #print >> sys.stderr, 'getGUIPeers(%s, %s, %s, %s)' % (category_name, range, sort, reverse)
+        #print >> sys.stderr, time.asctime(),'-', 'getGUIPeers(%s, %s, %s, %s)' % (category_name, range, sort, reverse)
         """
         db keys: peer_id, permid, name, ip, port, thumbnail, oversion, 
                  similarity, friend, superpeer, last_seen, last_connected, 
@@ -482,8 +483,8 @@ class PeerDBHandler(BasicDBHandler):
             
         res_list = self.getAll(value_name, where, offset= offset, limit=limit, order_by=order_by)
         
-        #print >>sys.stderr,"getGUIPeers: where",where,"offset",offset,"limit",limit,"order",order_by
-        #print >>sys.stderr,"getGUIPeers: returned len",len(res_list)
+        #print >>sys.stderr,time.asctime(),'-', "getGUIPeers: where",where,"offset",offset,"limit",limit,"order",order_by
+        #print >>sys.stderr,time.asctime(),'-', "getGUIPeers: returned len",len(res_list)
         
         peer_list = []
         for item in res_list:
@@ -535,7 +536,7 @@ class PeerDBHandler(BasicDBHandler):
         else: # connection closed
             self.online_peers.remove(permid)
         self.lock.release()
-        #print >> sys.stderr, (('#'*50)+'\n')*5+'%d peers online' % len(self.online_peers)
+        #print >> sys.stderr, time.asctime(),'-', (('#'*50)+'\n')*5+'%d peers online' % len(self.online_peers)
 
     def registerConnectionUpdater(self, session):
         # Arno, 2010-01-28: Disabled this. Maybe something wrong with setOnline
@@ -605,7 +606,7 @@ class SuperPeerDBHandler(BasicDBHandler):
             filepath = os.path.abspath(filename)
             file = open(filepath, "r")
         except IOError:
-            print >> sys.stderr, "superpeer: cannot open superpeer file", filepath
+            print >> sys.stderr, time.asctime(),'-', "superpeer: cannot open superpeer file", filepath
             return []
             
         superpeers = file.readlines()
@@ -697,7 +698,7 @@ class CrawlerDBHandler:
             filepath = os.path.abspath(filename)
             file = open(filepath, "r")
         except IOError:
-            print >> sys.stderr, "crawler: cannot open crawler file", filepath
+            print >> sys.stderr, time.asctime(),'-', "crawler: cannot open crawler file", filepath
             return []
             
         crawlers = file.readlines()
@@ -799,7 +800,7 @@ class PreferenceDBHandler(BasicDBHandler):
         # Nicolas: did not change this function as it seems addPreference*s* is getting called
         peer_id = self._db.getPeerID(permid)
         if peer_id is None:
-            print >> sys.stderr, 'PreferenceDBHandler: add preference of a peer which is not existed in Peer table', `permid`
+            print >> sys.stderr, time.asctime(),'-', 'PreferenceDBHandler: add preference of a peer which is not existed in Peer table', `permid`
             return
         
         sql_insert_peer_torrent = u"INSERT INTO Preference (peer_id, torrent_id) VALUES (?,?)"        
@@ -821,7 +822,7 @@ class PreferenceDBHandler(BasicDBHandler):
         # or dictionaries (indicating an infohash with metadata)
         peer_id = self._db.getPeerID(peer_permid)
         if peer_id is None:
-            print >> sys.stderr, 'PreferenceDBHandler: add preference of a peer which is not existed in Peer table', `peer_permid`
+            print >> sys.stderr, time.asctime(),'-', 'PreferenceDBHandler: add preference of a peer which is not existed in Peer table', `peer_permid`
             return
 
         prefs = [type(pref) is str and {"infohash":pref} or pref
@@ -886,7 +887,7 @@ class PreferenceDBHandler(BasicDBHandler):
                     popularity_db.storePeerPopularity(peer_id, torrent_id_swarm_size, commit=commit)
             except Exception, msg:    # duplicated
                 print_exc()
-                print >> sys.stderr, 'dbhandler: addPreferences:', Exception, msg
+                print >> sys.stderr, time.asctime(),'-', 'dbhandler: addPreferences:', Exception, msg
                 
         # now, store search terms
         
@@ -896,7 +897,7 @@ class PreferenceDBHandler(BasicDBHandler):
         nums_of_search_terms = [len(pref.get('search_terms',[])) for pref in prefs]
         if max(nums_of_search_terms)>MAX_KEYWORDS_STORED:
             if DEBUG:
-                print >>sys.stderr, "peer %d exceeds max number %d of keywords per torrent, aborting storing keywords"  % \
+                print >>sys.stderr, time.asctime(),'-', "peer %d exceeds max number %d of keywords per torrent, aborting storing keywords"  % \
                                     (peer_id, MAX_KEYWORDS_STORED)
             return  
         
@@ -938,7 +939,7 @@ class PreferenceDBHandler(BasicDBHandler):
                 continue
             if not torrent_id:
                 if DEBUG:
-                    print >> sys.stderr, "torrent_id not set, retrieving manually!"
+                    print >> sys.stderr, time.asctime(),'-', "torrent_id not set, retrieving manually!"
                 torrent_id = TorrentDBHandler.getInstance().getTorrentID(infohash)
                 
             term_ids = [foreign2local[str(foreign)] for foreign in search_terms if str(foreign) in foreign2local]
@@ -1197,7 +1198,7 @@ class TorrentDBHandler(BasicDBHandler):
             values = [(keyword, torrent_id) for keyword in keywords]
             self._db.executemany(u"INSERT OR REPLACE INTO InvertedIndex VALUES(?, ?)", values, commit=False)
             if DEBUG:
-                print >> sys.stderr, "torrentdb: Extending the InvertedIndex table with", len(values), "new keywords for", torrent_name
+                print >> sys.stderr, time.asctime(),'-', "torrentdb: Extending the InvertedIndex table with", len(values), "new keywords for", torrent_name
         
         self._addTorrentTracker(torrent_id, torrentdef, extra_info, commit=False)
         if commit:
@@ -1357,7 +1358,7 @@ class TorrentDBHandler(BasicDBHandler):
             try:
                 os.remove(src)
             except Exception, msg:
-                print >> sys.stderr, "cachedbhandler: failed to erase torrent", src, Exception, msg
+                print >> sys.stderr, time.asctime(),'-', "cachedbhandler: failed to erase torrent", src, Exception, msg
                 return False
         
         return True
@@ -1496,7 +1497,7 @@ class TorrentDBHandler(BasicDBHandler):
             
         """
         
-        #print >> sys.stderr, 'TorrentDBHandler: getTorrents(%s, %s, %s, %s, %s)' % (category_name, range, library, sort, reverse)
+        #print >> sys.stderr, time.asctime(),'-', 'TorrentDBHandler: getTorrents(%s, %s, %s, %s, %s)' % (category_name, range, library, sort, reverse)
         s = time()
         
         value_name = deepcopy(self.value_name)
@@ -1530,7 +1531,7 @@ class TorrentDBHandler(BasicDBHandler):
         else:
             order_by = None
             
-        #print >>sys.stderr,"TorrentDBHandler: GET TORRENTS val",value_name,"where",where,"limit",limit,"offset",offset,"order",order_by
+        #print >>sys.stderr,time.asctime(),'-', "TorrentDBHandler: GET TORRENTS val",value_name,"where",where,"limit",limit,"offset",offset,"order",order_by
         #print_stack
         
         # Must come before query
@@ -1545,7 +1546,7 @@ class TorrentDBHandler(BasicDBHandler):
         
         mypref_stats = self.mypref_db.getMyPrefStats()
         
-        #print >>sys.stderr,"TorrentDBHandler: getTorrents: getAll returned ###################",len(res_list)
+        #print >>sys.stderr,time.asctime(),'-', "TorrentDBHandler: getTorrents: getAll returned ###################",len(res_list)
         
         torrent_list = self.valuelist2torrentlist(value_name,res_list,ranks,mypref_stats)
         del res_list
@@ -1585,7 +1586,7 @@ class TorrentDBHandler(BasicDBHandler):
                 torrent['progress'] = data[1]
                 torrent['destdir'] = data[2]
             
-            #print >>sys.stderr,"TorrentDBHandler: GET TORRENTS",`torrent`
+            #print >>sys.stderr,time.asctime(),'-', "TorrentDBHandler: GET TORRENTS",`torrent`
                 
             torrent_list.append(torrent)
         return  torrent_list
@@ -1640,10 +1641,10 @@ class TorrentDBHandler(BasicDBHandler):
             torrent_path = os.path.join(torrent_dir, torrent_file_name)
             try:
                 os.remove(torrent_path)
-                print >> sys.stderr, "Erase torrent:", os.path.basename(torrent_path)
+                print >> sys.stderr, time.asctime(),'-', "Erase torrent:", os.path.basename(torrent_path)
                 deleted += 1
             except Exception, msg:
-                #print >> sys.stderr, "Error in erase torrent", Exception, msg
+                #print >> sys.stderr, time.asctime(),'-', "Error in erase torrent", Exception, msg
                 pass
         
         self.notifier.notify(NTFY_TORRENTS, NTFY_DELETE, str2bin(infohash)) # refresh gui
@@ -1733,7 +1734,7 @@ class TorrentDBHandler(BasicDBHandler):
                     numsubscriptions = (sum + count)/3
                     negvotes = (2*count-sum)/3
                     if numsubscriptions-negvotes > old_record['subscriptions'] - old_record['neg_votes']:
-                        #print >> sys.stderr, "overridden", torrent['channel_name'], old_record['channel_name']
+                        #print >> sys.stderr, time.asctime(),'-', "overridden", torrent['channel_name'], old_record['channel_name']
                         old_record['channel_permid'] = torrent['channel_permid']
                         old_record['channel_name'] = torrent['channel_name']
                         old_record['subscriptions'] = numsubscriptions
@@ -1775,12 +1776,12 @@ class TorrentDBHandler(BasicDBHandler):
                 torrent['neg_votes']=negvotes
                 torrent['subscriptions']=numsubscriptions
             
-            #print >> sys.stderr, "hello.. %.3f,%.3f" %((time()-a), time())
+            #print >> sys.stderr, time.asctime(),'-', "hello.. %.3f,%.3f" %((time()-a), time())
         def compare(a,b):
             return -1*cmp(a['num_seeders'], b['num_seeders'])
         torrent_list = torrents_dict.values()
         torrent_list.sort(compare)
-        #print >> sys.stderr, "# hits:%d; search time:%.3f,%.3f,%.3f" % (len(torrent_list),t2-t1, t3-t2, time()-t3 )
+        #print >> sys.stderr, time.asctime(),'-', "# hits:%d; search time:%.3f,%.3f,%.3f" % (len(torrent_list),t2-t1, t3-t2, time()-t3 )
         return torrent_list
 
 
@@ -1803,7 +1804,7 @@ class TorrentDBHandler(BasicDBHandler):
             permid_str = bin2str(permid)
             results = self._db.fetchall(sql, (50, permid_str))
         else:
-            #print >>sys.stderr,"torrentdb: selectTorrentToCollect: cands",`candidate_list`
+            #print >>sys.stderr,time.asctime(),'-', "torrentdb: selectTorrentToCollect: cands",`candidate_list`
             
             cand_str = [bin2str(infohash) for infohash in candidate_list]
             s = repr(cand_str).replace('[','(').replace(']',')')
@@ -1883,7 +1884,7 @@ class TorrentDBHandler(BasicDBHandler):
         """
         
         #import threading
-        #print >> sys.stderr, "****** selectTorrentToCheck", threading.currentThread().getName()
+        #print >> sys.stderr, time.asctime(),'-', "****** selectTorrentToCheck", threading.currentThread().getName()
         
         if infohash is None:
             # create a view?
@@ -2108,10 +2109,10 @@ class MyPreferenceDBHandler(BasicDBHandler):
                                 
         if d=={}:
             if DEBUG:
-                print >> sys.stderr, "no updatable information given to addClicklogToMyPreference"
+                print >> sys.stderr, time.asctime(),'-', "no updatable information given to addClicklogToMyPreference"
         else:
             if DEBUG:
-                print >> sys.stderr, "addClicklogToMyPreference: updatable clicklog data: %s" % d
+                print >> sys.stderr, time.asctime(),'-', "addClicklogToMyPreference: updatable clicklog data: %s" % d
             self._db.update(self.table_name, 'torrent_id=%d' % torrent_id, commit=commit, **d)
                 
         # have keywords stored by SearchDBHandler
@@ -2293,7 +2294,7 @@ class MyPreferenceDBHandler(BasicDBHandler):
         if torrent_id is None:
             return
         self._db.update(self.table_name, 'torrent_id=%d'%torrent_id, commit=commit, progress=progress)
-        #print >> sys.stderr, '********* update progress', `infohash`, progress, commit
+        #print >> sys.stderr, time.asctime(),'-', '********* update progress', `infohash`, progress, commit
 
     def getAllEntries(self):
         """use with caution,- for testing purposes"""
@@ -2347,7 +2348,7 @@ class BarterCastDBHandler(BasicDBHandler):
         self.update_network()
                    
         if DEBUG:
-            print >> sys.stderr, "bartercastdb:"
+            print >> sys.stderr, time.asctime(),'-', "bartercastdb:"
 
         
     ##def registerSession(self, session):
@@ -2364,7 +2365,7 @@ class BarterCastDBHandler(BasicDBHandler):
         self.my_permid = session.get_permid()
 
         if DEBUG:
-            print >> sys.stderr, "bartercastdb: MyPermid is ", `self.my_permid`
+            print >> sys.stderr, time.asctime(),'-', "bartercastdb: MyPermid is ", `self.my_permid`
 
         if self.my_permid is None:
             raise ValueError('Cannot get permid from Session')
@@ -2387,7 +2388,7 @@ class BarterCastDBHandler(BasicDBHandler):
             self.total_down = 0
             
 #         if DEBUG:
-#             print >> sys.stderr, "My reputation: ", self.getMyReputation()
+#             print >> sys.stderr, time.asctime(),'-', "My reputation: ", self.getMyReputation()
             
     
     def getTotals(self):
@@ -2510,7 +2511,7 @@ class BarterCastDBHandler(BasicDBHandler):
     def updateItem(self, (permid_from, permid_to), key, value, commit=True):
         
         if DEBUG:
-            print >> sys.stderr, "bartercastdb: update (%s, %s) [%s] += %s" % (self.getName(permid_from), self.getName(permid_to), key, str(value))
+            print >> sys.stderr, time.asctime(),'-', "bartercastdb: update (%s, %s) [%s] += %s" % (self.getName(permid_from), self.getName(permid_to), key, str(value))
 
         itemdict = self.getItem((permid_from, permid_to))
 
@@ -2531,7 +2532,7 @@ class BarterCastDBHandler(BasicDBHandler):
 
     def incrementItem(self, (permid_from, permid_to), key, value, commit=True):
         if DEBUG:
-            print >> sys.stderr, "bartercastdb: increment (%s, %s) [%s] += %s" % (self.getName(permid_from), self.getName(permid_to), key, str(value))
+            print >> sys.stderr, time.asctime(),'-', "bartercastdb: increment (%s, %s) [%s] += %s" % (self.getName(permid_from), self.getName(permid_to), key, str(value))
 
         # adjust total_up and total_down
         if permid_from == self.my_permid:
@@ -2566,7 +2567,7 @@ class BarterCastDBHandler(BasicDBHandler):
     def addPeersBatch(self,permids):
         """ Add unknown permids as batch -> single transaction """
         if DEBUG:
-            print >> sys.stderr, "bartercastdb: addPeersBatch: n=",len(permids)
+            print >> sys.stderr, time.asctime(),'-', "bartercastdb: addPeersBatch: n=",len(permids)
         
         for permid in permids:
             peer_id = self.getPeerID(permid)
@@ -2579,7 +2580,7 @@ class BarterCastDBHandler(BasicDBHandler):
         """ Add ul/dl record to database as a single write """
         
         if DEBUG:
-            print >> sys.stderr, "bartercastdb: updateULDL (%s, %s) ['ul'] += %s ['dl'] += %s" % (self.getName(permid_from), self.getName(permid_to), str(ul), str(dl))
+            print >> sys.stderr, time.asctime(),'-', "bartercastdb: updateULDL (%s, %s) ['ul'] += %s ['dl'] += %s" % (self.getName(permid_from), self.getName(permid_to), str(ul), str(dl))
 
         itemdict = self.getItem((permid_from, permid_to))
 
@@ -2616,7 +2617,7 @@ class BarterCastDBHandler(BasicDBHandler):
         # is NxN
         
         if DEBUG:
-            print >> sys.stderr, "bartercastdb: getTopNPeers: local = ", local_only
+            print >> sys.stderr, time.asctime(),'-', "bartercastdb: getTopNPeers: local = ", local_only
             #print_stack()
         
         n = max(1, n)
@@ -2633,17 +2634,17 @@ class BarterCastDBHandler(BasicDBHandler):
         increment = 500
         
         nrecs = self.size()
-        #print >>sys.stderr,"NEXTtopN: size is",nrecs
+        #print >>sys.stderr,time.asctime(),'-', "NEXTtopN: size is",nrecs
         
         for offset in range(0,nrecs,increment):
             if offset+increment > nrecs:
                 limit = nrecs-offset
             else:
                 limit = increment
-            #print >>sys.stderr,"NEXTtopN: get",offset,limit
+            #print >>sys.stderr,time.asctime(),'-', "NEXTtopN: get",offset,limit
         
             reslist = self.getAll(value_name, offset=offset, limit=limit)
-            #print >>sys.stderr,"NEXTtopN: res len is",len(reslist),`reslist`
+            #print >>sys.stderr,time.asctime(),'-', "NEXTtopN: res len is",len(reslist),`reslist`
             for res in reslist:
                 (peer_id_from,peer_id_to,downloaded,uploaded,last_seen,value) = res
             
@@ -2659,7 +2660,7 @@ class BarterCastDBHandler(BasicDBHandler):
                     down = downloaded *1024
     
                     if DEBUG:
-                        print >> sys.stderr, "bartercastdb: getTopNPeers: DB entry: (%s, %s) up = %d down = %d" % (self.getNameByID(peer_id_from), self.getNameByID(peer_id_to), up, down)
+                        print >> sys.stderr, time.asctime(),'-', "bartercastdb: getTopNPeers: DB entry: (%s, %s) up = %d down = %d" % (self.getNameByID(peer_id_from), self.getNameByID(peer_id_to), up, down)
     
                     processed.add((peer_id_from, peer_id_to))
     
@@ -2688,7 +2689,7 @@ class BarterCastDBHandler(BasicDBHandler):
             down = total_down[peer_id]
 
             if DEBUG:
-                print >> sys.stderr, "bartercastdb: getTopNPeers: total of %s: up = %d down = %d" % (self.getName(peer_id), up, down)
+                print >> sys.stderr, time.asctime(),'-', "bartercastdb: getTopNPeers: total of %s: up = %d down = %d" % (self.getName(peer_id), up, down)
 
             # we know rank on total upload?
             value = up
@@ -2727,7 +2728,7 @@ class BarterCastDBHandler(BasicDBHandler):
         result['tribler_down'] = result['total_down'] - total_up.get(-1, 0) # -1 = 'non-tribler'
 
         if DEBUG:
-            print >> sys.stderr, result
+            print >> sys.stderr, time.asctime(),'-', result
 
         return result
         
@@ -2769,20 +2770,20 @@ class VoteCastDBHandler(BasicDBHandler):
         try:
             db = SQLiteCacheDB.getInstance()
             BasicDBHandler.__init__(self,db,'VoteCast')
-            if DEBUG: print >> sys.stderr, "votecast: DB made" 
+            if DEBUG: print >> sys.stderr, time.asctime(),'-', "votecast: DB made" 
         except: 
-            print >> sys.stderr, "votecast: couldn't make the table"
+            print >> sys.stderr, time.asctime(),'-', "votecast: couldn't make the table"
         
         self.peer_db = PeerDBHandler.getInstance()
         if DEBUG:
-            print >> sys.stderr, "votecast: "
+            print >> sys.stderr, time.asctime(),'-', "votecast: "
     
     def registerSession(self, session):
         self.session = session
         self.my_permid = session.get_permid()
 
         if DEBUG:
-            print >> sys.stderr, "votecast: My permid is",`self.my_permid`
+            print >> sys.stderr, time.asctime(),'-', "votecast: My permid is",`self.my_permid`
 
     def getAllVotes(self, permid):
         sql = 'select * from VoteCast where mod_id==?'
@@ -2818,7 +2819,7 @@ class VoteCastDBHandler(BasicDBHandler):
     def hasVote(self, permid, voter_peerid):
         sql = 'select mod_id, voter_id from VoteCast where mod_id==? and voter_id==?'
         item = self._db.fetchone(sql,(permid,voter_peerid,))
-        #print >> sys.stderr,"well well well",infohash," sdd",item
+        #print >> sys.stderr,time.asctime(),'-', "well well well",infohash," sdd",item
         if item is None:
             return False
         else:
@@ -2989,9 +2990,9 @@ class ChannelCastDBHandler(BasicDBHandler):
         try:
             db = SQLiteCacheDB.getInstance()
             BasicDBHandler.__init__(self,db,'ChannelCast')
-            print >> sys.stderr, "ChannelCast: DB made" 
+            print >> sys.stderr, time.asctime(),'-', "ChannelCast: DB made" 
         except: 
-            print >> sys.stderr, "ChannelCast: couldn't make the table"
+            print >> sys.stderr, time.asctime(),'-', "ChannelCast: couldn't make the table"
         
         self.peer_db = PeerDBHandler.getInstance()
         self.firstQueryMySubscriptions=True
@@ -3000,7 +3001,7 @@ class ChannelCastDBHandler(BasicDBHandler):
         self.allRecordsPopularChannels=None
         
         if DEBUG:
-            print >> sys.stderr, "ChannelCast: "
+            print >> sys.stderr, time.asctime(),'-', "ChannelCast: "
             
         self.value_name = ['publisher_id','publisher_name','infohash','torrenthash','torrentname','time_stamp','signature'] ##
     
@@ -3011,7 +3012,7 @@ class ChannelCastDBHandler(BasicDBHandler):
         self.getMostPopularUnsubscribedChannels()
         self.ensureRecentNames()
         if DEBUG:
-            print >> sys.stderr, "ChannelCast: My permid is",`self.my_permid`
+            print >> sys.stderr, time.asctime(),'-', "ChannelCast: My permid is",`self.my_permid`
         
     def _sign(self, record):
         assert record is not None
@@ -3179,7 +3180,7 @@ class ChannelCastDBHandler(BasicDBHandler):
                 if channel[0] in channels:
                     continue
                 channels[channel[0]] = channel[1]
-                #print >>sys.stderr, "channel:", repr(channel)
+                #print >>sys.stderr, time.asctime(),'-', "channel:", repr(channel)
                 # now, retrieve the last 20 of each of these channels' torrents                             
                 s = "select * from ChannelCast where publisher_id==? order by time_stamp desc limit 20"
                 record = self._db.fetchall(s,(channel[0],))
@@ -3193,7 +3194,7 @@ class ChannelCastDBHandler(BasicDBHandler):
         elif query[0] == 'p': 
             # search channel's torrents based on permid
             q = query[2:]
-            #print>>sys.stderr, "ChannelCastDB: searchChannels: This is a permid-based search:", `q`            
+            #print>>sys.stderr, time.asctime(),'-', "ChannelCastDB: searchChannels: This is a permid-based search:", `q`            
             s = "select * from ChannelCast where publisher_id==? order by time_stamp desc limit 20"
             allrecords = self._db.fetchall(s,(q,)) ## before records = {'torrents':self._db.fetchall(s)}
             #channelList = self.valuelist2channellist(records,value_name)  
@@ -3303,7 +3304,7 @@ class ChannelCastDBHandler(BasicDBHandler):
             if a[2]<b[2] : return 1
             return 0
         allrecords.sort(compare)
-        #print >> sys.stderr, "getMostPopularUnsubscribedChannels: execution times %.3f, %.3f, %.3f" %(t2-t1, t3-t2, time()-t3)
+        #print >> sys.stderr, time.asctime(),'-', "getMostPopularUnsubscribedChannels: execution times %.3f, %.3f, %.3f" %(t2-t1, t3-t2, time()-t3)
         
         
         #if not from_channelcast:
@@ -3355,7 +3356,7 @@ class ChannelCastDBHandler(BasicDBHandler):
             if channel[0] != bin2str(self.my_permid):
                 num_votes = self.getSubscribersCount(channel[0])
                 records.append((channel[0], channel[1], num_votes, {}))
-        if DEBUG: print >> sys.stderr , "records" , records
+        if DEBUG: print >> sys.stderr , time.asctime(),'-', "records" , records
         return records
 
 
@@ -3375,12 +3376,12 @@ class ChannelCastDBHandler(BasicDBHandler):
 #            mod_name = record[0]
 #            records.append((vote[0],mod_name,vote[1]))
 #        t2 = time()
-#        print >> sys.stderr , "subscribed" , t2 - t1
+#        print >> sys.stderr , time.asctime(),'-', "subscribed" , t2 - t1
 
 #        return records
 
         if DEBUG and from_channelcast:
-            print >> sys.stderr , "FROM CHANNELCAST"
+            print >> sys.stderr , time.asctime(),'-', "FROM CHANNELCAST"
 
         if not self.firstQueryMySubscriptions and not from_channelcast:
             self.firstQueryMySubscriptions=True
@@ -3389,7 +3390,7 @@ class ChannelCastDBHandler(BasicDBHandler):
 
 
         if DEBUG:
-            print >> sys.stderr , "getMySubscribedChannels"
+            print >> sys.stderr , time.asctime(),'-', "getMySubscribedChannels"
         allrecords = []
 
         sql = "select distinct publisher_id, publisher_name from ChannelCast"
@@ -3565,9 +3566,9 @@ class GUIDBHandler:
             res.sort()
             res.reverse()
         
-            print >> sys.stderr, '------------', top, '-------------'
+            print >> sys.stderr, time.asctime(),'-', '------------', top, '-------------'
             for k in res[:10]:
-                print >> sys.stderr, k
+                print >> sys.stderr, time.asctime(),'-', k
          
     def get_family_filter_sql(self, table_name=''):
         torrent_db_handler = TorrentDBHandler.getInstance()
@@ -3796,7 +3797,7 @@ class PopularityDBHandler(BasicDBHandler):
             return (num_of_popularity, oldest_record_age)
         else:
             if DEBUG:
-                print >> sys.stderr, "The torrent with the id ", torrent_id, " does not have any popularity record."
+                print >> sys.stderr, time.asctime(),'-', "The torrent with the id ", torrent_id, " does not have any popularity record."
             return (0 , sys.maxint) 
     ###--------------------------------------------------------------------------------------------------------------------------        
     def countTorrentPeerPopularityRec(self, torrent_id, peer_id, timeNow):
@@ -3815,7 +3816,7 @@ class PopularityDBHandler(BasicDBHandler):
             return (num_of_popularity, oldest_record_age)
         else:
             if DEBUG:
-                print >> sys.stderr, "The peer with the id ", peer_id, "has not reported any thing about the torrent: ", torrent_id
+                print >> sys.stderr, time.asctime(),'-', "The peer with the id ", peer_id, "has not reported any thing about the torrent: ", torrent_id
             return (0 , sys.maxint) 
     ###--------------------------------------------------------------------------------------------------------------------------     
     def deleteOldTorrentRecords(self, torrent_id, num_rec_to_delete, timeNow, commit=True):
@@ -3892,7 +3893,7 @@ class PopularityDBHandler(BasicDBHandler):
        
         peer_id = self._db.getPeerID(peer_permid)
         if peer_id is None:
-            print >> sys.stderr, 'PopularityDBHandler: update received popularity list from a peer that is not existed in Peer table', `peer_permid`
+            print >> sys.stderr, time.asctime(),'-', 'PopularityDBHandler: update received popularity list from a peer that is not existed in Peer table', `peer_permid`
             return
 
         pops = [type(pop) is str and {"infohash":pop} or pop
@@ -3946,7 +3947,7 @@ class PopularityDBHandler(BasicDBHandler):
                 self.storePeerPopularity(peer_id, torrent_id_swarm_size, commit=commit)
             except Exception, msg:    
                 print_exc()
-                print >> sys.stderr, 'dbhandler: updatePopularity:', Exception, msg 
+                print >> sys.stderr, time.asctime(),'-', 'dbhandler: updatePopularity:', Exception, msg 
 
 class TermDBHandler(BasicDBHandler):
     
@@ -4250,13 +4251,13 @@ def doPeerSearchNames(self,dbname,kws):
     # See getGUIPeers()
     value_name = PeerDBHandler.gui_value_name
     
-    #print >>sys.stderr,"peer_db: searchNames: sql",where
+    #print >>sys.stderr,time.asctime(),'-', "peer_db: searchNames: sql",where
     res_list = self._db.getAll(dbname, value_name, where)
-    #print >>sys.stderr,"peer_db: searchNames: res",res_list
+    #print >>sys.stderr,time.asctime(),'-', "peer_db: searchNames: res",res_list
     
     peer_list = []
     for item in res_list:
-        #print >>sys.stderr,"peer_db: searchNames: Got Record",`item`
+        #print >>sys.stderr,time.asctime(),'-', "peer_db: searchNames: Got Record",`item`
         peer = dict(zip(value_name, item))
         peer['name'] = dunno2unicode(peer['name'])
         peer['simRank'] = ranksfind(ranks,peer['permid'])

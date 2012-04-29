@@ -1,3 +1,4 @@
+import time 
 # Written by Pawel Garbacki, Arno Bakker, George Milescu
 # see LICENSE.txt for license information
 #
@@ -81,7 +82,7 @@ class Coordinator:
         """
         if DEBUG:
             for peer in peerList:
-                print >> sys.stderr, "coordinator: i was requested to send help request to", show_permid_short(peer['permid'])
+                print >> sys.stderr, time.asctime(),'-', "coordinator: i was requested to send help request to", show_permid_short(peer['permid'])
                 
         try:
             # List of helpers to be contacted for help
@@ -133,7 +134,7 @@ class Coordinator:
             self.overlay_bridge.add_task(olthread_send_request_help_lambda,0)
         except Exception,e:
             print_exc()
-            print >> sys.stderr, "coordinator: Exception while requesting help",e
+            print >> sys.stderr, time.asctime(),'-', "coordinator: Exception while requesting help",e
         
 
     def olthread_send_ask_for_help(self,permidlist):
@@ -145,7 +146,7 @@ class Coordinator:
         """
         for permid in permidlist:
             if DEBUG:
-                print >> sys.stderr, "coordinator: olthread_send_ask_for_help connecting to",show_permid_short(permid)
+                print >> sys.stderr, time.asctime(),'-', "coordinator: olthread_send_ask_for_help connecting to",show_permid_short(permid)
             
             # Connect to the peer designated by permid
             self.overlay_bridge.connect(permid,self.olthread_ask_for_help_connect_callback)
@@ -164,7 +165,7 @@ class Coordinator:
         if exc is None:
             # Peer is reachable
             if DEBUG:
-                print >> sys.stderr, "coordinator: olthread_ask_for_help_connect_callback sending help request to",show_permid_short(permid)
+                print >> sys.stderr, time.asctime(),'-', "coordinator: olthread_ask_for_help_connect_callback sending help request to",show_permid_short(permid)
             
             # get the peer challenge
             challenge = self.sent_challenges_by_permid[permid]
@@ -177,7 +178,7 @@ class Coordinator:
         else:
             # Peer is unreachable
             if DEBUG:
-                print >> sys.stderr, "coordinator: olthread_ask_for_help_connect_callback: error connecting to",show_permid_short(permid),exc
+                print >> sys.stderr, time.asctime(),'-', "coordinator: olthread_ask_for_help_connect_callback: error connecting to",show_permid_short(permid),exc
             # Remove peer from the list of asked peers
             self.remove_unreachable_helper(permid)
 
@@ -193,7 +194,7 @@ class Coordinator:
         if exc is not None:
             # Peer is unreachable
             if DEBUG:
-                print >> sys.stderr, "coordinator: olthread_ask_for_help_send_callback: error sending to",show_permid_short(permid),exc
+                print >> sys.stderr, time.asctime(),'-', "coordinator: olthread_ask_for_help_send_callback: error sending to",show_permid_short(permid),exc
             # Remove peer from the list of asked peers
             self.remove_unreachable_helper(permid)
 
@@ -215,7 +216,7 @@ class Coordinator:
             self.asked_helpers = new_asked_helpers
         except Exception,e:
             print_exc()
-            print >> sys.stderr, "coordinator: Exception in remove_unreachable_helper",e
+            print >> sys.stderr, time.asctime(),'-', "coordinator: Exception in remove_unreachable_helper",e
         finally:
             self.asked_helpers_lock.release()
 
@@ -233,7 +234,7 @@ class Coordinator:
         """
         if DEBUG:
             for peer in peerList:
-                print >> sys.stderr, "coordinator: i was requested to send a stop helping request to", show_permid_short(peer)
+                print >> sys.stderr, time.asctime(),'-', "coordinator: i was requested to send a stop helping request to", show_permid_short(peer)
                 
 
         # TODO: optimize the search below
@@ -318,7 +319,7 @@ class Coordinator:
             self.overlay_bridge.add_task(olthread_send_stop_help_lambda,0)
         except Exception,e:
             print_exc()
-            print >> sys.stderr, "coordinator: Exception in send_stop_helping",e
+            print >> sys.stderr, time.asctime(),'-', "coordinator: Exception in send_stop_helping",e
 
 
     def olthread_send_stop_help(self,permidlist):
@@ -330,7 +331,7 @@ class Coordinator:
         """
         for permid in permidlist:
             if DEBUG:
-                print >> sys.stderr, "coordinator: error connecting to", show_permid_short(permid), "for stopping help"
+                print >> sys.stderr, time.asctime(),'-', "coordinator: error connecting to", show_permid_short(permid), "for stopping help"
             self.overlay_bridge.connect(permid,self.olthread_stop_help_connect_callback)
 
 
@@ -351,7 +352,7 @@ class Coordinator:
             self.overlay_bridge.send(permid, message, self.olthread_stop_help_send_callback)
         elif DEBUG:
             # Peer is not reachable
-            print >> sys.stderr, "coordinator: olthread_stop_help_connect_callback: error connecting to",show_permid_short(permid),exc
+            print >> sys.stderr, time.asctime(),'-', "coordinator: olthread_stop_help_connect_callback: error connecting to",show_permid_short(permid),exc
 
 
     def olthread_stop_help_send_callback(self,exc,permid):
@@ -365,7 +366,7 @@ class Coordinator:
         if exc is not None:
             # Peer is unreachable
             if DEBUG:
-                print >> sys.stderr, "coordinator: STOP_HELPING: error sending to",show_permid_short(permid),exc
+                print >> sys.stderr, time.asctime(),'-', "coordinator: STOP_HELPING: error sending to",show_permid_short(permid),exc
 
 
 
@@ -380,7 +381,7 @@ class Coordinator:
         @param peerid: The peerid of the helper that will be requested for the piece
         """
         if DEBUG:
-            print >>sys.stderr, "coordinator: send_request_pieces: will send requests for piece", piece
+            print >>sys.stderr, time.asctime(),'-', "coordinator: send_request_pieces: will send requests for piece", piece
                 
         try:
             # Choose one of the confirmed helpers
@@ -394,7 +395,7 @@ class Coordinator:
                 if piece in current_requested_pieces:
                     # The piece has already been requested to that helper. No re-requests in this version
                     if DEBUG:
-                        print >> sys.stderr, "coordinator: send_request_pieces: piece", piece, "was already requested to another helper"
+                        print >> sys.stderr, time.asctime(),'-', "coordinator: send_request_pieces: piece", piece, "was already requested to another helper"
                     return
                 current_requested_pieces.append(piece)
                 self.requested_pieces[chosen_permid] = current_requested_pieces
@@ -407,7 +408,7 @@ class Coordinator:
             self.overlay_bridge.add_task(olthread_send_request_help_lambda,0)
         except Exception,e:
             print_exc()
-            print >> sys.stderr, "coordinator: Exception while requesting piece",piece,e
+            print >> sys.stderr, time.asctime(),'-', "coordinator: Exception while requesting piece",piece,e
         
 
     def olthread_send_request_pieces(self, permid, piece):
@@ -419,7 +420,7 @@ class Coordinator:
         @param piece: The piece that will be requested
         """
         if DEBUG:
-            print >> sys.stderr, "coordinator: olthread_send_request_pieces connecting to", show_permid_short(permid), "to request piece", piece
+            print >> sys.stderr, time.asctime(),'-', "coordinator: olthread_send_request_pieces connecting to", show_permid_short(permid), "to request piece", piece
         # Connect to the peer designated by permid
         olthread_reserve_pieces_connect_callback_lambda = lambda e,d,p,s:self.olthread_request_pieces_connect_callback(e,d,p,s,piece)
         self.overlay_bridge.connect(permid, olthread_reserve_pieces_connect_callback_lambda)
@@ -439,7 +440,7 @@ class Coordinator:
         if exc is None:
             # Peer is reachable
             if DEBUG:
-                print >> sys.stderr, "coordinator: olthread_request_pieces_connect_callback sending help request to", show_permid_short(permid), "for piece", piece
+                print >> sys.stderr, time.asctime(),'-', "coordinator: olthread_request_pieces_connect_callback sending help request to", show_permid_short(permid), "for piece", piece
             
             # Create message according to protocol version
             message = REQUEST_PIECES + self.infohash + bencode(piece)
@@ -449,7 +450,7 @@ class Coordinator:
         else:
             # Peer is unreachable
             if DEBUG:
-                print >> sys.stderr, "coordinator: olthread_request_pieces_connect_callback: error connecting to",show_permid_short(permid),exc
+                print >> sys.stderr, time.asctime(),'-', "coordinator: olthread_request_pieces_connect_callback: error connecting to",show_permid_short(permid),exc
             # Remove peer from the list of asked peers
             self.remove_unreachable_helper(permid)
 
@@ -465,7 +466,7 @@ class Coordinator:
         if exc is not None:
             # Peer is unreachable
             if DEBUG:
-                print >> sys.stderr, "coordinator: olthread_request_pieces_send_callback: error sending to",show_permid_short(permid),exc
+                print >> sys.stderr, time.asctime(),'-', "coordinator: olthread_request_pieces_send_callback: error sending to",show_permid_short(permid),exc
             # Remove peer from the list of asked peers
             self.remove_unreachable_helper(permid)
 
@@ -498,14 +499,14 @@ class Coordinator:
         @param piece: The piece that will be canceled to the respective helper
         """
         if DEBUG:
-            print >> sys.stderr, "coordinator: i will cancel the request for piece", piece
+            print >> sys.stderr, time.asctime(),'-', "coordinator: i will cancel the request for piece", piece
             
         try:
             # Check if the piece was reserved before
             all_requested_pieces = self.requested_pieces.values()
             if piece not in all_requested_pieces:
                 if DEBUG:
-                    print >> sys.stderr, "coordinator: piece", piece, "was not requested to any peer"
+                    print >> sys.stderr, time.asctime(),'-', "coordinator: piece", piece, "was not requested to any peer"
                 return
             
             # Find the peer that was requested to download the piece
@@ -513,13 +514,13 @@ class Coordinator:
                 his_pieces = self.requested_pieces[helper]
                 if piece in his_pieces:
                     if DEBUG:
-                        print >> sys.stderr, "coordinator: canceling piece", piece, "to peer", show_permid_short(helper)
+                        print >> sys.stderr, time.asctime(),'-', "coordinator: canceling piece", piece, "to peer", show_permid_short(helper)
                     # Sent the cancel message to the helper
                     olthread_send_cancel_piece_lambda = lambda:self.olthread_send_cancel_piece(chosen_permid, piece)
                     self.overlay_bridge.add_task(olthread_send_cancel_piece_lambda,0)
         except Exception,e:
             print_exc()
-            print >> sys.stderr, "coordinator: Exception while requesting piece",piece,e
+            print >> sys.stderr, time.asctime(),'-', "coordinator: Exception while requesting piece",piece,e
         
 
     def olthread_send_cancel_piece(self, permid, piece):
@@ -531,7 +532,7 @@ class Coordinator:
         @param piece: The piece that will be canceled
         """
         if DEBUG:
-            print >> sys.stderr, "coordinator: olthread_send_cancel_piece connecting to", show_permid_short(permid), "to cancel piece", piece
+            print >> sys.stderr, time.asctime(),'-', "coordinator: olthread_send_cancel_piece connecting to", show_permid_short(permid), "to cancel piece", piece
         # Connect to the peer designated by permid
         self.overlay_bridge.connect(permid, piece, self.olthread_cancel_piece_connect_callback)
 
@@ -550,7 +551,7 @@ class Coordinator:
         if exc is None:
             # Peer is reachable
             if DEBUG:
-                print >> sys.stderr, "coordinator: olthread_cancel_piece_connect_callback sending a cancel request to", show_permid_short(permid), "for piece", piece
+                print >> sys.stderr, time.asctime(),'-', "coordinator: olthread_cancel_piece_connect_callback sending a cancel request to", show_permid_short(permid), "for piece", piece
             
             # Create message according to protocol version
             message = CANCEL_PIECE + self.infohash + bencode(piece)
@@ -560,7 +561,7 @@ class Coordinator:
         else:
             # Peer is unreachable
             if DEBUG:
-                print >> sys.stderr, "coordinator: olthread_cancel_piece_connect_callback: error connecting to",show_permid_short(permid),exc
+                print >> sys.stderr, time.asctime(),'-', "coordinator: olthread_cancel_piece_connect_callback: error connecting to",show_permid_short(permid),exc
             # Remove peer from the list of asked peers
             self.remove_unreachable_helper(permid)
 
@@ -576,7 +577,7 @@ class Coordinator:
         if exc is not None:
             # Peer is unreachable
             if DEBUG:
-                print >> sys.stderr, "coordinator: olthread_cancel_piece_send_callback: error sending to",show_permid_short(permid),exc
+                print >> sys.stderr, time.asctime(),'-', "coordinator: olthread_cancel_piece_send_callback: error sending to",show_permid_short(permid),exc
             # Remove peer from the list of asked peers
             self.remove_unreachable_helper(permid)
 
@@ -594,7 +595,7 @@ class Coordinator:
         @param selversion:
         """
         if DEBUG:
-            print >> sys.stderr, "coordinator: received a JOIN_HELPERS message from", show_permid_short(permid)
+            print >> sys.stderr, time.asctime(),'-', "coordinator: received a JOIN_HELPERS message from", show_permid_short(permid)
 
         #Search the peer in the asked_helpers list, remove it from there, and put it in the confirmed_helpers list.
         self.asked_helpers_lock.acquire()
@@ -629,7 +630,7 @@ class Coordinator:
         @param selversion:
         """
         if DEBUG:
-            print >> sys.stderr, "coordinator: received a RESIGN_AS_HELPER message from", show_permid_short(permid)
+            print >> sys.stderr, time.asctime(),'-', "coordinator: received a RESIGN_AS_HELPER message from", show_permid_short(permid)
 
         #Search the peer in the asked_helpers list and remove it from there
         self.asked_helpers_lock.acquire()
@@ -667,7 +668,7 @@ class Coordinator:
         @param selversion:
         """
         if DEBUG:
-            print >> sys.stderr, "coordinator: received a DROPPED_PIECE message from", show_permid_short(permid)
+            print >> sys.stderr, time.asctime(),'-', "coordinator: received a DROPPED_PIECE message from", show_permid_short(permid)
 
         pass
 
@@ -683,10 +684,10 @@ class Coordinator:
         @param aggregated_string: a bitstring of available pieces built by the helper based on HAVE messages it received
         """
         if DEBUG:
-            print >> sys.stderr, "coordinator: received a PROXY_HAVE message from", show_permid_short(permid)
+            print >> sys.stderr, time.asctime(),'-', "coordinator: received a PROXY_HAVE message from", show_permid_short(permid)
 
 #        if len(aggregated_string) != self.num_pieces:
-#            print >> sys.stderr, "coordinator: got_proxy_have: invalid payload in received PROXY_HAVE message. self.num_pieces=", self.num_pieces, "len(aggregated_string)=", len(aggregated_string)
+#            print >> sys.stderr, time.asctime(),'-', "coordinator: got_proxy_have: invalid payload in received PROXY_HAVE message. self.num_pieces=", self.num_pieces, "len(aggregated_string)=", len(aggregated_string)
 
         # Get the recorded peer challenge
         peer_challenge = self.sent_challenges_by_permid[permid]
@@ -709,7 +710,7 @@ class Coordinator:
         """ Returns a COPY of the list. We need 'before' and 'after' info here,
         so the caller is not allowed to update the current confirmed_helpers """
         if DEBUG:
-            print >> sys.stderr, "coordinator: network_get_asked_helpers_copy: Number of helpers:",len(self.confirmed_helpers)
+            print >> sys.stderr, time.asctime(),'-', "coordinator: network_get_asked_helpers_copy: Number of helpers:",len(self.confirmed_helpers)
         self.confirmed_helpers_lock.acquire()
         try:
             return copy.deepcopy(self.confirmed_helpers)

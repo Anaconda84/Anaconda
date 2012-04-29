@@ -1,3 +1,4 @@
+import time 
 # Written by Arno Bakker
 # see LICENSE.txt for license information
 #
@@ -114,7 +115,7 @@ class DialbackMsgHandler:
         """
         # Called by overlay thread
         if DEBUG:
-            print >> sys.stderr,"dialback: handleConnection",exc,"v",selversion,"local",locally_initiated
+            print >> sys.stderr,time.asctime(),'-', "dialback: handleConnection",exc,"v",selversion,"local",locally_initiated
         if selversion < OLPROTO_VER_THIRD:
             return True
         
@@ -123,7 +124,7 @@ class DialbackMsgHandler:
                 del self.peers_asked[permid]
             except:
                 if DEBUG:
-                    print >> sys.stderr,"dialback: handleConnection: Got error on connection that we didn't ask for dialback"
+                    print >> sys.stderr,time.asctime(),'-', "dialback: handleConnection: Got error on connection that we didn't ask for dialback"
                 pass
             return
         
@@ -131,7 +132,7 @@ class DialbackMsgHandler:
             self.ntries += 1
             if self.ntries >= MAX_TRIES:
                 if DEBUG:
-                    print >> sys.stderr,"dialback: tried too many times, giving up"
+                    print >> sys.stderr,time.asctime(),'-', "dialback: tried too many times, giving up"
                 return True
             
             if self.dbreach or self.btenginereach:
@@ -149,7 +150,7 @@ class DialbackMsgHandler:
     def olthread_attempt_request_dialback(self,permid):
         # Called by overlay thread
         if DEBUG:
-            print >> sys.stderr,"dialback: attempt dialback request",show_permid_short(permid)
+            print >> sys.stderr,time.asctime(),'-', "dialback: attempt dialback request",show_permid_short(permid)
                     
         dns = self.olthread_get_dns_from_peerdb(permid)
         ipinuse = False
@@ -171,7 +172,7 @@ class DialbackMsgHandler:
             if DEBUG:
                 pipa = permid in self.peers_asked
                 lpa = len(self.peers_asked)
-                print >> sys.stderr,"dialback: No request made to",show_permid_short(permid),"already asked",pipa,"IP in use",ipinuse,"nasked",lpa
+                print >> sys.stderr,time.asctime(),'-', "dialback: No request made to",show_permid_short(permid),"already asked",pipa,"IP in use",ipinuse,"nasked",lpa
 
             return
         dns = self.olthread_get_dns_from_peerdb(permid)
@@ -187,16 +188,16 @@ class DialbackMsgHandler:
             if selversion >= OLPROTO_VER_THIRD:
                 self.overlay_bridge.send(permid, DIALBACK_REQUEST+'',self.olthread_request_send_callback)
             elif DEBUG:
-                print >> sys.stderr,"dialback: DIALBACK_REQUEST: peer speaks old protocol, weird",show_permid_short(permid)
+                print >> sys.stderr,time.asctime(),'-', "dialback: DIALBACK_REQUEST: peer speaks old protocol, weird",show_permid_short(permid)
         elif DEBUG:
-            print >> sys.stderr,"dialback: DIALBACK_REQUEST: error connecting to",show_permid_short(permid),exc
+            print >> sys.stderr,time.asctime(),'-', "dialback: DIALBACK_REQUEST: error connecting to",show_permid_short(permid),exc
 
 
     def olthread_request_send_callback(self,exc,permid):
         # Called by overlay thread
         if exc is not None:
             if DEBUG:
-                print >> sys.stderr,"dialback: DIALBACK_REQUEST error sending to",show_permid_short(permid),exc
+                print >> sys.stderr,time.asctime(),'-', "dialback: DIALBACK_REQUEST error sending to",show_permid_short(permid),exc
             pass
 
     def olthread_handleSecOverlayMessage(self,permid,selversion,message):
@@ -208,11 +209,11 @@ class DialbackMsgHandler:
         
         if t == DIALBACK_REQUEST:
             if DEBUG:
-                print >> sys.stderr,"dialback: Got DIALBACK_REQUEST",len(message),show_permid_short(permid)
+                print >> sys.stderr,time.asctime(),'-', "dialback: Got DIALBACK_REQUEST",len(message),show_permid_short(permid)
             return self.olthread_process_dialback_request(permid, message, selversion)
         else:
             if DEBUG:
-                print >> sys.stderr,"dialback: UNKNOWN OVERLAY MESSAGE", ord(t)
+                print >> sys.stderr,time.asctime(),'-', "dialback: UNKNOWN OVERLAY MESSAGE", ord(t)
             return False
 
 
@@ -221,7 +222,7 @@ class DialbackMsgHandler:
         # 1. Check
         if len(message) != 1:
             if DEBUG:
-                print >> sys.stderr,"dialback: DIALBACK_REQUEST: message too big"
+                print >> sys.stderr,time.asctime(),'-', "dialback: DIALBACK_REQUEST: message too big"
             return False
 
         # 2. Retrieve peer's IP address
@@ -240,7 +241,7 @@ class DialbackMsgHandler:
         # Called by network thread
         
         if not currentThread().getName().startswith("NetworkThread"):
-            print >>sys.stderr,"dialback: network_returnconn_reply_connect_callback: called by",currentThread().getName()," not NetworkThread"
+            print >>sys.stderr,time.asctime(),'-', "dialback: network_returnconn_reply_connect_callback: called by",currentThread().getName()," not NetworkThread"
             print_stack()
         
         if exc is None:
@@ -248,23 +249,23 @@ class DialbackMsgHandler:
             try:
                 reply = bencode(hisip)
                 if DEBUG:
-                    print >> sys.stderr,"dialback: DIALBACK_REPLY: sending to",dns
+                    print >> sys.stderr,time.asctime(),'-', "dialback: DIALBACK_REPLY: sending to",dns
                 self.returnconnhand.send(dns, DIALBACK_REPLY+reply, self.network_returnconn_reply_send_callback)
             except:
                 print_exc()
                 return False
         elif DEBUG:
-            print >> sys.stderr,"dialback: DIALBACK_REPLY: error connecting to",dns,exc
+            print >> sys.stderr,time.asctime(),'-', "dialback: DIALBACK_REPLY: error connecting to",dns,exc
 
     def network_returnconn_reply_send_callback(self,exc,dns):
         # Called by network thread
         if DEBUG:
-            print >> sys.stderr,"dialback: DIALBACK_REPLY: send callback:",dns,exc
+            print >> sys.stderr,time.asctime(),'-', "dialback: DIALBACK_REPLY: send callback:",dns,exc
 
         
         if exc is not None:
             if DEBUG:
-                print >> sys.stderr,"dialback: DIALBACK_REPLY: error sending to",dns,exc
+                print >> sys.stderr,time.asctime(),'-', "dialback: DIALBACK_REPLY: error sending to",dns,exc
             pass
 
     #
@@ -273,7 +274,7 @@ class DialbackMsgHandler:
     def network_handleReturnConnConnection(self,exc,dns,locally_initiated):
         # Called by network thread
         if DEBUG:
-            print >> sys.stderr,"dialback: DIALBACK_REPLY: Got connection from",dns,exc
+            print >> sys.stderr,time.asctime(),'-', "dialback: DIALBACK_REPLY: Got connection from",dns,exc
         pass
 
     def network_handleReturnConnMessage(self,dns,message):
@@ -282,7 +283,7 @@ class DialbackMsgHandler:
         
         if t == DIALBACK_REPLY:
             if DEBUG:
-                print >> sys.stderr,"dialback: Got DIALBACK_REPLY",len(message),dns
+                print >> sys.stderr,time.asctime(),'-', "dialback: Got DIALBACK_REPLY",len(message),dns
 
             # Hand over processing to overlay thread
             olthread_process_dialback_reply_lambda = lambda:self.olthread_process_dialback_reply(dns, message)
@@ -294,7 +295,7 @@ class DialbackMsgHandler:
             return True
         else:
             if DEBUG:
-                print >> sys.stderr,"dialback: UNKNOWN RETURNCONN MESSAGE", ord(t)
+                print >> sys.stderr,time.asctime(),'-', "dialback: UNKNOWN RETURNCONN MESSAGE", ord(t)
             return False
 
 
@@ -308,7 +309,7 @@ class DialbackMsgHandler:
         permid = self.olthread_permid_of_asked_peer(dns)
         if permid is None:
             if DEBUG:
-                print >> sys.stderr,"dialback: DIALBACK_REPLY: Got reply from peer I didn't ask",dns
+                print >> sys.stderr,time.asctime(),'-', "dialback: DIALBACK_REPLY: Got reply from peer I didn't ask",dns
             return False
 
         del self.peers_asked[permid]
@@ -319,11 +320,11 @@ class DialbackMsgHandler:
         except:
             print_exc()
             if DEBUG:
-                print >> sys.stderr,"dialback: DIALBACK_REPLY: error becoding"
+                print >> sys.stderr,time.asctime(),'-', "dialback: DIALBACK_REPLY: error becoding"
             return False
         if not isValidIP(myip):
             if DEBUG:
-                print >> sys.stderr,"dialback: DIALBACK_REPLY: invalid IP"
+                print >> sys.stderr,time.asctime(),'-', "dialback: DIALBACK_REPLY: invalid IP"
             return False
 
 
@@ -332,7 +333,7 @@ class DialbackMsgHandler:
             superpeers = self.superpeer_db.getSuperPeers()
             if permid in superpeers:
                 if DEBUG:
-                    print >> sys.stderr,"dialback: DIALBACK_REPLY: superpeer said my IP address is",myip,"setting it to that"
+                    print >> sys.stderr,time.asctime(),'-', "dialback: DIALBACK_REPLY: superpeer said my IP address is",myip,"setting it to that"
                 self.consensusip = myip
                 self.fromsuperpeer = True
         else:
@@ -348,7 +349,7 @@ class DialbackMsgHandler:
             
             self.launchmany.dialback_got_ext_ip_callback(self.consensusip)
             if DEBUG:
-                print >> sys.stderr,"dialback: DIALBACK_REPLY: I think my IP address is",self.old_ext_ip,"others say",self.consensusip,", setting it to latter"
+                print >> sys.stderr,time.asctime(),'-', "dialback: DIALBACK_REPLY: I think my IP address is",self.old_ext_ip,"others say",self.consensusip,", setting it to latter"
 
         # 9. Notify GUI that we are connectable
         self.launchmany.dialback_reachable_callback()
@@ -386,11 +387,11 @@ class DialbackMsgHandler:
         """
         self.myips_according_to_yourip, yourip_consensusip = tally_opinion(myip,self.myips_according_to_yourip,YOURIP_PEERS_TO_AGREE)
         if DEBUG:
-            print >> sys.stderr,"dialback: yourip: someone said my IP is",myip
+            print >> sys.stderr,time.asctime(),'-', "dialback: yourip: someone said my IP is",myip
         if yourip_consensusip is not None:
             self.launchmany.yourip_got_ext_ip_callback(yourip_consensusip)
             if DEBUG:
-                print >> sys.stderr,"dialback: yourip: I think my IP address is",self.old_ext_ip,"others via EXTEND hs say",yourip_consensusip,"recording latter as option"
+                print >> sys.stderr,time.asctime(),'-', "dialback: yourip: I think my IP address is",self.old_ext_ip,"others via EXTEND hs say",yourip_consensusip,"recording latter as option"
 
     #
     # Internal methods
@@ -398,7 +399,7 @@ class DialbackMsgHandler:
     def olthread_get_dns_from_peerdb(self,permid):
         dns = None
         peer = self.peer_db.getPeer(permid)
-        #print >>sys.stderr,"dialback: get_dns_from_peerdb: Got peer",peer
+        #print >>sys.stderr,time.asctime(),'-', "dialback: get_dns_from_peerdb: Got peer",peer
         if peer:
             ip = self.to_real_ip(peer['ip'])
             dns = (ip, int(peer['port']))
@@ -434,7 +435,7 @@ def tally_opinion(myip,oplist,requiredquorum):
     # 5. Ordinary peer, just add his opinion
     oplist.append([myip,time()])
     if DEBUG:
-        print >> sys.stderr,"dialback: DIALBACK_REPLY: peer said I have IP address",myip
+        print >> sys.stderr,time.asctime(),'-', "dialback: DIALBACK_REPLY: peer said I have IP address",myip
 
     # 6. Remove stale opinions
     newlist = []
@@ -459,7 +460,7 @@ def tally_opinion(myip,oplist,requiredquorum):
             if consensusip is None:
                 consensusip = o
                 if DEBUG:
-                    print >> sys.stderr,"dialback: DIALBACK_REPLY: Got consensus on my IP address being",consensusip
+                    print >> sys.stderr,time.asctime(),'-', "dialback: DIALBACK_REPLY: Got consensus on my IP address being",consensusip
             else:
                 # Hmmmm... more than one consensus
                 pass

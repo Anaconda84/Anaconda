@@ -1,3 +1,4 @@
+import time 
 # Written by Bram Cohen
 # see LICENSE.txt for license information
 
@@ -852,7 +853,7 @@ class Tracker:
 
     def natcheckOK(self, infohash, peerid, ip, port, not_seed):
         if DEBUG:
-            print >>sys.stderr,"tracker: natcheck: Recorded succes"
+            print >>sys.stderr,time.asctime(),'-', "tracker: natcheck: Recorded succes"
         bc = self.becache.setdefault(infohash,[[{}, {}], [{}, {}], [{}, {}]])
         bc[0][not not_seed][peerid] = Bencached(bencode({'ip': ip, 'port': port,
                                               'peer id': peerid}))
@@ -879,7 +880,7 @@ class Tracker:
             if self.config['tracker_log_nat_checks']:
                 self.natchecklog(peerid, ip, port, 404)
             if DEBUG:
-                print >>sys.stderr,"tracker: natcheck: No record found for tested peer"
+                print >>sys.stderr,time.asctime(),'-', "tracker: natcheck: No record found for tested peer"
             return
         if self.config['tracker_log_nat_checks']:
             if result:
@@ -897,7 +898,7 @@ class Tracker:
         elif not result:
             record['nat'] += 1
             if DEBUG:
-                print >>sys.stderr,"tracker: natcheck: Recorded failed attempt"
+                print >>sys.stderr,time.asctime(),'-', "tracker: natcheck: Recorded failed attempt"
 
 
     def remove_from_state(self, *l):
@@ -919,7 +920,7 @@ class Tracker:
 
     def parse_allowed(self,source=None):
         if DEBUG:
-            print >>sys.stderr,"tracker: parse_allowed: Source is",source,"alloweddir",self.config['tracker_allowed_dir']
+            print >>sys.stderr,time.asctime(),'-', "tracker: parse_allowed: Source is",source,"alloweddir",self.config['tracker_allowed_dir']
         
         if source is None:
             self.rawserver.add_task(self.parse_allowed, self.parse_dir_interval)
@@ -932,7 +933,7 @@ class Tracker:
                 added, garbage2 ) = r
             
             if DEBUG:
-                print >>sys.stderr,"tracker: parse_allowed: Found new",`added`
+                print >>sys.stderr,time.asctime(),'-', "tracker: parse_allowed: Found new",`added`
             
             self.state['allowed'] = self.allowed
             self.state['allowed_dir_files'] = self.allowed_dir_files

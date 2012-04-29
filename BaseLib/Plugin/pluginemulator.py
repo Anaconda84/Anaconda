@@ -1,3 +1,4 @@
+import time 
 # BAD CLIENT: SENDS 
 # GET /path\r\n
 # HTTP/1.1\r\n
@@ -21,9 +22,9 @@ class PluginEmulator:
         #s.close()
         while True:
             data = s.recv(1024)
-            print >>sys.stderr,"pe: Got BG command",data
+            print >>sys.stderr,time.asctime(),'-', "pe: Got BG command",data
             if len(data) == 0:
-                print >>sys.stderr,"pe: BG closes IC"
+                print >>sys.stderr,time.asctime(),'-', "pe: BG closes IC"
                 return
             
             s.send(msg)
@@ -43,7 +44,7 @@ class PluginEmulator:
         #s2.connect(('127.0.0.1',6878))
         #s2.send("GET "+path+"HTTP/1.1\r\nHost: localhost:6878\r\n\r\n")
         #data = s2.recv(100)
-        #print >>sys.stderr,"pe: Got HTTP command",data
+        #print >>sys.stderr,time.asctime(),'-', "pe: Got HTTP command",data
         time.sleep(10000)
 
 
@@ -51,7 +52,7 @@ class PluginEmulator:
         readbufsize = 100000
         
         links = []
-        print >>sys.stderr,"pe: GET",path
+        print >>sys.stderr,time.asctime(),'-', "pe: GET",path
         s2 = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         s2.connect(('127.0.0.1',6878))
         s2.send("GET "+path+" HTTP/1.1\r\nHost: localhost:6878\r\n\r\n")
@@ -59,7 +60,7 @@ class PluginEmulator:
             data = s2.recv(readbufsize)
             if len(data) == 0:
                 break
-            print >>sys.stderr,"pe: Got HTTP data",`data`
+            print >>sys.stderr,time.asctime(),'-', "pe: Got HTTP data",`data`
             
             eidx = 0
             while True:
@@ -68,7 +69,7 @@ class PluginEmulator:
                     eidx = data.find('"',sidx)
                     if eidx != -1:
                         hitpath = data[sidx:eidx]
-                        #print >>sys.stderr,"pe: Found link",hitpath
+                        #print >>sys.stderr,time.asctime(),'-', "pe: Found link",hitpath
                         links.append(hitpath)
                 else:
                     break
@@ -76,14 +77,14 @@ class PluginEmulator:
         if recurse:
             for hitpath in links:
                 #hitpath = links[2][:-len("/thumbnail")]
-                #print >>sys.stderr,"pe: Retrieving link",hitpath,"EOT"
+                #print >>sys.stderr,time.asctime(),'-', "pe: Retrieving link",hitpath,"EOT"
                 recurse = hitpath.endswith(".xml")
                 
                 # My dumb parser hack
                 idx = hitpath.find("</MediaUri>")
                 if idx != -1:
                     hitpath = hitpath[0:idx]
-                print >>sys.stderr,"pe: FINAL link",hitpath,"EOT"
+                print >>sys.stderr,time.asctime(),'-', "pe: FINAL link",hitpath,"EOT"
                 self.retrieve_path(hitpath,recurse=recurse)
             
             

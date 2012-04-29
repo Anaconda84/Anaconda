@@ -1,3 +1,4 @@
+import time 
 # Written by Jie Yang
 # see LICENSE.txt for license information
 #
@@ -67,7 +68,7 @@ class Logger:
                 self.logfile = open(file_path, open_mode)
             except Exception, msg:
                 self.logfile = None
-                print >> sys.stderr, "logger: cannot open log file", \
+                print >> sys.stderr, time.asctime(),'-', "logger: cannot open log file", \
                          file_name, file_dir, prefix, prefix_date, msg
                 print_exc() 
                 
@@ -157,7 +158,7 @@ class OverlayLogger:
         log_msg = ''
         nmsgs = len(msgs)
         if nmsgs < 2:
-            print >> sys.stderr, "Error message for log", msgs
+            print >> sys.stderr, time.asctime(),'-', "Error message for log", msgs
             return
         
         else:

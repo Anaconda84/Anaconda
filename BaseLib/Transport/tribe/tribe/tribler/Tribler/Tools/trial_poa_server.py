@@ -1,3 +1,4 @@
+import time 
 # Written by Njaal Borch
 # see LICENSE.txt for license information
 
@@ -32,7 +33,7 @@ class MyWebServer(BaseHTTPServer.HTTPServer):
                                                server_address,
                                                RequestHandlerClass)
         except:
-            print >>sys.stderr,"Failed to use IPv6, using IPv4 instead"
+            print >>sys.stderr,time.asctime(),'-', "Failed to use IPv6, using IPv4 instead"
             self.address_family = socket.AF_INET
             BaseHTTPServer.HTTPServer.__init__(self,
                                                server_address,
@@ -130,13 +131,13 @@ class WebHandler(BaseHTTPServer.BaseHTTPRequestHandler):
             try: # Should this be here?
                 self.end_headers()
             except Exception,e:
-                print >>sys.stderr, "Error sending end_headers - I guess I shouldn't do  it then"
+                print >>sys.stderr, time.asctime(),'-', "Error sending end_headers - I guess I shouldn't do  it then"
             
             #self.wfile.close()
         except Exception,e:
             
             # Error sending error...  Log and ingnore
-            print >>sys.stderr, "Error sending error %s, ignoring (%s)"%(code, e)
+            print >>sys.stderr, time.asctime(),'-', "Error sending error %s, ignoring (%s)"%(code, e)
 
             # TODO: Remove this error thingy
             raise Exception("Could not send error")
@@ -152,7 +153,7 @@ class WebHandler(BaseHTTPServer.BaseHTTPRequestHandler):
         try:
             self.send_response(response)
         except Exception, e:
-            print >>sys.stderr, "Error sending response: %s"%e
+            print >>sys.stderr, time.asctime(),'-', "Error sending response: %s"%e
             return
 
         #self.send_header("date", makeRFC1123time(time.time()))
@@ -194,7 +195,7 @@ class WebHandler(BaseHTTPServer.BaseHTTPRequestHandler):
         try:
             poa = self.generate_poa(swarm_id, perm_id)
         except Exception,e:
-            print >>sys.stderr, "Missing key for swarm '%s'"%swarm_id,e
+            print >>sys.stderr, time.asctime(),'-', "Missing key for swarm '%s'"%swarm_id,e
             return self.failed(404)
         
         self.prepareSend("application/octet-stream", len(poa))
@@ -254,7 +255,7 @@ class WebServer(threading.Thread):
                 self.server.handle_request()
             except Exception,e:
                 if e.args[0] != "unpack non-sequence":
-                    print >>sys.stderr, "Error handling request",e
+                    print >>sys.stderr, time.asctime(),'-', "Error handling request",e
                 
                 # Ignore these, Just means that there was no request
                 # waiting for us

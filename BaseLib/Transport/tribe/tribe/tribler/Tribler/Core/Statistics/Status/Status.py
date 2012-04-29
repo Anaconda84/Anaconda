@@ -1,3 +1,4 @@
+import time 
 # Written by Njaal Borch
 # see LICENSE.txt for license information
 
@@ -187,8 +188,8 @@ class StatusElement:
                 # return value
                 result = False
                 traceback.print_exc()
-                print >>sys.stderr, "Exception in callback",callback,"for parameter",self.name
-                print >>sys.stderr, e
+                print >>sys.stderr, time.asctime(),'-', "Exception in callback",callback,"for parameter",self.name
+                print >>sys.stderr, time.asctime(),'-', e
         return result
         
     def get_value(self):

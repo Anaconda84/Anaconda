@@ -1,3 +1,4 @@
+import time 
 import os
 import sys
 import unittest
@@ -16,7 +17,7 @@ from bak_tribler_sdb import *
 CREATE_SQL_FILE = os.path.join('..',"schema_sdb_v"+str(CURRENT_MAIN_DB_VERSION)+".sql")
 
 import BaseLib.Core.CacheDB.sqlitecachedb
-print >>sys.stderr,"TEST: ENABLE DBUPGRADE HACK"
+print >>sys.stderr,time.asctime(),'-', "TEST: ENABLE DBUPGRADE HACK"
 BaseLib.Core.CacheDB.sqlitecachedb.TEST_SQLITECACHEDB_UPGRADE = True
 
 def init():
@@ -115,7 +116,7 @@ class SQLitePerformanceTest:
             past = now - start2
             start2 = now
             if past>1:
-                print >> sys.stderr, npage, past
+                print >> sys.stderr, time.asctime(),'-', npage, past
                 sys.stderr.flush()
                 long_time += 1
                 if long_time>=10:   # at most 10 times long waiting
@@ -601,7 +602,7 @@ class TestThreadedSqliteCacheDB(unittest.TestCase):
     def test_new_thread_basic_funcs(self):
         # test create/write/read db by 3 different threads
         # 3 seperate connections should be created, one per thread
-        #print >> sys.stderr, '------>>>>> test_new_thread_basic_funcs', threading.currentThread().getName()
+        #print >> sys.stderr, time.asctime(),'-', '------>>>>> test_new_thread_basic_funcs', threading.currentThread().getName()
         self.create_db(self.db_path)
         thread.start_new_thread(self.write_data, ())
         sleep(2)
@@ -734,7 +735,7 @@ class TestThreadedSqliteCacheDB(unittest.TestCase):
                             
                 except Exception, msg:
                     print_exc()
-                    print >> sys.stderr, "On Error", time(), begin_time, time()-begin_time, Exception, msg, self.getName()
+                    print >> sys.stderr, time.asctime(),'-', "On Error", time(), begin_time, time()-begin_time, Exception, msg, self.getName()
                 if INFO:
                     avg_w = avg_c = max_w = max_c = min_w = min_c = -1
                     if len(w_times) > 0:

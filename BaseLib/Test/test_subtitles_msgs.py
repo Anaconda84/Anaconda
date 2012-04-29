@@ -7,6 +7,7 @@ import tempfile
 from Tribler import LIBRARYNAME
 import os
 import sys
+import time 
 import shutil
 import hashlib
 from BaseLib.Core.BitTornado.BT1.MessageID import GET_SUBS, SUBS
@@ -61,7 +62,7 @@ class TestSubtitleMessages(TestAsServer):
         os.makedirs(statsdir)
         
         superpeerfilename = os.path.join(spdir, 'superpeer.txt')
-        print >> sys.stderr,"test: writing empty superpeers to",superpeerfilename
+        print >> sys.stderr,time.asctime(),'-', "test: writing empty superpeers to",superpeerfilename
         f = open(superpeerfilename, "w")
         f.write('# Leeg')
         f.close()
@@ -73,7 +74,7 @@ class TestSubtitleMessages(TestAsServer):
         for srcfile in srcfiles:
             sfn = os.path.join('..','..',srcfile)
             dfn = os.path.join(self.install_path,srcfile)
-            print >>sys.stderr,"test: copying",sfn,dfn
+            print >>sys.stderr,time.asctime(),'-', "test: copying",sfn,dfn
             shutil.copyfile(sfn,dfn)
             
         #copy subtitles files in the appropriate subtitles folder
@@ -146,7 +147,7 @@ class TestSubtitleMessages(TestAsServer):
         a valid SUBS message containing its contents
         '''
         
-        print >> sys.stderr, "test: test_subtitles_msgs_1_1 -----------------------"
+        print >> sys.stderr, time.asctime(),'-', "test: test_subtitles_msgs_1_1 -----------------------"
         ol_conn = OLConnection(self.my_keypair,'localhost',self.hisport)
         
         bitmask = LanguagesProvider.getLanguagesInstance().langCodesToMask(['nld'])
@@ -164,10 +165,10 @@ class TestSubtitleMessages(TestAsServer):
         
         ol_conn.send(request)
         subs_data = ol_conn.recv()
-        print >> sys.stderr, "test: subtitles_messages : received SUBS response: len",len(subs_data)
+        print >> sys.stderr, time.asctime(),'-', "test: subtitles_messages : received SUBS response: len",len(subs_data)
         self.assertEquals(SUBS, subs_data[0])
         data = bdecode(subs_data[1:])
-        print >> sys.stderr, "test: subtitles_messages : received SUBS response: ", data
+        print >> sys.stderr, time.asctime(),'-', "test: subtitles_messages : received SUBS response: ", data
         
         #check on the format of the response
         self.assertTrue(isinstance(data,list))
@@ -183,8 +184,8 @@ class TestSubtitleMessages(TestAsServer):
         
         ol_conn.close()
         
-        print >> sys.stderr, "test: subtitles_messages: received content is valid."
-        print >> sys.stderr, "End of test_subtitles_msgs_1_1 test --------------------"
+        print >> sys.stderr, time.asctime(),'-', "test: subtitles_messages: received content is valid."
+        print >> sys.stderr, time.asctime(),'-', "End of test_subtitles_msgs_1_1 test --------------------"
         
         
     def subtest_receptionOfSUBSTwoRequestsOneAvailable(self):
@@ -194,7 +195,7 @@ class TestSubtitleMessages(TestAsServer):
         plus a bitmask that reflects the contents of the response.
         """
         
-        print >> sys.stderr, "test: test_subtitles_msgs_2_1 -----------------------"
+        print >> sys.stderr, time.asctime(),'-', "test: test_subtitles_msgs_2_1 -----------------------"
         ol_conn = OLConnection(self.my_keypair,'localhost',self.hisport)
         
         bitmask = LanguagesProvider.getLanguagesInstance().langCodesToMask(['nld','eng'])
@@ -214,7 +215,7 @@ class TestSubtitleMessages(TestAsServer):
         subs_data = ol_conn.recv()
         self.assertEquals(SUBS, subs_data[0])
         data = bdecode(subs_data[1:])
-        print >> sys.stderr, "test: subtitles_messages : received SUBS repsonse: ", data
+        print >> sys.stderr, time.asctime(),'-', "test: subtitles_messages : received SUBS repsonse: ", data
         
         #check on the format of the response
         self.assertTrue(isinstance(data,list))
@@ -235,15 +236,15 @@ class TestSubtitleMessages(TestAsServer):
         self.assertEquals(expectedContents, data[3][0])
         
         ol_conn.close()
-        print >> sys.stderr, "test: subtitles_messages: received content is valid."
-        print >> sys.stderr, "End of test_subtitles_msgs_2_1 test --------------------"
+        print >> sys.stderr, time.asctime(),'-', "test: subtitles_messages: received content is valid."
+        print >> sys.stderr, time.asctime(),'-', "End of test_subtitles_msgs_2_1 test --------------------"
         
     def subtest_invalidRequest1(self):
         """
         Trying to send an empty message.
         The connection should be closed by the receiver
         """
-        print >> sys.stderr, "test: test_subtitles_msgs_invalid_request_1 ------------------"
+        print >> sys.stderr, time.asctime(),'-', "test: test_subtitles_msgs_invalid_request_1 ------------------"
         ol_conn = OLConnection(self.my_keypair,'localhost',self.hisport)
 
         
@@ -252,17 +253,17 @@ class TestSubtitleMessages(TestAsServer):
         
         ol_conn.send(request)
         self.assertEquals(0, len(ol_conn.recv()))
-        print >> sys.stderr, "test: test_subtitles_msgs_invalid_request_1: connection closed as expected"
+        print >> sys.stderr, time.asctime(),'-', "test: test_subtitles_msgs_invalid_request_1: connection closed as expected"
         
         ol_conn.close()
-        print >> sys.stderr, "End of test_subtitles_msgs_invalid_request_1 ------------------"
+        print >> sys.stderr, time.asctime(),'-', "End of test_subtitles_msgs_invalid_request_1 ------------------"
         
     def subtest_invalidRequest2(self):
         """
         Trying to send an invalid message (an integer instead of a 4 bytes binary string)
         The connection should be closed by the receiver
         """
-        print >> sys.stderr, "test: test_subtitles_msgs_invalid_request_2 ------------------"
+        print >> sys.stderr, time.asctime(),'-', "test: test_subtitles_msgs_invalid_request_2 ------------------"
         ol_conn = OLConnection(self.my_keypair,'localhost',self.hisport)
 
         
@@ -275,17 +276,17 @@ class TestSubtitleMessages(TestAsServer):
         
         ol_conn.send(request)
         self.assertEquals(0, len(ol_conn.recv()))
-        print >> sys.stderr, "test: test_subtitles_msgs_invalid_request_2: connection closed as expected"
+        print >> sys.stderr, time.asctime(),'-', "test: test_subtitles_msgs_invalid_request_2: connection closed as expected"
         
         ol_conn.close()
-        print >> sys.stderr, "End of test_subtitles_msgs_invalid_request_2 ------------------"
+        print >> sys.stderr, time.asctime(),'-', "End of test_subtitles_msgs_invalid_request_2 ------------------"
         
     def subtest_invalidRequest3(self):
         """
         Trying to send an invalid message (valid for everythin except that there is one field more)
         The connection should be closed by the receiver
         """
-        print >> sys.stderr, "test: test_subtitles_msgs_invalid_request_3 ------------------"
+        print >> sys.stderr, time.asctime(),'-', "test: test_subtitles_msgs_invalid_request_3 ------------------"
         ol_conn = OLConnection(self.my_keypair,'localhost',self.hisport)
 
         bitmask = LanguagesProvider.getLanguagesInstance().langCodesToMask(['nld','eng'])
@@ -301,10 +302,10 @@ class TestSubtitleMessages(TestAsServer):
         
         ol_conn.send(request)
         self.assertEquals(0, len(ol_conn.recv()))
-        print >> sys.stderr, "test: test_subtitles_msgs_invalid_request_3: connection closed as expected"
+        print >> sys.stderr, time.asctime(),'-', "test: test_subtitles_msgs_invalid_request_3: connection closed as expected"
         
         ol_conn.close()
-        print >> sys.stderr, "End of test_subtitles_msgs_invalid_request_3 ------------------"
+        print >> sys.stderr, time.asctime(),'-', "End of test_subtitles_msgs_invalid_request_3 ------------------"
         
     def singtest_subs_messages(self):
         self.setUpDB()

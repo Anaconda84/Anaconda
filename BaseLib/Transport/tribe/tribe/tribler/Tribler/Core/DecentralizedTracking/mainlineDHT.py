@@ -1,3 +1,4 @@
+import time 
 # written by Fabian van der Werf, Arno Bakker
 # Modified by Raul Jimenez to integrate KTH DHT
 # see LICENSE.txt for license information
@@ -22,11 +23,11 @@ def init(*args, **kws):
     global dht
     global dht_imported
     if DEBUG:
-        print >>sys.stderr,'dht: DHT initialization', dht_imported
+        print >>sys.stderr,time.asctime(),'-', 'dht: DHT initialization', dht_imported
     if dht_imported and dht is None:
         dht = KadTracker(*args, **kws)
         if DEBUG:
-            print >>sys.stderr,'dht: DHT running'
+            print >>sys.stderr,time.asctime(),'-', 'dht: DHT running'
 
 def control():
     import pdb

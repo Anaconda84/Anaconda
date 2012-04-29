@@ -1,3 +1,4 @@
+import time 
 # Written by Jelle Roozenburg
 # see LICENSE.txt for license information
 
@@ -50,7 +51,7 @@ class UploadLimitation:
         
     def log(self, s):
         if DEBUG:
-            print >> sys.stderr, 'UploadLimitation: ', s
+            print >> sys.stderr, time.asctime(),'-', 'UploadLimitation: ', s
     
     def logSpeeds(self, speed, limit, mode):
         f = file(self.logFilename, 'a')

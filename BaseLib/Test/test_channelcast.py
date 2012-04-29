@@ -1,3 +1,4 @@
+import time 
 # Written by Arno Bakker
 # see LICENSE.txt for license information
 
@@ -52,7 +53,7 @@ class TestChannels(TestAsServer):
         os.makedirs(statsdir)
         
         superpeerfilename = os.path.join(spdir, 'superpeer.txt')
-        print >> sys.stderr,"test: writing empty superpeers to",superpeerfilename
+        print >> sys.stderr,time.asctime(),'-', "test: writing empty superpeers to",superpeerfilename
         f = open(superpeerfilename, "w")
         f.write('# Leeg')
         f.close()
@@ -64,7 +65,7 @@ class TestChannels(TestAsServer):
         for srcfile in srcfiles:
             sfn = os.path.join('..','..',srcfile)
             dfn = os.path.join(self.install_path,srcfile)
-            print >>sys.stderr,"test: copying",sfn,dfn
+            print >>sys.stderr,time.asctime(),'-', "test: copying",sfn,dfn
             shutil.copyfile(sfn,dfn)
 
 
@@ -181,23 +182,23 @@ class TestChannels(TestAsServer):
     def subtest_voting(self):
         self.votecast_db.unsubscribe(bin2str(self.mypermid))
         self.assertEqual(self.votecast_db.getVote(bin2str(self.mypermid),bin2str(self.hispermid)),None)
-        #print >> sys.stderr, self.votecast_db.getAll()
+        #print >> sys.stderr, time.asctime(),'-', self.votecast_db.getAll()
 
         self.votecast_db.spam(bin2str(self.mypermid))
         self.assertEqual(self.votecast_db.getVote(bin2str(self.mypermid),bin2str(self.hispermid)),-1)
-        #print >> sys.stderr, self.votecast_db.getAll()
+        #print >> sys.stderr, time.asctime(),'-', self.votecast_db.getAll()
                 
         self.votecast_db.subscribe(bin2str(self.mypermid))
         self.assertEqual(self.votecast_db.getVote(bin2str(self.mypermid),bin2str(self.hispermid)),2)
-        #print >> sys.stderr, self.votecast_db.getAll()
+        #print >> sys.stderr, time.asctime(),'-', self.votecast_db.getAll()
         
         self.votecast_db.unsubscribe(bin2str(self.mypermid))
         self.assertEqual(self.votecast_db.getVote(bin2str(self.mypermid),bin2str(self.hispermid)),None)
-        #print >> sys.stderr, self.votecast_db.getAll()
+        #print >> sys.stderr, time.asctime(),'-', self.votecast_db.getAll()
         
         self.votecast_db.spam(bin2str(self.mypermid))
         self.assertEqual(self.votecast_db.getVote(bin2str(self.mypermid),bin2str(self.hispermid)),-1)
-        #print >> sys.stderr, self.votecast_db.getAll()
+        #print >> sys.stderr, time.asctime(),'-', self.votecast_db.getAll()
         
     def check_chquery_reply(self, data, nickname):
         d = bdecode(data)
@@ -213,7 +214,7 @@ class TestChannels(TestAsServer):
             self.assert_(val['publisher_id'] == self.hispermid)
 
     def subtest_channel_permid_query(self,nickname):
-        print >>sys.stderr,"test: chquery permid-----------------------------"
+        print >>sys.stderr,time.asctime(),'-', "test: chquery permid-----------------------------"
         s = OLConnection(self.my_keypair,'localhost',self.hisport)
         data = {}
         uq = u'CHANNEL p '+ bin2str(self.hispermid)
@@ -222,16 +223,16 @@ class TestChannels(TestAsServer):
         msg = QUERY + bencode(data)
         s.send(msg)
         resp = s.recv()
-        #print >> sys.stderr, "printing resp", resp
+        #print >> sys.stderr, time.asctime(),'-', "printing resp", resp
         if len(resp) > 0:
-            print >>sys.stderr,"test: chquery: got",getMessageName(resp[0])
+            print >>sys.stderr,time.asctime(),'-', "test: chquery: got",getMessageName(resp[0])
         self.assert_(resp[0]==QUERY_REPLY)
         self.check_chquery_reply(resp[1:],nickname)
-        print >>sys.stderr,"test:",`bdecode(resp[1:])`
+        print >>sys.stderr,time.asctime(),'-', "test:",`bdecode(resp[1:])`
         s.close()
         
     def subtest_channel_keyword_query(self,nickname):
-        print >>sys.stderr,"test: chquery keyword-----------------------------"
+        print >>sys.stderr,time.asctime(),'-', "test: chquery keyword-----------------------------"
         s = OLConnection(self.my_keypair,'localhost',self.hisport)
         data = {}
         uq = u'CHANNEL k '+nickname
@@ -240,30 +241,30 @@ class TestChannels(TestAsServer):
         msg = QUERY + bencode(data)
         s.send(msg)
         resp = s.recv()
-        #print >> sys.stderr, "printing resp", resp
+        #print >> sys.stderr, time.asctime(),'-', "printing resp", resp
         if len(resp) > 0:
-            print >>sys.stderr,"test: chquery: got",getMessageName(resp[0])
+            print >>sys.stderr,time.asctime(),'-', "test: chquery: got",getMessageName(resp[0])
         self.assert_(resp[0]==QUERY_REPLY)
         self.check_chquery_reply(resp[1:],nickname)
-        print >>sys.stderr,"test:",`bdecode(resp[1:])`
+        print >>sys.stderr,time.asctime(),'-', "test:",`bdecode(resp[1:])`
         s.close()
         
     def subtest_votecast(self):
-        print >>sys.stderr,"test: votecast-----------------------------"
+        print >>sys.stderr,time.asctime(),'-', "test: votecast-----------------------------"
         s = OLConnection(self.my_keypair,'localhost',self.hisport)
         vcast = VoteCastCore(None, s, self.session, None, log = '', dnsindb = None)
         
         #Send Good VoteCast message
         vdata = {self.hispermid:{'vote':-1,'time_stamp':12345345}}
-        print >> sys.stderr, "Test Good VoteCast", `vdata`
+        print >> sys.stderr, time.asctime(),'-', "Test Good VoteCast", `vdata`
         msg = VOTECAST+bencode(vdata)
         s.send(msg)
         resp = s.recv()
-        #print >> sys.stderr, "printing resp", resp
+        #print >> sys.stderr, time.asctime(),'-', "printing resp", resp
         if len(resp) > 0:
-            print >>sys.stderr,"test: votecast: got",getMessageName(resp[0])
+            print >>sys.stderr,time.asctime(),'-', "test: votecast: got",getMessageName(resp[0])
         self.assert_(resp[0]==VOTECAST)
-        print >>sys.stderr, "test: votecast: got msg", `bdecode(resp[1:])`
+        print >>sys.stderr, time.asctime(),'-', "test: votecast: got msg", `bdecode(resp[1:])`
         vdata_rcvd = bdecode(resp[1:])
         self.assert_(validVoteCastMsg(vdata_rcvd)==True)
         s.close()
@@ -283,32 +284,32 @@ class TestChannels(TestAsServer):
         vdata = {bin2str(self.hispermid):{'vote':-15,'timestamp':12345345}}
         self.subtest_bad_votecast(vdata)
         
-        print>>sys.stderr, "End of votecast test"
+        print>>sys.stderr, time.asctime(),'-', "End of votecast test"
     
     def subtest_bad_votecast(self, vdata):
         s = OLConnection(self.my_keypair,'localhost',self.hisport)
         vcast = VoteCastCore(None, s, self.session, None, log = '', dnsindb = None)
-        print >> sys.stderr, "Test Bad VoteCast", `vdata`
+        print >> sys.stderr, time.asctime(),'-', "Test Bad VoteCast", `vdata`
         msg = VOTECAST+bencode(vdata)
         s.send(msg)
         self.assert_(len(s.recv())==0)
         s.close()
                     
     def subtest_channelcast(self):
-        print >>sys.stderr,"test: channelcast----------------------"
+        print >>sys.stderr,time.asctime(),'-', "test: channelcast----------------------"
         s = OLConnection(self.my_keypair,'localhost',self.hisport)
         chcast = ChannelCastCore(None, s, self.session, None, log = '', dnsindb = None)
         
         #Send Empty ChannelCast message
         chdata = {}
-        print >> sys.stderr, "Test Good ChannelCast", `chdata`
+        print >> sys.stderr, time.asctime(),'-', "Test Good ChannelCast", `chdata`
         msg = CHANNELCAST+bencode(chdata)
         s.send(msg)
         resp = s.recv()
         if len(resp) > 0:
-            print >>sys.stderr,"test: channelcast: got",getMessageName(resp[0])
+            print >>sys.stderr,time.asctime(),'-', "test: channelcast: got",getMessageName(resp[0])
         self.assert_(resp[0]==CHANNELCAST)
-        print >>sys.stderr, "test: channelcast: got msg", `bdecode(resp[1:])`
+        print >>sys.stderr, time.asctime(),'-', "test: channelcast: got msg", `bdecode(resp[1:])`
         chdata_rcvd = bdecode(resp[1:])
         self.assert_(validChannelCastMsg(chdata_rcvd)==True)
         s.close() 
@@ -341,13 +342,13 @@ class TestChannels(TestAsServer):
         self.subtest_bad_channelcast(chdata)
         
         #Bad 
-        print>>sys.stderr, "End of channelcast test---------------------------"
+        print>>sys.stderr, time.asctime(),'-', "End of channelcast test---------------------------"
                
     
     def subtest_bad_channelcast(self, chdata):
         s = OLConnection(self.my_keypair,'localhost',self.hisport)
         chcast = ChannelCastCore(None, s, self.session, None, log = '', dnsindb = None)
-        print >> sys.stderr, "Test Bad ChannelCast", `chdata`
+        print >> sys.stderr, time.asctime(),'-', "Test Bad ChannelCast", `chdata`
         msg = CHANNELCAST+bencode(chdata)
         s.send(msg)
         self.assert_(len(s.recv())==0)

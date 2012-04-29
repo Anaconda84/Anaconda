@@ -1,3 +1,4 @@
+import time 
 # Written by Arno Bakker
 # see LICENSE.txt for license information
 
@@ -101,7 +102,7 @@ class TestSocialOverlap(TestAsServer):
         """ 
             test good SOCIAL_OVERLAP messages
         """
-        print >>sys.stderr,"test: good SOCIAL_OVERLAP"
+        print >>sys.stderr,time.asctime(),'-', "test: good SOCIAL_OVERLAP"
         s = OLConnection(self.my_keypair,'localhost',self.hisport)
         msg = self.create_good_soverlap(name)
         s.send(msg)
@@ -156,13 +157,13 @@ class TestSocialOverlap(TestAsServer):
 
     def check_persinfo(self,d):
         self.assert_(type(d) == DictType)
-        print >>sys.stderr,"test: persinfo: keys is",d.keys()
+        print >>sys.stderr,time.asctime(),'-', "test: persinfo: keys is",d.keys()
 
         self.assert_(d.has_key('name'))
         self.assert_(isinstance(d['name'],str))
         self.assert_(d.has_key('icontype'))
         if d.has_key('icontype'):
-            print >>sys.stderr,"test: persinfo: HAS ICON"
+            print >>sys.stderr,time.asctime(),'-', "test: persinfo: HAS ICON"
         self.assert_(d.has_key('icondata'))
         self.check_usericon(d['icontype'],d['icondata'])
 
@@ -174,7 +175,7 @@ class TestSocialOverlap(TestAsServer):
         self.assert_(idx != -1)
         self.assert_(idx == ridx)
         self.assert_(len(icondata) <= ICON_MAX_SIZE)
-        print >>sys.stderr,"test: check_usericon: len icon is",len(icondata)
+        print >>sys.stderr,time.asctime(),'-', "test: check_usericon: len icon is",len(icondata)
 
     # Bad soverlap
     #    
@@ -210,12 +211,12 @@ class TestSocialOverlap(TestAsServer):
             self.make_persinfo_icondata_too_big ]
         for method in methods:
             # Hmmm... let's get dirty
-            print >> sys.stderr,"\ntest: ",method,
+            print >> sys.stderr,time.asctime(),'-', "\ntest: ",method,
             func = lambda: self.create_bad_persinfo(method)
             self._test_bad(func)
 
     def _test_bad(self,gen_soverlap_func):
-        print >>sys.stderr,"test: bad SOCIAL_OVERLAP",gen_soverlap_func
+        print >>sys.stderr,time.asctime(),'-', "test: bad SOCIAL_OVERLAP",gen_soverlap_func
         s = OLConnection(self.my_keypair,'localhost',self.hisport)
         msg = gen_soverlap_func()
         s.send(msg)

@@ -1,3 +1,4 @@
+import time 
 # Written by Jan David Mol
 # see LICENSE.txt for license information
 
@@ -53,7 +54,7 @@ class Reporter:
     def phone_home( self, report ):
         """ Report status to a centralised server. """
 
-        #if DEBUG: print >>sys.stderr,"\nreport: ".join(reports)
+        #if DEBUG: print >>sys.stderr,time.asctime(),'-', "\nreport: ".join(reports)
 
         # do not actually send if reporting is disabled
         if not self.do_reporting or not PHONEHOME:
@@ -72,7 +73,7 @@ class Reporter:
         s = pickle.dumps( self.buffered_reports )
         self.buffered_reports = []
 
-        if DEBUG: print >>sys.stderr,"\nreport: phoning home."
+        if DEBUG: print >>sys.stderr,time.asctime(),'-', "\nreport: phoning home."
         try:
             data = zlib.compress( s, 9 ).encode("base64")
             sock = urllib.urlopen("http://swpreporter.tribler.org/reporting/report.cgi",data)
@@ -92,14 +93,14 @@ class Reporter:
             self.do_reporting = False
         except ValueError, e:
             # page did not obtain an integer
-            print >>sys.stderr,"report: got %s" % (result,)
+            print >>sys.stderr,time.asctime(),'-', "report: got %s" % (result,)
             print_exc(file=sys.stderr)
             self.do_reporting = False
         except:
             # any other error
             print_exc(file=sys.stderr)
             self.do_reporting = False
-        if DEBUG: print >>sys.stderr,"\nreport: succes. reported %s bytes, will report again (%s) in %s seconds" % (len(data),self.do_reporting,self.report_interval)
+        if DEBUG: print >>sys.stderr,time.asctime(),'-', "\nreport: succes. reported %s bytes, will report again (%s) in %s seconds" % (len(data),self.do_reporting,self.report_interval)
 
     def report_stat( self, ds ):
         chokestr = lambda b: ["c","C"][int(bool(b))]

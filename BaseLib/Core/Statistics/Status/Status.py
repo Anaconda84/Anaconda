@@ -1,3 +1,4 @@
+import time 
 # Written by Njaal Borch
 # see LICENSE.txt for license information
 
@@ -293,7 +294,7 @@ class BaseElement:
                 callback(self)
             except Exception, e:
                 import sys
-                print >> sys.stderr, "Exception in callback", \
+                print >> sys.stderr, time.asctime(),'-', "Exception in callback", \
                       callback,"for parameter",self.name,":",e
 
         

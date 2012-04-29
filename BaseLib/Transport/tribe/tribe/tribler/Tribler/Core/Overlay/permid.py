@@ -1,3 +1,4 @@
+import time 
 # Written by Arno Bakker
 # see LICENSE.txt for license information
 
@@ -190,7 +191,7 @@ def do_verify_torrent_signature(digest,sigstr,permid):
         intret = ecpub.verify_dsa_asn1(digest,sigstr)
         return intret == 1
     except Exception, e:
-        print >> sys.stderr,"permid: Exception in verify_torrent_signature:",str(e) 
+        print >> sys.stderr,time.asctime(),'-', "permid: Exception in verify_torrent_signature:",str(e) 
         return False
 
 
@@ -234,13 +235,13 @@ class ChallengeResponse:
         if self.state != STATE_INITIAL:
             self.state = STATE_FAILED
             if DEBUG:
-                print >> sys.stderr, "Got unexpected CHALLENGE message"
+                print >> sys.stderr, time.asctime(),'-', "Got unexpected CHALLENGE message"
             raise PermIDException
         self.peer_random = check_challenge(cdata)
         if self.peer_random is None:
             self.state = STATE_FAILED
             if DEBUG:
-                print >> sys.stderr,"Got bad CHALLENGE message"
+                print >> sys.stderr,time.asctime(),'-', "Got bad CHALLENGE message"
             raise PermIDException
         self.peer_id = peer_id
         [self.my_random,rdata1] = generate_response1(self.peer_random,peer_id,self.my_keypair)
@@ -251,14 +252,14 @@ class ChallengeResponse:
         if self.state != STATE_AWAIT_R1:
             self.state = STATE_FAILED
             if DEBUG:
-                print >> sys.stderr,"Got unexpected RESPONSE1 message"
+                print >> sys.stderr,time.asctime(),'-', "Got unexpected RESPONSE1 message"
             raise PermIDException
         [randomA,peer_pub] = check_response1(rdata1,self.my_random,self.my_id)
         
         if randomA is None or peer_pub is None:
             self.state = STATE_FAILED
             if DEBUG:
-                print >> sys.stderr,"Got bad RESPONSE1 message"
+                print >> sys.stderr,time.asctime(),'-', "Got bad RESPONSE1 message"
             raise PermIDException
         
         # avoid being connected by myself
@@ -266,7 +267,7 @@ class ChallengeResponse:
         if self.permid == peer_permid:
             self.state = STATE_FAILED
             if DEBUG:
-                print >> sys.stderr,"Got the same Permid as myself"
+                print >> sys.stderr,time.asctime(),'-', "Got the same Permid as myself"
             raise PermIDException
         
         self.peer_id = peer_id
@@ -280,13 +281,13 @@ class ChallengeResponse:
         if self.state != STATE_AWAIT_R2:
             self.state = STATE_FAILED
             if DEBUG:
-                print >> sys.stderr,"Got unexpected RESPONSE2 message"
+                print >> sys.stderr,time.asctime(),'-', "Got unexpected RESPONSE2 message"
             raise PermIDException
         self.peer_pub = check_response2(rdata2,self.my_random,self.my_id,self.peer_random,self.peer_id)
         if self.peer_pub is None:
             self.state = STATE_FAILED
             if DEBUG:
-                print >> sys.stderr,"Got bad RESPONSE2 message, authentication failed."
+                print >> sys.stderr,time.asctime(),'-', "Got bad RESPONSE2 message, authentication failed."
             raise PermIDException
         else:
             # avoid being connected by myself
@@ -294,14 +295,14 @@ class ChallengeResponse:
             if self.permid == peer_permid:
                 self.state = STATE_FAILED
                 if DEBUG:
-                    print >> sys.stderr,"Got the same Permid as myself"
+                    print >> sys.stderr,time.asctime(),'-', "Got the same Permid as myself"
                 raise PermIDException
             else:
                 self.set_peer_authenticated()
 
     def set_peer_authenticated(self):
         if DEBUG:
-            print >> sys.stderr,"permid: Challenge response succesful!"
+            print >> sys.stderr,time.asctime(),'-', "permid: Challenge response succesful!"
         self.state = STATE_AUTHENTICATED
 
     def get_peer_authenticated(self):
@@ -365,40 +366,40 @@ class ChallengeResponse:
         if t == CHALLENGE:
             if len(message) < self.get_challenge_minlen():
                 if DEBUG:
-                    print >> sys.stderr,"permid: Close on bad CHALLENGE: msg len",len(message)
+                    print >> sys.stderr,time.asctime(),'-', "permid: Close on bad CHALLENGE: msg len",len(message)
                 self.state = STATE_FAILED
                 return False
             try:
                 self.got_challenge(msg, conn)
             except Exception,e:
                 if DEBUG:
-                    print >> sys.stderr,"permid: Close on bad CHALLENGE: exception",str(e)
+                    print >> sys.stderr,time.asctime(),'-', "permid: Close on bad CHALLENGE: exception",str(e)
                     traceback.print_exc()
                 return False
         elif t == RESPONSE1:
             if len(message) < self.get_response1_minlen():
                 if DEBUG:
-                    print >> sys.stderr,"permid: Close on bad RESPONSE1: msg len",len(message)
+                    print >> sys.stderr,time.asctime(),'-', "permid: Close on bad RESPONSE1: msg len",len(message)
                 self.state = STATE_FAILED
                 return False
             try:
                 self.got_response1(msg, conn)
             except Exception,e:
                 if DEBUG:
-                    print >> sys.stderr,"permid: Close on bad RESPONSE1: exception",str(e)
+                    print >> sys.stderr,time.asctime(),'-', "permid: Close on bad RESPONSE1: exception",str(e)
                     traceback.print_exc()
                 return False
         elif t == RESPONSE2:
             if len(message) < self.get_response2_minlen():
                 if DEBUG:
-                    print >> sys.stderr,"permid: Close on bad RESPONSE2: msg len",len(message)
+                    print >> sys.stderr,time.asctime(),'-', "permid: Close on bad RESPONSE2: msg len",len(message)
                 self.state = STATE_FAILED
                 return False
             try:
                 self.got_response2(msg, conn)
             except Exception,e:
                 if DEBUG:
-                    print >> sys.stderr,"permid: Close on bad RESPONSE2: exception",str(e)
+                    print >> sys.stderr,time.asctime(),'-', "permid: Close on bad RESPONSE2: exception",str(e)
                     traceback.print_exc()
                 return False
         else:

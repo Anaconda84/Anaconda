@@ -1,3 +1,4 @@
+import time 
 # Written by Jelle Roozenburg 
 # see LICENSE.txt for license information
 """ Controls the authorization of messages received via the Tribler Overlay """
@@ -91,8 +92,8 @@ class CommonRequestPolicy(AbstractRequestPolicy):
         this peer.
         """
         peer = self.peerdb.getPeer(permid)
-        #print >>sys.stderr,"CommonRequestPolicy: get_peer_nqueries: getPeer",`permid`,peer
-        #print >>sys.stderr,"CommonRequestPolicy: get_peer_nqueries: called by",currentThread().getName()
+        #print >>sys.stderr,time.asctime(),'-', "CommonRequestPolicy: get_peer_nqueries: getPeer",`permid`,peer
+        #print >>sys.stderr,time.asctime(),'-', "CommonRequestPolicy: get_peer_nqueries: called by",currentThread().getName()
         if peer is None:
             return 0
         else:

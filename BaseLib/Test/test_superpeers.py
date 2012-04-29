@@ -1,3 +1,4 @@
+import time 
 import os, sys
 import tempfile
 import unittest
@@ -9,7 +10,7 @@ CREATE_SQL_FILE = os.path.join('..',"schema_sdb_v"+str(CURRENT_MAIN_DB_VERSION)+
 assert os.path.isfile(CREATE_SQL_FILE)
     
 import BaseLib.Core.CacheDB.sqlitecachedb
-print >>sys.stderr,"TEST: ENABLE DBUPGRADE HACK"
+print >>sys.stderr,time.asctime(),'-', "TEST: ENABLE DBUPGRADE HACK"
 BaseLib.Core.CacheDB.sqlitecachedb.TEST_SQLITECACHEDB_UPGRADE = True
 
 
@@ -25,8 +26,8 @@ class TestSuperPeerList(unittest.TestCase):
         self.file_path = tempfile.mktemp()
         self.db_path = tempfile.mktemp()
         
-        #print >>sys.stderr,"test: file_path",self.file_path
-        #print >>sys.stderr,"test: db_path",self.db_path
+        #print >>sys.stderr,time.asctime(),'-', "test: file_path",self.file_path
+        #print >>sys.stderr,time.asctime(),'-', "test: db_path",self.db_path
         
         self.writeSuperPeers()
         head,tail = os.path.split(self.file_path)

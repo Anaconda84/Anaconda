@@ -1,3 +1,4 @@
+import time 
 # Written by Arno Bakker, Jie Yang
 # see LICENSE.txt for license information
 
@@ -73,7 +74,7 @@ class BTConnection:
         handshake += self.expected_infohash
         handshake += self.myid
         if DEBUG:
-            print >>sys.stderr,"btconn: Sending handshake len",len(handshake)
+            print >>sys.stderr,time.asctime(),'-', "btconn: Sending handshake len",len(handshake)
         self.s.send(handshake)
 
     def get_my_id(self):
@@ -98,8 +99,8 @@ class BTConnection:
         assert(low_ver == lowest_version)
         cur_ver = unpack('<H', self.hisid[18:20])[0]
         #if DEBUG:
-        #    print >> sys.stderr, "btconn: his cur_ver: ", cur_ver
-        #    print >> sys.stderr, "btconn: my curr_ver: ", current_version
+        #    print >> sys.stderr, time.asctime(),'-', "btconn: his cur_ver: ", cur_ver
+        #    print >> sys.stderr, time.asctime(),'-', "btconn: my curr_ver: ", current_version
         assert(cur_ver == current_version)
 
     def read_handshake_medium_rare(self,close_ok = False):
@@ -131,7 +132,7 @@ class BTConnection:
             return size_data
         size = toint(size_data)
         if DEBUG and size > 10000:
-            print >> sys.stderr,"btconn: waiting for message size",size
+            print >> sys.stderr,time.asctime(),'-', "btconn: waiting for message size",size
         if size == 0:
             # BT keep alive message, don't report upwards
             return self.recv()
@@ -150,12 +151,12 @@ class BTConnection:
                     continue
                 elif e[0] == 10054: 
                     # WSAECONNRESET on Windows
-                    print >>sys.stderr,"btconn:",e,"converted to EOF"
+                    print >>sys.stderr,time.asctime(),'-', "btconn:",e,"converted to EOF"
                     return '' # convert to EOF
                 else:
                     raise e
             if DEBUG:
-                print >> sys.stderr,"btconn: _readn got",len(data),"bytes"
+                print >> sys.stderr,time.asctime(),'-', "btconn: _readn got",len(data),"bytes"
             if len(data) == 0:
                 #raise socket.error(ECONNRESET,'arno says connection closed')
                 return data

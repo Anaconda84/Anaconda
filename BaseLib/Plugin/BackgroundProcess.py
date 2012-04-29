@@ -1,3 +1,4 @@
+import time 
 # Written by Arno Bakker, Diego Rabioli
 # see LICENSE.txt for license information
 #
@@ -186,12 +187,12 @@ class BackgroundApp(BaseApp):
             # capable of replying to the request. Hence, we disable self-destruct
             # for now.
             if KILLONIDLE:
-                print >>sys.stderr,"bg: Kill-on-idle test enabled"
+                print >>sys.stderr,time.asctime(),'-', "bg: Kill-on-idle test enabled"
                 self.i2is.add_task(self.i2i_kill_on_browser_gone,IDLE_BEFORE_SELFKILL/2)
             else:
-                print >>sys.stderr,"bg: Kill-on-idle test disabled"
+                print >>sys.stderr,time.asctime(),'-', "bg: Kill-on-idle test disabled"
             
-            print >>sys.stderr,"bg: Awaiting commands"
+            print >>sys.stderr,time.asctime(),'-', "bg: Awaiting commands"
             return True
 
         except Exception,e:
@@ -219,7 +220,7 @@ class BackgroundApp(BaseApp):
         ic = BGInstanceConnection(s,self,self.readlinecallback,self.videoHTTPServer)
         self.singsock2ic[s] = ic
         if DEBUG:
-            print >>sys.stderr,"bg: Plugin connection_made",len(self.singsock2ic),"++++++++++++++++++++++++++++++++++++++++++++++++"
+            print >>sys.stderr,time.asctime(),'-', "bg: Plugin connection_made",len(self.singsock2ic),"++++++++++++++++++++++++++++++++++++++++++++++++"
           
         # Arno: Concurrency problems getting SEARCHURL message to work, 
         # JavaScript can't always read it. TODO  
@@ -227,7 +228,7 @@ class BackgroundApp(BaseApp):
 
     def connection_lost(self,s):
         if DEBUG:
-            print >>sys.stderr,"bg: Plugin: connection_lost ------------------------------------------------" 
+            print >>sys.stderr,time.asctime(),'-', "bg: Plugin: connection_lost ------------------------------------------------" 
 
         ic = self.singsock2ic[s]
         InstanceConnectionHandler.connection_lost(self,s)
@@ -269,7 +270,7 @@ class BackgroundApp(BaseApp):
         
     def i2ithread_delayed_remove_if_not_complete(self,d2remove):
         if DEBUG:
-            print >>sys.stderr,"bg: i2ithread_delayed_remove_if_not_complete"
+            print >>sys.stderr,time.asctime(),'-', "bg: i2ithread_delayed_remove_if_not_complete"
         d2remove.set_state_callback(self.sesscb_remove_playing_callback)
         
     def remove_playing_download(self,d2remove):
@@ -279,20 +280,20 @@ class BackgroundApp(BaseApp):
         become interested. 
         """
         if DEBUG:
-            print >>sys.stderr,"bg: remove_playing_download @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
+            print >>sys.stderr,time.asctime(),'-', "bg: remove_playing_download @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
         if d2remove in self.dusers:
             duser = self.dusers[d2remove]
             if duser['uic'] is None:
                 # No interest
                 if DEBUG:
-                    print >>sys.stderr,"bg: remove_playing_download: Yes, no interest"
+                    print >>sys.stderr,time.asctime(),'-', "bg: remove_playing_download: Yes, no interest"
                 BaseApp.remove_playing_download(self,d2remove)
                 if 'streaminfo' in duser:
                     stream = duser['streaminfo']['stream']
                     stream.close() # Close original stream. 
                 del self.dusers[d2remove]
             elif DEBUG:
-                print >>sys.stderr,"bg: remove_playing_download: No, someone interested",`duser['uic']`
+                print >>sys.stderr,time.asctime(),'-', "bg: remove_playing_download: No, someone interested",`duser['uic']`
 
         
     def i2ithread_readlinecallback(self,ic,cmd):
@@ -320,7 +321,7 @@ class BackgroundApp(BaseApp):
         """ Receive command from Plugin """
         
         if DEBUG:
-            print >>sys.stderr,"bg: Got command:",cmd
+            print >>sys.stderr,time.asctime(),'-', "bg: Got command:",cmd
         try:
             # START command
             if cmd.startswith( 'START' ):
@@ -344,7 +345,7 @@ class BackgroundApp(BaseApp):
                             poa = ClosedSwarm.POA.deserialize(poa_serialized)
                             poa.verify()
                         except:
-                            print >>sys.stderr,"Bad POA, ignoring"
+                            print >>sys.stderr,time.asctime(),'-', "Bad POA, ignoring"
                             poa = None
                     else:
                         poa = None
@@ -353,7 +354,7 @@ class BackgroundApp(BaseApp):
         
             # SHUTDOWN command
             elif cmd.startswith('SHUTDOWN'):
-                print >>sys.stderr,"bg: Got SHUTDOWN, sending SHUTDOWN"
+                print >>sys.stderr,time.asctime(),'-', "bg: Got SHUTDOWN, sending SHUTDOWN"
                 ic.shutdown()
             elif cmd.startswith('SUPPORTS'):
                 # Arno, 2010-06-15: only used by SwarmTransport at the moment
@@ -393,7 +394,7 @@ class BackgroundApp(BaseApp):
             raise ValueError("bg: get_torrent_start_download: Too many files found! Giving up")
 
         if DEBUG:
-            print >>sys.stderr,"bg: get_torrent_start_download: Found video file",dlfile
+            print >>sys.stderr,time.asctime(),'-', "bg: get_torrent_start_download: Found video file",dlfile
 
         # Closed swarms?
         if not poa:
@@ -419,9 +420,9 @@ class BackgroundApp(BaseApp):
           
             if DEBUG:
                 if oldd is None:
-                    print >>sys.stderr,"bg: get_torrent_start_download: Starting new Download"
+                    print >>sys.stderr,time.asctime(),'-', "bg: get_torrent_start_download: Starting new Download"
                 else:
-                    print >>sys.stderr,"bg: get_torrent_start_download: Restarting old Download in VOD mode"
+                    print >>sys.stderr,time.asctime(),'-', "bg: get_torrent_start_download: Restarting old Download in VOD mode"
             
             d = self.start_download(tdef,dlfile,poa,ic.get_supported_vod_events())
             duser = {'uic':ic}
@@ -436,7 +437,7 @@ class BackgroundApp(BaseApp):
             olduic = duser['uic']
             if olduic is not None:
                 # Cleanup like a shutdown, but send STOP
-                print >>sys.stderr,"bg: get_torrent_start_download: Telling old player to stop"
+                print >>sys.stderr,time.asctime(),'-', "bg: get_torrent_start_download: Telling old player to stop"
                 olduic.cleanup_playback()
                 olduic.stop()
             duser['uic'] = ic
@@ -461,9 +462,9 @@ class BackgroundApp(BaseApp):
     #
     def gui_states_callback(self,dslist,haspeerlist):
         """ Override BaseApp """
-        #print >>sys.stderr,"bg: gui_states_callback",currentThread().getName()
+        #print >>sys.stderr,time.asctime(),'-', "bg: gui_states_callback",currentThread().getName()
         (playing_dslist,totalhelping,totalspeed) = BaseApp.gui_states_callback(self,dslist,haspeerlist)
-#        print >>sys.stderr,"playing_dslist=",playing_dslist,"  totalhelping=",totalhelping,"  down=",totalspeed[DOWNLOAD],"  up=",totalspeed[UPLOAD],"\n"
+#        print >>sys.stderr,time.asctime(),'-', "playing_dslist=",playing_dslist,"  totalhelping=",totalhelping,"  down=",totalspeed[DOWNLOAD],"  up=",totalspeed[UPLOAD],"\n"
         try:
             self.report_periodic_vod_stats(playing_dslist)
         except:
@@ -479,7 +480,7 @@ class BackgroundApp(BaseApp):
                 info = 'totalhelping='+str(totalhelping)+"\tdown="+str(totalspeed[DOWNLOAD])+"\tup="+str(totalspeed[UPLOAD])
 #		info = msg
                 #if DEBUG:
-                #    print >>sys.stderr, 'bg: 4INFO: Sending',info
+                #    print >>sys.stderr, time.asctime(),'-', 'bg: 4INFO: Sending',info
                 uic.info(info)
             
     def sesscb_vod_event_callback( self, d, event, params ):
@@ -488,8 +489,8 @@ class BackgroundApp(BaseApp):
         
     def gui_vod_event_callback( self, d, event, params ):
         if DEBUG:
-            print >>sys.stderr,"bg: gui_vod_event_callback: Event: ", event
-            print >>sys.stderr,"bg: gui_vod_event_callback: Params: ", params
+            print >>sys.stderr,time.asctime(),'-', "bg: gui_vod_event_callback: Event: ", event
+            print >>sys.stderr,time.asctime(),'-', "bg: gui_vod_event_callback: Params: ", params
         if event == VODEVENT_START:
             if params['filename']:
                 stream = open( params['filename'], "rb" )
@@ -568,7 +569,7 @@ class BackgroundApp(BaseApp):
         wx.CallAfter(self.videoserver_error_guicallback,e,url)
         
     def videoserver_error_guicallback(self,e,url):
-        print >>sys.stderr,"bg: Video server reported error",str(e)
+        print >>sys.stderr,time.asctime(),'-', "bg: Video server reported error",str(e)
         #    self.show_error(str(e))
         pass
         # ARNOTODO: schedule current Download for removal?
@@ -578,7 +579,7 @@ class BackgroundApp(BaseApp):
         wx.CallAfter(self.videoserver_set_status_guicallback,status)
 
     def videoserver_set_status_guicallback(self,status):
-        #print >>sys.stderr,"bg: Video server sets status callback",status
+        #print >>sys.stderr,time.asctime(),'-', "bg: Video server sets status callback",status
         # ARNOTODO: Report status to plugin
         pass
 
@@ -586,7 +587,7 @@ class BackgroundApp(BaseApp):
     # reports vod stats collected periodically
     #
     def report_periodic_vod_stats(self,playing_dslist):
-        #print >>sys.stderr, "VOD Stats"
+        #print >>sys.stderr, time.asctime(),'-', "VOD Stats"
         self.counter += 1
         if self.counter%self.interval == 0:
             event_reporter = Status.get_status_holder("LivingLab")
@@ -604,14 +605,14 @@ class BackgroundApp(BaseApp):
     def gui_webui_remove_download(self,d2remove):
         """ Called when user has decided to remove a specific DL via webUI """
         if DEBUG:
-            print >>sys.stderr,"bg: gui_webui_remove_download"
+            print >>sys.stderr,time.asctime(),'-', "bg: gui_webui_remove_download"
         self.gui_webui_halt_download(d2remove,stop=False)
 
 
     def gui_webui_stop_download(self,d2stop):
         """ Called when user has decided to stop a specific DL via webUI """
         if DEBUG:
-            print >>sys.stderr,"bg: gui_webui_stop_download"
+            print >>sys.stderr,time.asctime(),'-', "bg: gui_webui_stop_download"
         self.gui_webui_halt_download(d2stop,stop=True)
         
         
@@ -630,7 +631,7 @@ class BackgroundApp(BaseApp):
                 duser = self.dusers[d2halt]
                 olduic = duser['uic'] 
                 if olduic is not None:
-                    print >>sys.stderr,"bg: gui_webui_halt_download: Oops, someone interested, removing anyway"
+                    print >>sys.stderr,time.asctime(),'-', "bg: gui_webui_halt_download: Oops, someone interested, removing anyway"
                     olduic.shutdown()
                 if 'streaminfo' in duser:
                     # Download was already playing, clean up.
@@ -647,7 +648,7 @@ class BackgroundApp(BaseApp):
     def gui_webui_remove_all_downloads(self,ds2remove):
         """ Called when user has decided to remove all DLs via webUI """
         if DEBUG:
-            print >>sys.stderr,"bg: gui_webui_remove_all_downloads"
+            print >>sys.stderr,time.asctime(),'-', "bg: gui_webui_remove_all_downloads"
             
         for d2remove in ds2remove:
             self.gui_webui_halt_download(d2remove,stop=False)
@@ -656,7 +657,7 @@ class BackgroundApp(BaseApp):
     def gui_webui_stop_all_downloads(self,ds2stop):
         """ Called when user has decided to stop all DLs via webUI """
         if DEBUG:
-            print >>sys.stderr,"bg: gui_webui_stop_all_downloads"
+            print >>sys.stderr,time.asctime(),'-', "bg: gui_webui_stop_all_downloads"
             
         for d2stop in ds2stop:
             self.gui_webui_halt_download(d2stop,stop=True)
@@ -665,7 +666,7 @@ class BackgroundApp(BaseApp):
     def gui_webui_restart_all_downloads(self,ds2restart):
         """ Called when user has decided to restart all DLs via webUI """
         if DEBUG:
-            print >>sys.stderr,"bg: gui_webui_restart_all_downloads"
+            print >>sys.stderr,time.asctime(),'-', "bg: gui_webui_restart_all_downloads"
             
         for d2restart in ds2restart:
             self.gui_webui_restart_download(d2restart)
@@ -675,15 +676,15 @@ class BackgroundApp(BaseApp):
         try:
             lastt = self.webIFmapper.lastreqtime
             
-            print >>sys.stderr,"bg: Test for self destruct: idle",time.time()-lastt,currentThread().getName()
+            print >>sys.stderr,time.asctime(),'-', "bg: Test for self destruct: idle",time.time()-lastt,currentThread().getName()
             
             if time.time() - IDLE_BEFORE_SELFKILL > lastt:
                 if self.iseedeadpeople:
-                    print >>sys.stderr,"bg: SHOULD HAVE self destructed, hardcore stylie"
+                    print >>sys.stderr,time.asctime(),'-', "bg: SHOULD HAVE self destructed, hardcore stylie"
                     resched = False
                     #os._exit(0)
                 else:
-                    print >>sys.stderr,"bg: SHOULD HAVE self destructed"
+                    print >>sys.stderr,time.asctime(),'-', "bg: SHOULD HAVE self destructed"
                     self.iseedeadpeople = True
                     # No sign of life from statusbar, self destruct 
                     #wx.CallAfter(self.ExitMainLoop)            
@@ -737,13 +738,13 @@ class BGInstanceConnection(InstanceConnection):
         self.videoHTTPServer.set_inputstream(self.cstreaminfo,self.urlpath)
         
         if DEBUG:
-            print >> sys.stderr, "bg: Telling plugin to start playback of",self.urlpath
+            print >> sys.stderr, time.asctime(),'-', "bg: Telling plugin to start playback of",self.urlpath
         
         self.write( 'PLAY '+self.get_video_url()+'\r\n' )
 
     def cleanup_playback(self):
         if DEBUG:
-            print >>sys.stderr,'bg: ic: cleanup'
+            print >>sys.stderr,time.asctime(),'-', 'bg: ic: cleanup'
         # Cause HTTP server thread to receive EOF on inputstream
         if len(self.cstreaminfo) != 0:
             self.cstreaminfo['stream'].close()
@@ -780,7 +781,7 @@ class BGInstanceConnection(InstanceConnection):
     def shutdown(self):
         # SHUTDOWN Service
         if DEBUG:
-            print >>sys.stderr,'bg: ic: shutdown'
+            print >>sys.stderr,time.asctime(),'-', 'bg: ic: shutdown'
         if not self.shutteddown:
             self.shutteddown = True
             self.cleanup_playback()
@@ -882,7 +883,7 @@ class AtBitrateStream:
         if not self.done:
             to_give = self.stream.read( nbytes )
             sleep_time = self.has_to_sleep( nbytes )
-            #print >>sys.stderr,"DIEGO DEBUG : SLEEP_time", sleep_time
+            #print >>sys.stderr,time.asctime(),'-', "DIEGO DEBUG : SLEEP_time", sleep_time
             if sleep_time > 0.0:
                 time.sleep( sleep_time )
             return to_give
@@ -932,10 +933,10 @@ def run_bgapp(appname,appversion,i2iport,sessport,httpport,ws_serverport, params
     # the program will just say "15:29:02: Deleted stale lock file '/home/arno/SwarmPlugin-arno'"
     # and exit after a restart of the instance :-(
     #
-    print >>sys.stderr,"bg: Test if already running"
+    print >>sys.stderr,time.asctime(),'-', "bg: Test if already running"
     single_instance_checker = wx.SingleInstanceChecker(appname+"-"+ wx.GetUserId())
     if single_instance_checker.IsAnotherRunning():
-        print >>sys.stderr,"bg: Already running, exit"
+        print >>sys.stderr,time.asctime(),'-', "bg: Already running, exit"
         os._exit(0)
 
     arg0 = sys.argv[0].lower()
@@ -971,7 +972,7 @@ def run_bgapp(appname,appversion,i2iport,sessport,httpport,ws_serverport, params
     if PHONEHOME:
         reporter.stop()
 
-    print >>sys.stderr,"Sleeping seconds to let other threads finish"
+    print >>sys.stderr,time.asctime(),'-', "Sleeping seconds to let other threads finish"
     time.sleep(2)
 
     if not ALLOW_MULTIPLE:

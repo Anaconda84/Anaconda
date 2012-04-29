@@ -1,3 +1,4 @@
+import time 
 # Written by Arno Bakker
 # see LICENSE.txt for license information
 #
@@ -102,11 +103,11 @@ class TestP2PURLs(unittest.TestCase):
 
     def run_badurllist(self,badurllist):
         
-        #print >>sys.stderr,badurllist
+        #print >>sys.stderr,time.asctime(),'-', badurllist
         
         for url,problem in badurllist:
             try:
-                print >>sys.stderr,"\n\nTest",problem
+                print >>sys.stderr,time.asctime(),'-', "\n\nTest",problem
                 tdef = TorrentDef.load_from_url(url)
                 self.assert_(False,"Should not have accepted URL: "+problem)
             except AssertionError,e:
@@ -134,7 +135,7 @@ class TestP2PURLs(unittest.TestCase):
         for name,leng,piecesize,duration in paramlist:
             
             
-            print >>sys.stderr,"\n\nTest",`name`
+            print >>sys.stderr,time.asctime(),'-', "\n\nTest",`name`
             tmpfilename = os.path.join(tmpdirname,name)
         
             content = '*' * leng
@@ -154,7 +155,7 @@ class TestP2PURLs(unittest.TestCase):
             tdef.set_encoding('UTF-8')
             tdef.set_url_compat(True)
             tdef.finalize()
-            print >>sys.stderr,"URL",tdef.get_url()
+            print >>sys.stderr,time.asctime(),'-', "URL",tdef.get_url()
             
             tdef2 = TorrentDef.load_from_url(tdef.get_url())
             
@@ -163,8 +164,8 @@ class TestP2PURLs(unittest.TestCase):
             else:
                 utf8name = name
                 
-            #print >>sys.stderr,"ORIG NAME",`utf8name`
-            #print >>sys.stderr,"TDEF NAME",`tdef2.get_name()`
+            #print >>sys.stderr,time.asctime(),'-', "ORIG NAME",`utf8name`
+            #print >>sys.stderr,time.asctime(),'-', "TDEF NAME",`tdef2.get_name()`
                 
             self.assertEqual(tdef2.get_name(),utf8name)
             self.assertEqual(tdef2.get_length(),leng)
@@ -200,7 +201,7 @@ class TestP2PURLs(unittest.TestCase):
         
         for name,piecesize,bitrate,duration,authcfg in paramlist:
             
-            print >>sys.stderr,"\n\nTest",`name`
+            print >>sys.stderr,time.asctime(),'-', "\n\nTest",`name`
             
             tdef = TorrentDef()
             tdef.create_live(name,bitrate,playtime=duration,authconfig=authcfg)
@@ -213,12 +214,12 @@ class TestP2PURLs(unittest.TestCase):
             tdef.set_piece_length(piecesize)
             tdef.set_url_compat(True)
             
-            print >>sys.stderr,"Test: BEFORE FINALIZE"
+            print >>sys.stderr,time.asctime(),'-', "Test: BEFORE FINALIZE"
             tdef.finalize()
-            print >>sys.stderr,"Test: AFTER FINALIZE"
+            print >>sys.stderr,time.asctime(),'-', "Test: AFTER FINALIZE"
             url = tdef.get_url()
-            print >>sys.stderr,"URL",url
-            print >>sys.stderr,"Test: AFTER GET URL"
+            print >>sys.stderr,time.asctime(),'-', "URL",url
+            print >>sys.stderr,time.asctime(),'-', "Test: AFTER GET URL"
             
             tdef2 = TorrentDef.load_from_url(tdef.get_url())
             

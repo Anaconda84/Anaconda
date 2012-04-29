@@ -1,3 +1,4 @@
+import time 
 # Written by Arno Bakker, Bram Cohen
 # see LICENSE.txt for license information
 
@@ -41,7 +42,7 @@ EXTEND_MSG_UTORRENT_PEX = 'ut_pex' # note case sensitive
 DEBUG = False
 
 def create_ut_pex(addedconns,droppedconns,thisconn):
-    #print >>sys.stderr,"ut_pex: create_ut_pex:",addedconns,droppedconns,thisconn
+    #print >>sys.stderr,time.asctime(),'-', "ut_pex: create_ut_pex:",addedconns,droppedconns,thisconn
     d = {}
     compactedpeerstr = compact_connections(addedconns,thisconn)
     d['added'] = compactedpeerstr
@@ -58,7 +59,7 @@ def create_ut_pex(addedconns,droppedconns,thisconn):
         if conn.is_tribler_peer():
             flag |= 4
             
-        #print >>sys.stderr,"ut_pex: create_ut_pex: add flag",`flag`
+        #print >>sys.stderr,time.asctime(),'-', "ut_pex: create_ut_pex: add flag",`flag`
         flags += chr(flag)
     d['added.f'] = flags
     compactedpeerstr = compact_connections(droppedconns)
@@ -104,7 +105,7 @@ def check_ut_pex(d):
         ##raise ValueError('ut_pex: added.f: missing')
     
     if DEBUG:
-        print >>sys.stderr,"ut_pex: Got",apeers
+        print >>sys.stderr,time.asctime(),'-', "ut_pex: Got",apeers
     
     return (same_apeers,apeers,dpeers)
     

@@ -1,3 +1,4 @@
+import time 
 # Written by Arno Bakker
 # see LICENSE.txt for license information
 #
@@ -21,7 +22,7 @@ class CoordinatorMessageHandler:
     def handleMessage(self,permid,selversion,message):
         t = message[0]
         if DEBUG:
-            print >> sys.stderr,"helpcoord: Got",getMessageName(t)
+            print >> sys.stderr,time.asctime(),'-', "helpcoord: Got",getMessageName(t)
 
         if t == RESERVE_PIECES:
             return self.got_reserve_pieces(permid, message, selversion)
@@ -32,7 +33,7 @@ class CoordinatorMessageHandler:
             all_or_nothing = message[21]
             pieces = bdecode(message[22:])
         except:
-            print >> sys.stderr, "warning: bad data in RESERVE_PIECES"
+            print >> sys.stderr, time.asctime(),'-', "warning: bad data in RESERVE_PIECES"
             return False
 
         network_got_reserve_pieces_lambda = lambda:self.network_got_reserve_pieces(permid,infohash,pieces,all_or_nothing,selversion)
@@ -52,7 +53,7 @@ class CoordinatorMessageHandler:
         ## a STOP_DOWNLOAD_HELP (again)
         if not c.network_is_helper_permid(permid):
             if DEBUG:
-                print >> sys.stderr,"helpcoord: Ignoring RESERVE_PIECES from non-helper",show_permid_short(permid)
+                print >> sys.stderr,time.asctime(),'-', "helpcoord: Ignoring RESERVE_PIECES from non-helper",show_permid_short(permid)
             return
 
         c.network_got_reserve_pieces(permid, pieces, all_or_nothing, selversion)

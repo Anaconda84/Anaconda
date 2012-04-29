@@ -1,3 +1,4 @@
+import time 
 # written by Yuan Yuan, Jie Yang
 # see LICENSE.txt for license information
 #
@@ -44,7 +45,7 @@ class TorrentChecking(Thread):
         Thread.__init__(self)
         self.setName('TorrentChecking'+self.getName())
         if DEBUG:
-            print >> sys.stderr, 'TorrentChecking: Started torrentchecking', threading.currentThread().getName()
+            print >> sys.stderr, time.asctime(),'-', 'TorrentChecking: Started torrentchecking', threading.currentThread().getName()
         self.setDaemon(True)
         
         self.infohash = infohash
@@ -78,7 +79,7 @@ class TorrentChecking(Thread):
         
         try:
             if DEBUG:
-                print >> sys.stderr, "Torrent Checking: RUN", threading.currentThread().getName()
+                print >> sys.stderr, time.asctime(),'-', "Torrent Checking: RUN", threading.currentThread().getName()
                 
             event = threading.Event()
             return_value = safe_dict()
@@ -100,14 +101,14 @@ class TorrentChecking(Thread):
             
             torrent = return_value['torrent']
             if DEBUG:
-                print >> sys.stderr, "Torrent Checking: get value from DB:", torrent
+                print >> sys.stderr, time.asctime(),'-', "Torrent Checking: get value from DB:", torrent
             
             if not torrent:
                 return
     
             if self.infohash is None and torrent['ignored_times'] > 0:
                 if DEBUG:
-                    print >> sys.stderr, 'Torrent_checking: torrent: %s' % torrent
+                    print >> sys.stderr, time.asctime(),'-', 'Torrent_checking: torrent: %s' % torrent
                 kw = { 'ignored_times': torrent['ignored_times']-1 }
                 if self.db_thread:
                     self.db_thread.add_task(lambda:
@@ -128,7 +129,7 @@ class TorrentChecking(Thread):
             
             # TODO: tracker checking also needs to be update
             if DEBUG:
-                print >> sys.stderr, "Tracker Checking"
+                print >> sys.stderr, time.asctime(),'-', "Tracker Checking"
             trackerChecking(torrent)
             
             # Must come after tracker check, such that if tracker dead and DHT still alive, the
@@ -148,7 +149,7 @@ class TorrentChecking(Thread):
                 }
             
             if DEBUG:
-                print >> sys.stderr, "Torrent Checking: selectTorrentToCheck:", kw
+                print >> sys.stderr, time.asctime(),'-', "Torrent Checking: selectTorrentToCheck:", kw
             
             if self.db_thread:
                 self.db_thread.add_task(lambda:

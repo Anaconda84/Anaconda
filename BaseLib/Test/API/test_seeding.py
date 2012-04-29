@@ -1,3 +1,4 @@
+import time 
 # Written by Arno Bakker
 # see LICENSE.txt for license information
 #
@@ -28,9 +29,9 @@ class TestSeeding(TestAsServer):
     def setUp(self):
         """ override TestAsServer """
         TestAsServer.setUp(self)
-        print >>sys.stderr,"test: Giving Session time to startup"
+        print >>sys.stderr,time.asctime(),'-', "test: Giving Session time to startup"
         time.sleep(5)
-        print >>sys.stderr,"test: Session should have started up"
+        print >>sys.stderr,time.asctime(),'-', "test: Session should have started up"
     
     def setUpPreSession(self):
         """ override TestAsServer """
@@ -56,7 +57,7 @@ class TestSeeding(TestAsServer):
         self.torrentfn = os.path.join(self.session.get_state_dir(),"gen.torrent")
         self.tdef.save(self.torrentfn)
         
-        print >>sys.stderr,"test: setup_seeder: name is",self.tdef.metainfo['info']['name']
+        print >>sys.stderr,time.asctime(),'-', "test: setup_seeder: name is",self.tdef.metainfo['info']['name']
 
         self.dscfg = DownloadStartupConfig()
         self.dscfg.set_dest_dir(os.getcwd())
@@ -64,13 +65,13 @@ class TestSeeding(TestAsServer):
         
         d.set_state_callback(self.seeder_state_callback)
         
-        print >>sys.stderr,"test: Giving Download time to startup"
+        print >>sys.stderr,time.asctime(),'-', "test: Giving Download time to startup"
         time.sleep(5)
 
 
     def seeder_state_callback(self,ds):
         d = ds.get_download()
-        print >>sys.stderr,"test: seeder:",`d.get_def().get_name()`,dlstatus_strings[ds.get_status()],ds.get_progress()
+        print >>sys.stderr,time.asctime(),'-', "test: seeder:",`d.get_def().get_name()`,dlstatus_strings[ds.get_status()],ds.get_progress()
         return (1.0,False)
 
 
@@ -94,7 +95,7 @@ class TestSeeding(TestAsServer):
 
     def subtest_is_seeding(self):
         infohash = self.tdef.get_infohash()
-        print >> sys.stderr,"test: Connect to see if seeding this infohash"
+        print >> sys.stderr,time.asctime(),'-', "test: Connect to see if seeding this infohash"
         myid = '*' * 20
         s = BTConnection('localhost',self.hisport,myid=myid,user_infohash=infohash)
         s.read_handshake_medium_rare()
@@ -102,12 +103,12 @@ class TestSeeding(TestAsServer):
         s.send(CHOKE)
         try:
             s.s.settimeout(10.0)
-            print >> sys.stderr,"test: Receive to see if seeding this infohash"
+            print >> sys.stderr,time.asctime(),'-', "test: Receive to see if seeding this infohash"
             resp = s.recv()
             self.assert_(len(resp) > 0)
             self.assert_(resp[0] == EXTEND)
         except socket.timeout:
-            print >> sys.stderr,"test: Timeout, peer didn't reply"
+            print >> sys.stderr,time.asctime(),'-', "test: Timeout, peer didn't reply"
             self.assert_(False)
         s.close()
         
@@ -122,7 +123,7 @@ class TestSeeding(TestAsServer):
         self.session2 = Session(self.config2,ignore_singleton=True)
         
         # Allow session2 to start
-        print >>sys.stderr,"test: Sleeping 3 secs to let Session2 start"
+        print >>sys.stderr,time.asctime(),'-', "test: Sleeping 3 secs to let Session2 start"
         time.sleep(3)
         
         tdef2 = TorrentDef.load(self.torrentfn)
@@ -136,7 +137,7 @@ class TestSeeding(TestAsServer):
     
     def downloader_state_callback(self,ds):
         d = ds.get_download()
-        print >>sys.stderr,"test: download:",`d.get_def().get_name()`,dlstatus_strings[ds.get_status()],ds.get_progress()
+        print >>sys.stderr,time.asctime(),'-', "test: download:",`d.get_def().get_name()`,dlstatus_strings[ds.get_status()],ds.get_progress()
         
         if ds.get_status() == DLSTATUS_SEEDING:
             # File is in

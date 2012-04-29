@@ -1,3 +1,4 @@
+import time 
 # Written by Jan David Mol, Arno Bakker, Riccardo Petrocco
 # see LICENSE.txt for license information
 
@@ -52,7 +53,7 @@ class SVCVideoStatus:
         # the available layers in the torrent
         self.available_qualities = len(indexes)
         
-        if DEBUG: print >>sys.stderr, "VideoStatus: indexes of ordered layer [base, enhance1, enhance2,....] in the torrent: ", indexes
+        if DEBUG: print >>sys.stderr, time.asctime(),'-', "VideoStatus: indexes of ordered layer [base, enhance1, enhance2,....] in the torrent: ", indexes
         # Ric: first index is the base layer
         index = indexes[0]
 
@@ -65,7 +66,7 @@ class SVCVideoStatus:
         
 
         #enhancementIdx = indexes[1::]
-        #print >>sys.stderr, "enhancementIdx", enhancementIdx
+        #print >>sys.stderr, time.asctime(),'-', "enhancementIdx", enhancementIdx
 
         for idx in indexes:
             #field = "enhancement" + str(enhancementIdx.index(idx))
@@ -74,7 +75,7 @@ class SVCVideoStatus:
             offset = sum( (filesize for (_,filesize) in fileinfo[:idx] if filesize) )
             self.selected_movie.append( {"name": name, "size": size, "offset": offset} )
 
-        print >> sys.stderr, self.selected_movie
+        print >> sys.stderr, time.asctime(),'-', self.selected_movie
         
         self.playback_pos_observers = []
         # da rimuovere serve a video on demand
@@ -118,7 +119,7 @@ class SVCVideoStatus:
         self.dropping = False 
         # for live
         self.wraparound = False
-        print >>sys.stderr, self.first_piece
+        print >>sys.stderr, time.asctime(),'-', self.first_piece
 
         # ----- set defaults for dynamic positions
         self.playing = False     # video has started playback
@@ -160,7 +161,7 @@ class SVCVideoStatus:
         for i in range(len(download_range)):
             (f,t) = download_range[i]
             for x in xrange (f,t):
-                #print >> sys.stderr, "ttttttttttttttttttttttttttt", x
+                #print >> sys.stderr, time.asctime(),'-', "ttttttttttttttttttttttttttt", x
                 yield x    
 
     def dist_range(self, f, t):
@@ -269,7 +270,7 @@ class SVCVideoStatus:
         if self.high_prob_curr_pieces > self.high_prob_curr_pieces_limit[1]:
             self.high_prob_curr_pieces = self.high_prob_curr_pieces_limit[1]
 
-        if DEBUG: print >>sys.stderr, "VideoStatus:increase_high_range", self.high_prob_curr_time, "seconds or", self.high_prob_curr_pieces, "pieces"
+        if DEBUG: print >>sys.stderr, time.asctime(),'-', "VideoStatus:increase_high_range", self.high_prob_curr_time, "seconds or", self.high_prob_curr_pieces, "pieces"
 
     def decrease_high_range(self, factor=1):
         """
@@ -284,7 +285,7 @@ class SVCVideoStatus:
         if self.high_prob_curr_pieces < self.high_prob_curr_pieces_limit[0]:
             self.high_prob_curr_pieces = self.high_prob_curr_pieces_limit[0]
 
-        if DEBUG: print >>sys.stderr, "VideoStatus:decrease_high_range", self.high_prob_curr_time, "seconds or", self.high_prob_curr_pieces, "pieces"
+        if DEBUG: print >>sys.stderr, time.asctime(),'-', "VideoStatus:decrease_high_range", self.high_prob_curr_time, "seconds or", self.high_prob_curr_pieces, "pieces"
 
     def set_high_range(self, seconds=None, pieces=None):
         """

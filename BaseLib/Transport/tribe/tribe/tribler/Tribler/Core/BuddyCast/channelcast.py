@@ -1,3 +1,4 @@
+import time 
 # Written by Nitin Chiluka
 # see LICENSE.txt for license information
 
@@ -75,13 +76,13 @@ class ChannelCastCore:
         # ChannelCast feature starts from eleventh version; hence, do not send to lower version peers
         if selversion < OLPROTO_VER_ELEVENTH:
             if DEBUG:
-                print >> sys.stderr, "Do not send to lower version peer:", selversion
+                print >> sys.stderr, time.asctime(),'-', "Do not send to lower version peer:", selversion
             return
         
         channelcast_data = self.createChannelCastMessage()
         if channelcast_data is None or len(channelcast_data)==0:
             if DEBUG:
-                print >>sys.stderr, "No channels there.. hence we do not send"
+                print >>sys.stderr, time.asctime(),'-', "No channels there.. hence we do not send"
             #self.session.chquery_connected_peers('k:MFIwEAYHKoZIzj0CAQYFK4EEABoDPgAEAf3BkHsZ6UdIpuIX441wjU5Ybe0HPjTDvS+iacFZABH20It9N9uwkwtpkS3uEvVvfcTX50jcFNXOSCwq')            
             return
         channelcast_msg = bencode(channelcast_data)
@@ -96,13 +97,13 @@ class ChannelCastCore:
         
         data = CHANNELCAST + channelcast_msg
         self.secure_overlay.send(target_permid, data, self.channelCastSendCallback)        
-        if DEBUG: print >> sys.stderr, "Sent channelcastmsg",repr(channelcast_msg)
+        if DEBUG: print >> sys.stderr, time.asctime(),'-', "Sent channelcastmsg",repr(channelcast_msg)
     
     def createChannelCastMessage(self):
         """ Create a ChannelCast Message """
         
         if DEBUG: 
-            print >> sys.stderr, "Creating channelcastmsg..."
+            print >> sys.stderr, time.asctime(),'-', "Creating channelcastmsg..."
         
         hits = self.channelcastdb.getRecentAndRandomTorrents(NUM_OWN_RECENT_TORRENTS,NUM_OWN_RANDOM_TORRENTS,NUM_OTHERS_RECENT_TORRENTS,NUM_OTHERS_RECENT_TORRENTS)
         # hits is of the form: [(mod_id, mod_name, infohash, torrenthash, torrent_name, time_stamp, signature)]
@@ -124,31 +125,31 @@ class ChannelCastCore:
     def channelCastSendCallback(self, exc, target_permid, other=0):
         if DEBUG:
             if exc is None:
-                print >> sys.stderr,"channelcast: *** msg was sent successfully to peer", permid_for_user(target_permid)
+                print >> sys.stderr,time.asctime(),'-', "channelcast: *** msg was sent successfully to peer", permid_for_user(target_permid)
             else:
-                print >> sys.stderr, "channelcast: *** warning - error in sending msg to", permid_for_user(target_permid), exc
+                print >> sys.stderr, time.asctime(),'-', "channelcast: *** warning - error in sending msg to", permid_for_user(target_permid), exc
  
     def gotChannelCastMessage(self, recv_msg, sender_permid, selversion):
         """ Receive and handle a ChannelCast message """
         # ChannelCast feature starts from eleventh version; hence, do not receive from lower version peers
         if selversion < OLPROTO_VER_ELEVENTH:
             if DEBUG:
-                print >> sys.stderr, "Do not receive from lower version peer:", selversion
+                print >> sys.stderr, time.asctime(),'-', "Do not receive from lower version peer:", selversion
             return
                 
         if DEBUG:
-            print >> sys.stderr,'channelcast: Received a msg from ', permid_for_user(sender_permid)
-            print >> sys.stderr," my_permid=", permid_for_user(self.my_permid)
+            print >> sys.stderr,time.asctime(),'-', 'channelcast: Received a msg from ', permid_for_user(sender_permid)
+            print >> sys.stderr,time.asctime(),'-', " my_permid=", permid_for_user(self.my_permid)
 
         if not sender_permid or sender_permid == self.my_permid:
             if DEBUG:
-                print >> sys.stderr, "channelcast: warning - got channelcastMsg from a None/Self peer", \
+                print >> sys.stderr, time.asctime(),'-', "channelcast: warning - got channelcastMsg from a None/Self peer", \
                         permid_for_user(sender_permid), recv_msg
             return False
 
         #if len(recv_msg) > self.max_length:
         #    if DEBUG:
-        #        print >> sys.stderr, "channelcast: warning - got large channelCastHaveMsg", len(recv_msg)
+        #        print >> sys.stderr, time.asctime(),'-', "channelcast: warning - got large channelCastHaveMsg", len(recv_msg)
         #    return False
 
         channelcast_data = {}
@@ -156,12 +157,12 @@ class ChannelCastCore:
         try:
             channelcast_data = bdecode(recv_msg)
         except:
-            print >> sys.stderr, "channelcast: warning, invalid bencoded data"
+            print >> sys.stderr, time.asctime(),'-', "channelcast: warning, invalid bencoded data"
             return False
 
         # check message-structure
         if not validChannelCastMsg(channelcast_data):
-            print >> sys.stderr, "channelcast: invalid channelcast_message"
+            print >> sys.stderr, time.asctime(),'-', "channelcast: invalid channelcast_message"
             return False
         
         self.handleChannelCastMsg(sender_permid, channelcast_data)
@@ -196,7 +197,7 @@ class ChannelCastCore:
                 self.hits.append(hit)
             else:
                 def usercallback(infohash,metadata,filename):
-                    print >> sys.stderr , "USERCALLBACK" 
+                    print >> sys.stderr , time.asctime(),'-', "USERCALLBACK" 
                     self.channelcastdb.addTorrent(hit)
                     self.hits.append(hit)
                 self.rtorrent_handler.download_torrent(query_permid,str2bin(hit[2]),usercallback)

@@ -1,3 +1,4 @@
+import time 
 # Written by Vincent Heinink and Rameez Rahman
 # see LICENSE.txt for license information
 #
@@ -24,7 +25,7 @@ def validInfohash(infohash):
     r = ( type(infohash) == str or type(infohash) == unicode)
     if not r:
         if DEBUG:
-            print >>sys.stderr, "Invalid infohash: type(infohash) ==", str(type(infohash))+\
+            print >>sys.stderr, time.asctime(),'-', "Invalid infohash: type(infohash) ==", str(type(infohash))+\
             ", len(infohash) ==", str(len(infohash))
     return r
 
@@ -33,7 +34,7 @@ def validPermid(permid):
     r = (type(permid) == str or type(permid)== unicode) and len(permid) <= 125
     if not r:
         if DEBUG:
-            print >>sys.stderr, "Invalid permid: type(permid) ==", str(type(permid))+\
+            print >>sys.stderr, time.asctime(),'-', "Invalid permid: type(permid) ==", str(type(permid))+\
             ", len(permid) ==", str(len(permid))
     return r
 
@@ -46,29 +47,29 @@ def validTimestamp(timestamp):
     r = timestamp is not None and type(timestamp) == int and timestamp > 0 and timestamp <= now() + TIMESTAMP_IN_FUTURE
     if not r:
         if DEBUG:
-            print >>sys.stderr, "Invalid timestamp"
+            print >>sys.stderr, time.asctime(),'-', "Invalid timestamp"
     return r
 
 def validVoteCastMsg(data):
     """ Returns True if VoteCastMsg is valid, ie, be of type [(mod_id,vote)] """
     if data is None:
-        print >> sys.stderr, "data is None"
+        print >> sys.stderr, time.asctime(),'-', "data is None"
         return False
      
     if not type(data) == ListType:
-        print >> sys.stderr, "data is not List"
+        print >> sys.stderr, time.asctime(),'-', "data is not List"
         return False
     
     for record in data:
         if DEBUG: 
-            print >>sys.stderr, "validvotecastmsg: ", repr(record)
+            print >>sys.stderr, time.asctime(),'-', "validvotecastmsg: ", repr(record)
         if not validPermid(record[0]):
             if DEBUG:
-                print >> sys.stderr, "not valid permid: ", repr(record[0]) 
+                print >> sys.stderr, time.asctime(),'-', "not valid permid: ", repr(record[0]) 
             return False
         if not type(record[1]) == int:
             if DEBUG:
-                print >> sys.stderr, "not int: ", repr(record[1]) 
+                print >> sys.stderr, time.asctime(),'-', "not int: ", repr(record[1]) 
             return False
     
     return True
@@ -83,26 +84,26 @@ def validChannelCastMsg(channelcast_data):
     for signature, ch in channelcast_data.items():
         if not isinstance(ch,dict):
             if DEBUG:
-                print >>sys.stderr,"rvalidChannelCastMsg: a: value not dict"
+                print >>sys.stderr,time.asctime(),'-', "rvalidChannelCastMsg: a: value not dict"
             return False
         if len(ch) !=6:
             if DEBUG:
-                print >>sys.stderr,"rvalidChannelCastMsg: a: #keys!=6"
+                print >>sys.stderr,time.asctime(),'-', "rvalidChannelCastMsg: a: #keys!=6"
             return False
         if not ('publisher_id' in ch and 'publisher_name' in ch and 'infohash' in ch and 'torrenthash' in ch and 'torrentname' in ch and 'time_stamp' in ch):
             if DEBUG:
-                print >>sys.stderr,"validChannelCastMsg: a: key missing, got",d.keys()
+                print >>sys.stderr,time.asctime(),'-', "validChannelCastMsg: a: key missing, got",d.keys()
             return False
         if not (validPermid(ch['publisher_id']) and (isinstance(ch['publisher_name'],str) or isinstance(ch['publisher_name'], unicode)) and validInfohash(ch['infohash']) and validInfohash(ch['torrenthash'])
                 and (isinstance(ch['torrentname'],str) or isinstance(ch['torrentname'],unicode)) and validTimestamp(ch['time_stamp'])):
             if DEBUG:
-                print >>sys.stderr,"validChannelCastMsg: something not valid"
+                print >>sys.stderr,time.asctime(),'-', "validChannelCastMsg: something not valid"
             return False
         # now, verify signature
         l = (ch['publisher_id'],ch['infohash'], ch['torrenthash'], ch['time_stamp'])
         if not verify_data(bencode(l),str2bin(ch['publisher_id']),str2bin(signature)):
             if DEBUG:
-                print >>sys.stderr, "validChannelCastMsg: verification failed!"
+                print >>sys.stderr, time.asctime(),'-', "validChannelCastMsg: verification failed!"
             return False
     return True
      

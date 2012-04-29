@@ -1,3 +1,4 @@
+import time 
 # Written by Arno Bakker, Diego Rabaioli
 # see LICENSE.txt for license information
 """ Communication layer between other instance or Web plugin e.g. for starting Downloads. """
@@ -61,13 +62,13 @@ class Instance2InstanceServer(Thread):
     def rawserver_fatalerrorfunc(self,e):
         """ Called by network thread """
         if DEBUG:
-            print >>sys.stderr,"i2is: RawServer fatal error func called",e
+            print >>sys.stderr,time.asctime(),'-', "i2is: RawServer fatal error func called",e
         print_exc()
 
     def rawserver_nonfatalerrorfunc(self,e):
         """ Called by network thread """
         if DEBUG:
-            print >>sys.stderr,"i2is: RawServer non fatal error func called",e
+            print >>sys.stderr,time.asctime(),'-', "i2is: RawServer non fatal error func called",e
             print_exc()
         # Could log this somewhere, or phase it out
 
@@ -75,7 +76,7 @@ class Instance2InstanceServer(Thread):
         try:
             try:
                 if DEBUG:
-                    print >>sys.stderr,"i2is: Ready to receive remote commands on",self.i2iport
+                    print >>sys.stderr,time.asctime(),'-', "i2is: Ready to receive remote commands on",self.i2iport
                 self.rawserver.listen_forever(self)
             except:
                 print_exc()    
@@ -94,7 +95,7 @@ class Instance2InstanceServer(Thread):
     
     def connection_lost(self,s):
         if DEBUG:
-            print >>sys.stderr,"i2is: connection_lost ------------------------------------------------"
+            print >>sys.stderr,time.asctime(),'-', "i2is: connection_lost ------------------------------------------------"
         self.connhandler.connection_lost(s)
         
     def data_came_in(self, s, data):
@@ -119,10 +120,10 @@ class InstanceConnectionHandler:
     def external_connection_made(self,s):
         # Extra check in case bind() no work
         if DEBUG:
-            print >>sys.stderr,"i2is: ich: ext_conn_made"
+            print >>sys.stderr,time.asctime(),'-', "i2is: ich: ext_conn_made"
         peername = s.get_ip()
         if peername != "127.0.0.1":
-            print >>sys.stderr,"i2is: ich: ext_conn_made: Refusing non-local connection from",peername
+            print >>sys.stderr,time.asctime(),'-', "i2is: ich: ext_conn_made: Refusing non-local connection from",peername
             s.close()
 
         ic = InstanceConnection(s,self,self.readlinecallback)
@@ -134,19 +135,19 @@ class InstanceConnectionHandler:
     def connection_lost(self,s):
         """ Called when peer closes connection and when we close the connection """
         if DEBUG:
-            print >>sys.stderr,"i2is: ich: connection_lost ------------------------------------------------"
+            print >>sys.stderr,time.asctime(),'-', "i2is: ich: connection_lost ------------------------------------------------"
         
         # Extra check in case bind() no work
         peername = s.get_ip()
         if peername != "127.0.0.1":
-            print >>sys.stderr,"i2is: ich: connection_lost: Refusing non-local connection from",peername
+            print >>sys.stderr,time.asctime(),'-', "i2is: ich: connection_lost: Refusing non-local connection from",peername
             return
 
         del self.singsock2ic[s]
         
     def data_came_in(self,s, data):
         if DEBUG:
-            print >>sys.stderr,"i2is: ich: data_came_in"
+            print >>sys.stderr,time.asctime(),'-', "i2is: ich: data_came_in"
 
         ic = self.singsock2ic[s]
         try:
@@ -174,7 +175,7 @@ class InstanceConnection:
         """ Read \r\n ended lines from data and call readlinecallback(self,line) """
         
         #if DEBUG:
-        print >>sys.stderr,"i2is: ic: data_came_in",`data`,len(data),"proto",self.proto
+        print >>sys.stderr,time.asctime(),'-', "i2is: ic: data_came_in",`data`,len(data),"proto",self.proto
         
         if self.proto == 0:
             if data[0] == '\x00':

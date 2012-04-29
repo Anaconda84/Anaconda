@@ -1,3 +1,4 @@
+import time 
 # Written by Arno Bakker 
 # see LICENSE.txt for license information
 """ Definition of a torrent, that is, a collection of files or a live stream. """
@@ -99,7 +100,7 @@ class TorrentDef(Serializable,Copyable):
         bdata = stream.read()
         stream.close()
         data = bdecode(bdata)
-        #print >>sys.stderr,data
+        #print >>sys.stderr,time.asctime(),'-', data
         return TorrentDef._create(data)
     _read = staticmethod(_read)
         
@@ -124,7 +125,7 @@ class TorrentDef(Serializable,Copyable):
         assert isinstance(t.infohash, str), "INFOHASH has invalid type: %s" % type(t.infohash)
         assert len(t.infohash) == INFOHASH_LENGTH, "INFOHASH has invalid length: %d" % len(t.infohash)
         
-        #print >>sys.stderr,"INFOHASH",`t.infohash`
+        #print >>sys.stderr,time.asctime(),'-', "INFOHASH",`t.infohash`
 
         return t
     
@@ -735,13 +736,13 @@ class TorrentDef(Serializable,Copyable):
             length = float(self.input['bps']*secs)
 
             if DEBUG:
-                print >>sys.stderr,"TorrentDef: finalize: length",length,"piecelen",pl
+                print >>sys.stderr,time.asctime(),'-', "TorrentDef: finalize: length",length,"piecelen",pl
             diff = length % pl
             add = (pl - diff) % pl
             newlen = int(length + add)
 
                 
-            #print >>sys.stderr,"CHECK INFO LENGTH",secs,newlen
+            #print >>sys.stderr,time.asctime(),'-', "CHECK INFO LENGTH",secs,newlen
 
             d = self.input['files'][0]
             d['length'] = newlen
@@ -868,7 +869,7 @@ class TorrentDef(Serializable,Copyable):
                         if 0 < ord(char) < 128:
                             return char
                         else:
-                            if DEBUG: print >> sys.stderr, "Bad character filter", ord(char), "isalnum?", char.isalnum()
+                            if DEBUG: print >> sys.stderr, time.asctime(),'-', "Bad character filter", ord(char), "isalnum?", char.isalnum()
                             return u"?"
                     return u"".join([filter_character(char) for char in name])
                 return unicode(filter_characters(self.metainfo["info"]["name"]))
@@ -995,7 +996,7 @@ class TorrentDef(Serializable,Copyable):
                                 if 0 < ord(char) < 128:
                                     return char
                                 else:
-                                    if DEBUG: print >> sys.stderr, "Bad character filter", ord(char), "isalnum?", char.isalnum()
+                                    if DEBUG: print >> sys.stderr, time.asctime(),'-', "Bad character filter", ord(char), "isalnum?", char.isalnum()
                                     return u"?"
                             return u"".join([filter_character(char) for char in name])
                         yield join(*[unicode(filter_characters(element)) for element in file_dict["path"]]), file_dict["length"]

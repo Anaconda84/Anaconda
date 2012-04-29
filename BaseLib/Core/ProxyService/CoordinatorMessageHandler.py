@@ -1,3 +1,4 @@
+import time 
 # Written by Arno Bakker, George Milescu
 # see LICENSE.txt for license information
 #
@@ -29,7 +30,7 @@ class CoordinatorMessageHandler:
         
         type = message[0]
         if DEBUG:
-            print >> sys.stderr, "coordinator message handler: received the message", getMessageName(type), "from", show_permid_short(permid)
+            print >> sys.stderr, time.asctime(),'-', "coordinator message handler: received the message", getMessageName(type), "from", show_permid_short(permid)
 
         # Call the appropriate function 
         if type == JOIN_HELPERS:
@@ -54,12 +55,12 @@ class CoordinatorMessageHandler:
         """
 
         if DEBUG:
-            print >> sys.stderr, "coordinator: network_got_join_helpers: got_join_helpers"
+            print >> sys.stderr, time.asctime(),'-', "coordinator: network_got_join_helpers: got_join_helpers"
 
         try:
             infohash = message[1:21]
         except:
-            print >> sys.stderr, "coordinator: network_got_join_helpers: warning - bad data in JOIN_HELPERS"
+            print >> sys.stderr, time.asctime(),'-', "coordinator: network_got_join_helpers: warning - bad data in JOIN_HELPERS"
             return False
 
         # Add a task to find the appropriate Coordinator object method 
@@ -80,14 +81,14 @@ class CoordinatorMessageHandler:
         """
 
         if DEBUG:
-            print >> sys.stderr, "coordinator: network_got_join_helpers: network_got_join_helpers"
+            print >> sys.stderr, time.asctime(),'-', "coordinator: network_got_join_helpers: network_got_join_helpers"
 
         # Get coordinator object
         coord_obj = self.launchmany.get_coopdl_role_object(infohash, COOPDL_ROLE_COORDINATOR)
         if coord_obj is None:
             # There is no coordinator object associated with this infohash
             if DEBUG:
-                print >> sys.stderr, "coordinator: network_got_join_helpers: There is no coordinator object associated with this infohash"
+                print >> sys.stderr, time.asctime(),'-', "coordinator: network_got_join_helpers: There is no coordinator object associated with this infohash"
             return
 
         # Call the coordinator method
@@ -106,12 +107,12 @@ class CoordinatorMessageHandler:
         """
 
         if DEBUG:
-            print >> sys.stderr, "coordinator: got_resign_as_helper"
+            print >> sys.stderr, time.asctime(),'-', "coordinator: got_resign_as_helper"
 
         try:
             infohash = message[1:21]
         except:
-            print >> sys.stderr, "coordinator warning: bad data in RESIGN_AS_HELPER"
+            print >> sys.stderr, time.asctime(),'-', "coordinator warning: bad data in RESIGN_AS_HELPER"
             return False
 
         # Add a task to find the appropriate Coordinator object method 
@@ -132,14 +133,14 @@ class CoordinatorMessageHandler:
         """
 
         if DEBUG:
-            print >> sys.stderr, "coordinator: network_got_resign_as_helper"
+            print >> sys.stderr, time.asctime(),'-', "coordinator: network_got_resign_as_helper"
 
         # Get coordinator object
         coord_obj = self.launchmany.get_coopdl_role_object(infohash, COOPDL_ROLE_COORDINATOR)
         if coord_obj is None:
             # There is no coordinator object associated with this infohash
             if DEBUG:
-                print >> sys.stderr, "coordinator: network_got_resign_as_helper: There is no coordinator object associated with this infohash"
+                print >> sys.stderr, time.asctime(),'-', "coordinator: network_got_resign_as_helper: There is no coordinator object associated with this infohash"
             return
 
         # Call the coordinator method
@@ -158,13 +159,13 @@ class CoordinatorMessageHandler:
         """
 
         if DEBUG:
-            print >> sys.stderr, "coordinator: got_dropped_piece"
+            print >> sys.stderr, time.asctime(),'-', "coordinator: got_dropped_piece"
 
         try:
             infohash = message[1:21]
             piece = bdecode(message[22:])
         except:
-            print >> sys.stderr, "coordinator warning: bad data in DROPPED_PIECE"
+            print >> sys.stderr, time.asctime(),'-', "coordinator warning: bad data in DROPPED_PIECE"
             return False
 
         # Add a task to find the appropriate Coordinator object method 
@@ -186,14 +187,14 @@ class CoordinatorMessageHandler:
         """
 
         if DEBUG:
-            print >> sys.stderr, "coordinator: network_got_dropped_piece"
+            print >> sys.stderr, time.asctime(),'-', "coordinator: network_got_dropped_piece"
 
         # Get coordinator object
         coord_obj = self.launchmany.get_coopdl_role_object(infohash, COOPDL_ROLE_COORDINATOR)
         if coord_obj is None:
             # There is no coordinator object associated with this infohash
             if DEBUG:
-                print >> sys.stderr, "coordinator: network_got_dropped_piece: There is no coordinator object associated with this infohash"
+                print >> sys.stderr, time.asctime(),'-', "coordinator: network_got_dropped_piece: There is no coordinator object associated with this infohash"
             return
 
         # Call the coordinator method
@@ -212,13 +213,13 @@ class CoordinatorMessageHandler:
         """
 
         if DEBUG:
-            print >> sys.stderr, "coordinator: network_got_proxy_have: got_proxy_have"
+            print >> sys.stderr, time.asctime(),'-', "coordinator: network_got_proxy_have: got_proxy_have"
 
         try:
             infohash = message[1:21]
             aggregated_string = bdecode(message[21:])
         except:
-            print >> sys.stderr, "coordinator: network_got_proxy_have: warning - bad data in PROXY_HAVE"
+            print >> sys.stderr, time.asctime(),'-', "coordinator: network_got_proxy_have: warning - bad data in PROXY_HAVE"
             return False
 
         # Add a task to find the appropriate Coordinator object method 
@@ -240,14 +241,14 @@ class CoordinatorMessageHandler:
         """
 
         if DEBUG:
-            print >> sys.stderr, "coordinator: network_got_proxy_have: network_got_proxy_have"
+            print >> sys.stderr, time.asctime(),'-', "coordinator: network_got_proxy_have: network_got_proxy_have"
 
         # Get coordinator object
         coord_obj = self.launchmany.get_coopdl_role_object(infohash, COOPDL_ROLE_COORDINATOR)
         if coord_obj is None:
             # There is no coordinator object associated with this infohash
             if DEBUG:
-                print >> sys.stderr, "coordinator: network_got_proxy_have: There is no coordinator object associated with this infohash"
+                print >> sys.stderr, time.asctime(),'-', "coordinator: network_got_proxy_have: There is no coordinator object associated with this infohash"
             return
 
         # Call the coordinator method

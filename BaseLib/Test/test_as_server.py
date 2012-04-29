@@ -1,3 +1,4 @@
+import time 
 # Written by Arno Bakker, Jie Yang
 # see LICENSE.txt for license information
 
@@ -63,7 +64,7 @@ class TestAsServer(unittest.TestCase):
         """ unittest test tear down code """
         if self.session is not None:
             self.session.shutdown()
-            print >>sys.stderr,"test_as_server: sleeping after session shutdown"
+            print >>sys.stderr,time.asctime(),'-', "test_as_server: sleeping after session shutdown"
             time.sleep(2)
         try:
             shutil.rmtree(self.config_path)

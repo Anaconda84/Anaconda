@@ -1,3 +1,4 @@
+import time 
 # Written by Arno Bakker 
 # see LICENSE.txt for license information
 #
@@ -52,15 +53,15 @@ def states_callback(dslist):
     global sesjun
     if len(dslist) > 0 and allseeding and not checkpointedwhenseeding:
         checkpointedwhenseeding = True
-        print >>sys.stderr,"All seeding, checkpointing Session to enable quick restart"
+        print >>sys.stderr,time.asctime(),'-', "All seeding, checkpointing Session to enable quick restart"
         sesjun.checkpoint()
         
     return (1.0, False)
 
 def state_callback(ds):
     d = ds.get_download()
-#    print >>sys.stderr,`d.get_def().get_name()`,dlstatus_strings[ds.get_status()],ds.get_progress(),"%",ds.get_error(),"up",ds.get_current_speed(UPLOAD),"down",ds.get_current_speed(DOWNLOAD)
-    print >>sys.stderr, '%s %s %5.2f%% %s up %8.2fKB/s down %8.2fKB/s' % \
+#    print >>sys.stderr,time.asctime(),'-', `d.get_def().get_name()`,dlstatus_strings[ds.get_status()],ds.get_progress(),"%",ds.get_error(),"up",ds.get_current_speed(UPLOAD),"down",ds.get_current_speed(DOWNLOAD)
+    print >>sys.stderr, time.asctime(),'-', '%s %s %5.2f%% %s up %8.2fKB/s down %8.2fKB/s' % \
             (`d.get_def().get_name()`, \
             dlstatus_strings[ds.get_status()], \
             ds.get_progress() * 100, \
@@ -145,10 +146,10 @@ def main():
     try:
         while True:
             try:
-                print >>sys.stderr,"Rescanning",`torrentsdir`
+                print >>sys.stderr,time.asctime(),'-', "Rescanning",`torrentsdir`
                 for torrent_file in os.listdir(torrentsdir):
                     if torrent_file.endswith(".torrent") or torrent_file.endswith(".tstream") or torrent_file.endswith(".url"): 
-                        print >>sys.stderr,"Found file",`torrent_file`
+                        print >>sys.stderr,time.asctime(),'-', "Found file",`torrent_file`
                         tfullfilename = os.path.join(torrentsdir,torrent_file)
                         if torrent_file.endswith(".url"):
                             f = open(tfullfilename,"rb")
@@ -167,7 +168,7 @@ def main():
                                 existing = True
                                 break
                         if existing:
-                            print >>sys.stderr,"Ignoring existing Download",`tdef.get_name()`
+                            print >>sys.stderr,time.asctime(),'-', "Ignoring existing Download",`tdef.get_name()`
                         else:
                             if tracking:
                                 s.add_to_internal_tracker(tdef)

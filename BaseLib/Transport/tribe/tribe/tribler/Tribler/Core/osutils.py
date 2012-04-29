@@ -1,3 +1,4 @@
+import time 
 # Written by Arno Bakker, ABC authors
 # see LICENSE.txt for license information
 """
@@ -167,9 +168,9 @@ except:
                     size = long(sizestring)                    
                     
                     if size == 0L:
-                        print >>sys.stderr,"getfreespace: can't determine freespace of ",path
+                        print >>sys.stderr,time.asctime(),'-', "getfreespace: can't determine freespace of ",path
                         for line in mystdout:
-                            print >>sys.stderr,line
+                            print >>sys.stderr,time.asctime(),'-', line
                             
                         size = 2**80L
                 except:

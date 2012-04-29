@@ -1,3 +1,4 @@
+import time 
 # Written by Arno Bakker, Jie Yang
 # see LICENSE.txt for license information
 
@@ -29,7 +30,7 @@ class SocialNetworkMsgHandler:
 
     def register(self,overlay_bridge,launchmany,config):
         if DEBUG:
-            print >> sys.stderr,"socnet: register"
+            print >> sys.stderr,time.asctime(),'-', "socnet: register"
         self.overlay_bridge = overlay_bridge
         self.config = config
         self.overlap.register(overlay_bridge,launchmany)
@@ -42,17 +43,17 @@ class SocialNetworkMsgHandler:
         t = message[0]
         if t == SOCIAL_OVERLAP:
             if DEBUG:
-                print >> sys.stderr,"socnet: Got SOCIAL_OVERLAP",len(message)
+                print >> sys.stderr,time.asctime(),'-', "socnet: Got SOCIAL_OVERLAP",len(message)
             if self.config['superpeer']:
                 if DEBUG:
-                    print >> sys.stderr,"socnet: overlap: Ignoring, we are superpeer"
+                    print >> sys.stderr,time.asctime(),'-', "socnet: overlap: Ignoring, we are superpeer"
                 return True
             else:
                 return self.overlap.recv_overlap(permid,message,selversion)
 
         else:
             if DEBUG:
-                print >> sys.stderr,"socnet: UNKNOWN OVERLAY MESSAGE", ord(t)
+                print >> sys.stderr,time.asctime(),'-', "socnet: UNKNOWN OVERLAY MESSAGE", ord(t)
             return False
 
     #
@@ -61,7 +62,7 @@ class SocialNetworkMsgHandler:
     def handleConnection(self,exc,permid,selversion,locally_initiated):
         
         if DEBUG:
-            print >> sys.stderr,"socnet: handleConnection",exc,"v",selversion,"local",locally_initiated
+            print >> sys.stderr,time.asctime(),'-', "socnet: handleConnection",exc,"v",selversion,"local",locally_initiated
         if exc is not None:
             return
         
@@ -70,7 +71,7 @@ class SocialNetworkMsgHandler:
 
         if self.config['superpeer']:
             if DEBUG:
-                print >> sys.stderr,"socnet: overlap: Ignoring connection, we are superpeer"
+                print >> sys.stderr,time.asctime(),'-', "socnet: overlap: Ignoring connection, we are superpeer"
             return True
 
         self.overlap.initiate_overlap(permid,locally_initiated)

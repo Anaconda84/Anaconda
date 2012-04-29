@@ -1,3 +1,4 @@
+import time 
 # Written by Pawel Garbacki, Arno Bakker
 # see LICENSE.txt for license information
 #
@@ -33,7 +34,7 @@ class Coordinator:
     # Interface for Core API. 
     # 
     def network_request_help(self,peerList,force = False):
-        #print >> sys.stderr,"dlhelp: REQUESTING HELP FROM",peerList
+        #print >> sys.stderr,time.asctime(),'-', "dlhelp: REQUESTING HELP FROM",peerList
         self.lock.acquire()
         try:
             toask_helpers = []
@@ -58,7 +59,7 @@ class Coordinator:
             self.network_send_request_help(permidlist)
         except Exception,e:
             print_exc()
-            print >> sys.stderr,"helpcoord: Exception while requesting help",e
+            print >> sys.stderr,time.asctime(),'-', "helpcoord: Exception while requesting help",e
         self.lock.release()
 
     def network_send_request_help(self,permidlist):
@@ -68,25 +69,25 @@ class Coordinator:
     def olthread_send_request_help(self,permidlist):
         for permid in permidlist:
             if DEBUG:
-                print >> sys.stderr,"dlhelp: Coordinator connecting to",show_permid_short(permid),"for help"
+                print >> sys.stderr,time.asctime(),'-', "dlhelp: Coordinator connecting to",show_permid_short(permid),"for help"
             self.overlay_bridge.connect(permid,self.olthread_request_help_connect_callback)
 
     def olthread_request_help_connect_callback(self,exc,dns,permid,selversion):
         if exc is None:
             if DEBUG:
-                print >> sys.stderr,"dlhelp: Coordinator sending to",show_permid_short(permid)
+                print >> sys.stderr,time.asctime(),'-', "dlhelp: Coordinator sending to",show_permid_short(permid)
             ## Create message according to protocol version
             dlhelp_request = self.infohash 
             self.overlay_bridge.send(permid, DOWNLOAD_HELP + dlhelp_request,self.olthread_request_help_send_callback)
         else:
             if DEBUG:
-                print >> sys.stderr,"dlhelp: DOWNLOAD_HELP: error connecting to",show_permid_short(permid),exc
+                print >> sys.stderr,time.asctime(),'-', "dlhelp: DOWNLOAD_HELP: error connecting to",show_permid_short(permid),exc
             self.olthread_remove_unreachable_helper(permid)
 
     def olthread_request_help_send_callback(self,exc,permid):
         if exc is not None:
             if DEBUG:
-                print >> sys.stderr,"dlhelp: DOWNLOAD_HELP: error sending to",show_permid_short(permid),exc
+                print >> sys.stderr,time.asctime(),'-', "dlhelp: DOWNLOAD_HELP: error sending to",show_permid_short(permid),exc
             self.olthread_remove_unreachable_helper(permid)
 
 
@@ -104,7 +105,7 @@ class Coordinator:
 
 
     def network_stop_help(self,peerList, force = False):
-        # print >> sys.stderr,"dlhelp: STOPPING HELP FROM",peerList
+        # print >> sys.stderr,time.asctime(),'-', "dlhelp: STOPPING HELP FROM",peerList
         self.lock.acquire()
         try:
             if force:
@@ -149,7 +150,7 @@ class Coordinator:
     def olthread_send_stop_help(self,permidlist):
         for permid in permidlist:
             if DEBUG:
-                print >> sys.stderr,"dlhelp: Coordinator connecting to",show_permid_short(permid),"for stopping help"
+                print >> sys.stderr,time.asctime(),'-', "dlhelp: Coordinator connecting to",show_permid_short(permid),"for stopping help"
             self.overlay_bridge.connect(permid,self.olthread_stop_help_connect_callback)
 
     def olthread_stop_help_connect_callback(self,exc,dns,permid,selversion):
@@ -158,19 +159,19 @@ class Coordinator:
             stop_request = self.infohash
             self.overlay_bridge.send(permid,STOP_DOWNLOAD_HELP + stop_request,self.olthread_stop_help_send_callback)
         elif DEBUG:
-            print >> sys.stderr,"dlhelp: STOP_DOWNLOAD_HELP: error connecting to",show_permid_short(permid),exc
+            print >> sys.stderr,time.asctime(),'-', "dlhelp: STOP_DOWNLOAD_HELP: error connecting to",show_permid_short(permid),exc
 
     def olthread_stop_help_send_callback(self,exc,permid):
         if exc is not None:
             if DEBUG:
-                print >> sys.stderr,"dlhelp: STOP_DOWNLOAD_HELP: error sending to",show_permid_short(permid),exc
+                print >> sys.stderr,time.asctime(),'-', "dlhelp: STOP_DOWNLOAD_HELP: error sending to",show_permid_short(permid),exc
 
 
     def network_get_asked_helpers_copy(self):
         """ Returns a COPY of the list. We need 'before' and 'after' info here,
         so the caller is not allowed to update the current asked_helpers """
         if DEBUG:
-            print >> sys.stderr,"dlhelp: Coordinator: Asked helpers is #",len(self.asked_helpers)
+            print >> sys.stderr,time.asctime(),'-', "dlhelp: Coordinator: Asked helpers is #",len(self.asked_helpers)
         self.lock.acquire()
         try:
             return copy.deepcopy(self.asked_helpers)
@@ -231,7 +232,7 @@ class Coordinator:
                     self.reserved.append(-piece)
         except Exception, e:
             print_exc()
-            print >> sys.stderr,"helpcoord: Exception in reserve_pieces",e
+            print >> sys.stderr,time.asctime(),'-', "helpcoord: Exception in reserve_pieces",e
         return new_reserved
 
     def network_get_reserved(self):
@@ -250,10 +251,10 @@ class Coordinator:
     def olthread_pieces_reserved_send_callback(self,exc,permid):
         if exc is not None:
             if DEBUG:
-                print >> sys.stderr,"dlhelp: PIECES_RESERVED: error sending to",show_permid_short(permid),exc
+                print >> sys.stderr,time.asctime(),'-', "dlhelp: PIECES_RESERVED: error sending to",show_permid_short(permid),exc
         else:
             if DEBUG:
-                print >> sys.stderr,"dlhelp: PIECES_RESERVED: Successfully sent to",show_permid_short(permid)
+                print >> sys.stderr,time.asctime(),'-', "dlhelp: PIECES_RESERVED: Successfully sent to",show_permid_short(permid)
 
 
     #

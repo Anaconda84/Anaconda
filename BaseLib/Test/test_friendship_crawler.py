@@ -1,3 +1,4 @@
+import time 
 # Written by Boudewijn Schoon, Arno Bakker
 # see LICENSE.txt for license information
 
@@ -59,7 +60,7 @@ class TestFriendshipCrawler(TestCrawler):
         """
         Send a valid message-id from a registered crawler peer
         """
-        print >>sys.stderr, "-"*80, "\ntest: good friendship stats"
+        print >>sys.stderr, time.asctime(),'-', "-"*80, "\ntest: good friendship stats"
 
         s = OLConnection(self.my_keypair, "localhost", self.hisport)
 
@@ -73,7 +74,7 @@ class TestFriendshipCrawler(TestCrawler):
         
         d = bdecode(payload)
         if DEBUG:
-            print >>sys.stderr, "test: Got FRIENDSHIPSTATISTICS",`d`
+            print >>sys.stderr, time.asctime(),'-', "test: Got FRIENDSHIPSTATISTICS",`d`
         stats = d['stats']
         self.assert_(len(stats) == 1)
         record = d['stats'][0]

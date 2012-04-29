@@ -1,3 +1,4 @@
+import time 
 # Written by Njaal Borch
 # see LICENSE.txt for license information
 
@@ -199,17 +200,17 @@ class LivingLabReporter:
         h.send(body)
 
         if DEBUG:
-            print >> sys.stderr, "***"
-            print >> sys.stderr, "LivingLabReporter: post() Sending", uncompressed_xml_length, "bytes of xml data in a +/-", len(body), "bytes post"
+            print >> sys.stderr, time.asctime(),'-', "***"
+            print >> sys.stderr, time.asctime(),'-', "LivingLabReporter: post() Sending", uncompressed_xml_length, "bytes of xml data in a +/-", len(body), "bytes post"
             filename = "report-%d.xml" % time.time()
             open(filename, "w").write(body)
-            print >> sys.stderr, "Report stored locally in file", filename
-            print >> sys.stderr, "***"
+            print >> sys.stderr, time.asctime(),'-', "Report stored locally in file", filename
+            print >> sys.stderr, time.asctime(),'-', "***"
         
         errcode, errmsg, headers = h.getreply()
         if DEBUG:
-            # print >>sys.stderr, "LivingLabReporter:\n", xml_str
-            print >>sys.stderr, "LivingLabReporter:", `errcode`, `errmsg`, "\n", headers, "\n", h.file.read().replace("\\n", "\n")
+            # print >>sys.stderr, time.asctime(),'-', "LivingLabReporter:\n", xml_str
+            print >>sys.stderr, time.asctime(),'-', "LivingLabReporter:", `errcode`, `errmsg`, "\n", headers, "\n", h.file.read().replace("\\n", "\n")
 
         if errcode != 200:
             if not self.error_handler is None:

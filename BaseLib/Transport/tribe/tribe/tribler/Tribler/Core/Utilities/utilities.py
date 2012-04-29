@@ -1,3 +1,4 @@
+import time 
 # Written by Jie Yang
 # see LICENSE.txt for license information
 
@@ -241,7 +242,7 @@ def isValidURL(url):
         url = url.lower().replace('udp','http',1)
     r = urlparse.urlsplit(url)
     # if DEBUG:
-    #     print >>sys.stderr,"isValidURL:",r
+    #     print >>sys.stderr,time.asctime(),'-', "isValidURL:",r
     
     if r[0] == '' or r[1] == '':
         return False
@@ -416,7 +417,7 @@ def sort_dictlist(dict_list, key, order='increase'):
     
     aux = []
     for i in xrange(len(dict_list)):
-        #print >>sys.stderr,"sort_dictlist",key,"in",dict_list[i].keys(),"?"
+        #print >>sys.stderr,time.asctime(),'-', "sort_dictlist",key,"in",dict_list[i].keys(),"?"
         if key in dict_list[i]:
             aux.append((dict_list[i][key],i))
     aux.sort()
@@ -515,10 +516,10 @@ def hostname_or_ip2ip(hostname_or_ip):
             # dns-lookup for hostname_or_ip into an ip address
             ip = socket.gethostbyname(hostname_or_ip)
             if not hostname_or_ip.startswith("superpeer"):
-                print >>sys.stderr,"hostname_or_ip2ip: resolved ip from hostname, an ip should have been provided", hostname_or_ip
+                print >>sys.stderr,time.asctime(),'-', "hostname_or_ip2ip: resolved ip from hostname, an ip should have been provided", hostname_or_ip
 
         except:
-            print >>sys.stderr,"hostname_or_ip2ip: invalid hostname", hostname_or_ip
+            print >>sys.stderr,time.asctime(),'-', "hostname_or_ip2ip: invalid hostname", hostname_or_ip
             print_exc()
 
     return ip

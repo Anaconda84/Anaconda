@@ -1,3 +1,4 @@
+import time 
 # Written by Bram Cohen
 # see LICENSE.txt for license information
 
@@ -60,7 +61,7 @@ class Upload:
         """
         have_list = self.storage.get_have_list()
 
-        print >>sys.stderr, "Have list:",have_list
+        print >>sys.stderr, time.asctime(),'-', "Have list:",have_list
         
     def send_bitfield(self, connection):
         """

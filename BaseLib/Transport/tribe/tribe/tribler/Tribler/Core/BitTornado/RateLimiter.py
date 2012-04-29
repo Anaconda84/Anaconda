@@ -1,3 +1,4 @@
+import time 
 # Written by Bram Cohen and Pawel Garbacki
 # see LICENSE.txt for license information
 
@@ -46,7 +47,7 @@ class RateLimiter:
 
     def set_upload_rate(self, rate):
         if DEBUG: 
-            print >>sys.stderr, "RateLimiter: set_upload_rate", rate
+            print >>sys.stderr, time.asctime(),'-', "RateLimiter: set_upload_rate", rate
         # rate = -1 # test automatic
         if rate < 0:
             if self.autoadjust:
@@ -66,7 +67,7 @@ class RateLimiter:
         self.bytes_sent = 0
 
     def queue(self, conn):
-        if DEBUG: print >>sys.stderr, "RateLimiter: queue", conn
+        if DEBUG: print >>sys.stderr, time.asctime(),'-', "RateLimiter: queue", conn
         assert conn.next_upload is None
         if self.last is None:
             self.last = conn
@@ -81,7 +82,7 @@ class RateLimiter:
 # _2fastbt
 
     def try_send(self, check_time = False):
-        if DEBUG: print >>sys.stderr, "RateLimiter: try_send"
+        if DEBUG: print >>sys.stderr, time.asctime(),'-', "RateLimiter: try_send"
         t = clock()
         self.bytes_sent -= (t - self.lasttime) * self.upload_rate
         #print 'try_send: bytes_sent: %s' % self.bytes_sent
@@ -116,7 +117,7 @@ class RateLimiter:
             self.sched(self.try_send, self.bytes_sent / self.upload_rate)
 
     def adjust_sent(self, bytes):
-        if DEBUG: print >>sys.stderr, "RateLimiter: adjust_sent", bytes
+        if DEBUG: print >>sys.stderr, time.asctime(),'-', "RateLimiter: adjust_sent", bytes
         self.bytes_sent = min(self.bytes_sent+bytes, self.upload_rate*3)
         self.measure.update_rate(bytes)
 
@@ -124,14 +125,14 @@ class RateLimiter:
     def ping(self, delay):
         ##raise Exception('Is this called?')
         if DEBUG:
-            print >>sys.stderr, delay
+            print >>sys.stderr, time.asctime(),'-', delay
         if not self.autoadjust:
             return
         self.pings.append(delay > PING_BOUNDARY)
         if len(self.pings) < PING_SAMPLES+PING_DISCARDS:
             return
         if DEBUG:
-            print >>sys.stderr, 'RateLimiter: cycle'
+            print >>sys.stderr, time.asctime(),'-', 'RateLimiter: cycle'
         pings = sum(self.pings[PING_DISCARDS:])
         del self.pings[:]
         if pings >= PING_THRESHHOLD:   # assume flooded
@@ -144,7 +145,7 @@ class RateLimiter:
             self.slots = int(sqrt(self.upload_rate*SLOTS_FACTOR))
             self.slotsfunc(self.slots)
             if DEBUG:
-                print >>sys.stderr, 'RateLimiter: adjust down to '+str(self.upload_rate)
+                print >>sys.stderr, time.asctime(),'-', 'RateLimiter: adjust down to '+str(self.upload_rate)
             self.lasttime = clock()
             self.bytes_sent = 0
             self.autoadjustup = UP_DELAY_FIRST
@@ -158,7 +159,7 @@ class RateLimiter:
             self.slots = int(sqrt(self.upload_rate*SLOTS_FACTOR))
             self.slotsfunc(self.slots)
             if DEBUG:
-                print >>sys.stderr, 'RateLimiter: adjust up to '+str(self.upload_rate)
+                print >>sys.stderr, time.asctime(),'-', 'RateLimiter: adjust up to '+str(self.upload_rate)
             self.lasttime = clock()
             self.bytes_sent = 0
             self.autoadjustup = UP_DELAY_NEXT

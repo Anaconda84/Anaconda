@@ -1,3 +1,4 @@
+import time 
 # Written by Riccardo Petrocco
 # see LICENSE.txt for license information
 
@@ -113,7 +114,7 @@ class WebIFPathMapper(AbstractPathMapper):
         o = urlparse.urlparse(fakeurl)
 
         if DEBUG:
-            print >>sys.stderr,"webUI: path", urlpath        
+            print >>sys.stderr,time.asctime(),'-', "webUI: path", urlpath        
             
         path = urlpath[7:]
 
@@ -124,9 +125,9 @@ class WebIFPathMapper(AbstractPathMapper):
             page = self.statusPage()
             pageStream = StringIO(page)
                 
-#            print >>sys.stderr, "-------------page-----------------", fakeurl, "\n" , o
-#            print >>sys.stderr, "-------------page-----------------", page, "\n" 
-#            print >>sys.stderr, "-------------page-----------------", pageStream, "\n"
+#            print >>sys.stderr, time.asctime(),'-', "-------------page-----------------", fakeurl, "\n" , o
+#            print >>sys.stderr, time.asctime(),'-', "-------------page-----------------", page, "\n" 
+#            print >>sys.stderr, time.asctime(),'-', "-------------page-----------------", pageStream, "\n"
             #try:    
             return {'statuscode':200,'mimetype': 'text/html', 'stream': pageStream, 'length': len(page)}
             
@@ -137,7 +138,7 @@ class WebIFPathMapper(AbstractPathMapper):
                     txt = "var permid = '%s';"%permid
                     dataStream = StringIO(txt)
                 except Exception,e:
-                    print >> sys.stderr, "permid.js failure:", e
+                    print >> sys.stderr, time.asctime(),'-', "permid.js failure:", e
                     return {'statuscode': 500, 'statusmsg':'Bad permid'}
 
                 return {'statuscode':200, 'mimetype':'text/javascript', 'stream':dataStream, 'length': len(txt)}
@@ -167,8 +168,8 @@ class WebIFPathMapper(AbstractPathMapper):
                 dataStream = StringIO(data)
 
 
-#                print >>sys.stderr, "-------------page-----------------", self.getContentType(extension), "\n" 
-#                print >>sys.stderr, "-------------page-----------------", dataStream, "\n"
+#                print >>sys.stderr, time.asctime(),'-', "-------------page-----------------", self.getContentType(extension), "\n" 
+#                print >>sys.stderr, time.asctime(),'-', "-------------page-----------------", dataStream, "\n"
 
                 
                 # Send response
@@ -177,7 +178,7 @@ class WebIFPathMapper(AbstractPathMapper):
             elif urlpath[6] == '?':
             
                 if DEBUG:
-                    print >>sys.stderr,"webUI: received a GET request"
+                    print >>sys.stderr,time.asctime(),'-', "webUI: received a GET request"
 
                 # It's a GET request (webUI/?..), check for json format
 
@@ -204,22 +205,22 @@ class WebIFPathMapper(AbstractPathMapper):
                 try:                    
                     args = jreq['arguments']
                     if DEBUG:
-                        print >> sys.stderr, "webUI: Got JSON request: " , jreq, "; method: ", method, "; arguments: ", args
+                        print >> sys.stderr, time.asctime(),'-', "webUI: Got JSON request: " , jreq, "; method: ", method, "; arguments: ", args
                 except:
                     args = None
                     if DEBUG:
-                        print >> sys.stderr, "webUI: Got JSON request: " , jreq, "; method: ", method
+                        print >> sys.stderr, time.asctime(),'-', "webUI: Got JSON request: " , jreq, "; method: ", method
 
 
                 if args is None:
                 # TODO check params
                     data = self.process_json_request(method)
                     if DEBUG:
-                        print >>sys.stderr, "WebUI: response to JSON ", method, " request: ", data
+                        print >>sys.stderr, time.asctime(),'-', "WebUI: response to JSON ", method, " request: ", data
                 else:
                     data = self.process_json_request(method, args)
                     if DEBUG:
-                        print >>sys.stderr, "WebUI: response to JSON ", method, " request: ", data, " arguments: ", args                    
+                        print >>sys.stderr, time.asctime(),'-', "WebUI: response to JSON ", method, " request: ", data, " arguments: ", args                    
 
                 if data == "Args missing":
                     return {'statuscode':504, 'statusmsg':'Json request in wrong format! Arguments have to be specified!'}
@@ -247,7 +248,7 @@ class WebIFPathMapper(AbstractPathMapper):
             
         
         if DEBUG:
-            print >>sys.stderr, "WebUI: received JSON request for method: ", method
+            print >>sys.stderr, time.asctime(),'-', "WebUI: received JSON request for method: ", method
         
         if method == "get_all_downloads":
 

@@ -1,3 +1,4 @@
+import time 
 # Written by Arno Bakker, George Milescu
 # see LICENSE.txt for license information
 #
@@ -42,9 +43,9 @@ class TestProxyServiceAsCoordinator(TestAsServer):
     def setUp(self):
         """ override TestAsServer """
         TestAsServer.setUp(self)
-        print >>sys.stderr,"test: Giving MyLaunchMany time to startup"
+        print >>sys.stderr,time.asctime(),'-', "test: Giving MyLaunchMany time to startup"
         time.sleep(5)
-        print >>sys.stderr,"test: MyLaunchMany should have started up"
+        print >>sys.stderr,time.asctime(),'-', "test: MyLaunchMany should have started up"
 
     def setUpPreSession(self):
         """ override TestAsServer """
@@ -128,7 +129,7 @@ class TestProxyServiceAsCoordinator(TestAsServer):
         
     def tearDown(self):
         """ override TestAsServer """
-        print >> sys.stderr,"test: *** TEARDOWN"
+        print >> sys.stderr,time.asctime(),'-', "test: *** TEARDOWN"
         TestAsServer.tearDown(self)
         self.mytracker.shutdown()
         self.tearDownMyListenSockets()
@@ -140,11 +141,11 @@ class TestProxyServiceAsCoordinator(TestAsServer):
 
 
     def states_callback(self,dslist):
-        print >>sys.stderr,"stats: dslist",len(dslist)
+        print >>sys.stderr,time.asctime(),'-', "stats: dslist",len(dslist)
         for ds in dslist:
-            print >>sys.stderr,"stats: coordinator",`ds.get_coopdl_coordinator()`
-            print >>sys.stderr,"stats: helpers",`ds.get_coopdl_helpers()`
-        print >>sys.stderr, ""
+            print >>sys.stderr,time.asctime(),'-', "stats: coordinator",`ds.get_coopdl_coordinator()`
+            print >>sys.stderr,time.asctime(),'-', "stats: helpers",`ds.get_coopdl_helpers()`
+        print >>sys.stderr, time.asctime(),'-', ""
         return (0.5,False)
 
     # Creates dictionary with the correct (good) commands used by the coordinator to test the helper
@@ -164,7 +165,7 @@ class TestProxyServiceAsCoordinator(TestAsServer):
     #
     def singtest_good_proxy(self):
         genresdict = self.get_genresdict()
-        print >> sys.stderr, "test: good ASK_FOR_HELP"
+        print >> sys.stderr, time.asctime(),'-', "test: good ASK_FOR_HELP"
         self._test_proxy(genresdict)
     
 
@@ -176,7 +177,7 @@ class TestProxyServiceAsCoordinator(TestAsServer):
         genresdict = self.get_genresdict()
         # Prepare a bad ASK_FOR_HELP message
         genresdict[ASK_FOR_HELP] = (self.create_bad_ask_for_help_no_infohash,False)
-        print >> sys.stderr, "test: bad ask_for_help"
+        print >> sys.stderr, time.asctime(),'-', "test: bad ask_for_help"
         self._test_proxy(genresdict)
         
     def singtest_bad_proxy_metadata_not_bdecodable(self):
@@ -184,7 +185,7 @@ class TestProxyServiceAsCoordinator(TestAsServer):
         genresdict = self.get_genresdict()
         # Prepare a bad METADATA message
         genresdict[METADATA] = (self.create_bad_metadata_not_bdecodable,False)
-        print >> sys.stderr, "test: bad METADATA (not bdecodable)", genresdict[METADATA][0]
+        print >> sys.stderr, time.asctime(),'-', "test: bad METADATA (not bdecodable)", genresdict[METADATA][0]
         self._test_proxy(genresdict)
 
     def singtest_bad_proxy_metadata_not_dict1(self):
@@ -192,7 +193,7 @@ class TestProxyServiceAsCoordinator(TestAsServer):
         genresdict = self.get_genresdict()
         # Prepare a bad METADATA message
         genresdict[METADATA] = (self.create_bad_metadata_not_dict1,False)
-        print >> sys.stderr, "test: bad METADATA (not a dictionary)", genresdict[METADATA][0]
+        print >> sys.stderr, time.asctime(),'-', "test: bad METADATA (not a dictionary)", genresdict[METADATA][0]
         self._test_proxy(genresdict)
 
     def singtest_bad_proxy_metadata_not_dict2(self):
@@ -200,7 +201,7 @@ class TestProxyServiceAsCoordinator(TestAsServer):
         genresdict = self.get_genresdict()
         # Prepare a bad METADATA message
         genresdict[METADATA] = (self.create_bad_metadata_not_dict2,False)
-        print >>sys.stderr,"test: bad METADATA (not a dictionary)",genresdict[METADATA][0]
+        print >>sys.stderr,time.asctime(),'-', "test: bad METADATA (not a dictionary)",genresdict[METADATA][0]
         self._test_proxy(genresdict)
 
     def singtest_bad_2fast_metadata_empty_dict(self):
@@ -208,7 +209,7 @@ class TestProxyServiceAsCoordinator(TestAsServer):
         genresdict = self.get_genresdict()
         # Prepare a bad METADATA message
         genresdict[METADATA] = (self.create_bad_metadata_empty_dict,False)
-        print >>sys.stderr,"test: bad METADATA (empty dictionary)",genresdict[METADATA][0]
+        print >>sys.stderr,time.asctime(),'-', "test: bad METADATA (empty dictionary)",genresdict[METADATA][0]
         self._test_proxy(genresdict)
 
     def singtest_bad_proxy_metadata_wrong_dict_keys(self):
@@ -216,7 +217,7 @@ class TestProxyServiceAsCoordinator(TestAsServer):
         genresdict = self.get_genresdict()
         # Prepare a bad METADATA message
         genresdict[METADATA] = (self.create_bad_metadata_wrong_dict_keys,False)
-        print >>sys.stderr,"test: bad METADATA (wrong keys in dictionary)",genresdict[METADATA][0]
+        print >>sys.stderr,time.asctime(),'-', "test: bad METADATA (wrong keys in dictionary)",genresdict[METADATA][0]
         self._test_proxy(genresdict)
 
     def singtest_bad_proxy_metadata_bad_torrent1(self):
@@ -224,7 +225,7 @@ class TestProxyServiceAsCoordinator(TestAsServer):
         genresdict = self.get_genresdict()
         # Prepare a bad METADATA message
         genresdict[METADATA] = (self.create_bad_metadata_bad_torrent1,False)
-        print >>sys.stderr,"test: bad METADATA (wrong metadata field in dictionary)",genresdict[METADATA][0]
+        print >>sys.stderr,time.asctime(),'-', "test: bad METADATA (wrong metadata field in dictionary)",genresdict[METADATA][0]
         self._test_proxy(genresdict)
 
 
@@ -233,7 +234,7 @@ class TestProxyServiceAsCoordinator(TestAsServer):
         genresdict = self.get_genresdict()
         # Prepare a bad METADATA message
         genresdict[METADATA] = (self.create_bad_metadata_bad_torrent2,False)
-        print >>sys.stderr,"test: bad METADATA (empty dictionary in metadata filed)",genresdict[METADATA][0]
+        print >>sys.stderr,time.asctime(),'-', "test: bad METADATA (empty dictionary in metadata filed)",genresdict[METADATA][0]
         self._test_proxy(genresdict)
 
     def singtest_bad_proxy_metadata_bad_torrent3(self):
@@ -241,7 +242,7 @@ class TestProxyServiceAsCoordinator(TestAsServer):
         genresdict = self.get_genresdict()
         # Prepare a bad METADATA message
         genresdict[METADATA] = (self.create_bad_metadata_bad_torrent3,False)
-        print >>sys.stderr,"test: bad METADATA (bad metadata field in dictionary)",genresdict[METADATA][0]
+        print >>sys.stderr,time.asctime(),'-', "test: bad METADATA (bad metadata field in dictionary)",genresdict[METADATA][0]
         self._test_proxy(genresdict)
 
 
@@ -265,7 +266,7 @@ class TestProxyServiceAsCoordinator(TestAsServer):
             # 3. At this point, the helper does not have the .torrent file, so it requests it with a METADATA message
             self.assert_(resp[0] == GET_METADATA)
             self.check_get_metadata(resp[1:])
-            print >>sys.stderr,"test: Got GET_METADATA for torrent, good"
+            print >>sys.stderr,time.asctime(),'-', "test: Got GET_METADATA for torrent, good"
         else:
             # Read the helper's response
             resp = ol_connection.recv()
@@ -285,7 +286,7 @@ class TestProxyServiceAsCoordinator(TestAsServer):
             # Check the helper's response
             self.assert_(resp[0] == JOIN_HELPERS)
             self.check_ask_for_help(resp)
-            print >>sys.stderr,"test: Got JOIN_HELPERS for torrent, good"
+            print >>sys.stderr,time.asctime(),'-', "test: Got JOIN_HELPERS for torrent, good"
 
             # 6. At this point, the helper will contact the tracker and then wait for REQUEST_PIECES messages 
             # So we send a request pieces message
@@ -312,7 +313,7 @@ class TestProxyServiceAsCoordinator(TestAsServer):
             s2.send(msg)
             msg = UNCHOKE
             s2.send(msg)
-            print >>sys.stderr,"test: Got BT connection to us, as fake seeder, good"
+            print >>sys.stderr,time.asctime(),'-', "test: Got BT connection to us, as fake seeder, good"
         else:
             resp = ol_connection.recv()
             self.assert_(len(resp)==0)
@@ -328,12 +329,12 @@ class TestProxyServiceAsCoordinator(TestAsServer):
         
         msg = UNCHOKE
         s3.send(msg)
-        print >>sys.stderr,"test: Got data connection to us, as coordinator, good"
+        print >>sys.stderr,time.asctime(),'-', "test: Got data connection to us, as coordinator, good"
         
         # 9. At this point the helper should sent a PROXY_HAVE message on the overlay connection
 #        resp = ol_connection.recv()
 #        self.assert_(resp[0] == PROXY_HAVE)
-#        print >>sys.stderr,"test: Got PROXY)HAVE, good"
+#        print >>sys.stderr,time.asctime(),'-', "test: Got PROXY)HAVE, good"
 
         # 10. Await REQUEST on fake seeder
         try:
@@ -344,11 +345,11 @@ class TestProxyServiceAsCoordinator(TestAsServer):
                 print "test: Fake seeder got message",getMessageName(resp[0])
                 if resp[0] == REQUEST:
                     self.check_request(resp[1:])
-                    print >>sys.stderr,"test: Fake seeder got REQUEST for reserved piece, good"
+                    print >>sys.stderr,time.asctime(),'-', "test: Fake seeder got REQUEST for reserved piece, good"
                     break
                 
         except socket.timeout:
-            print >> sys.stderr,"test: Timeout, bad, fake seeder didn't reply with message"
+            print >> sys.stderr,time.asctime(),'-', "test: Timeout, bad, fake seeder didn't reply with message"
             self.assert_(False)
         
         # 11. Sent the helper a STOP_HELPING message

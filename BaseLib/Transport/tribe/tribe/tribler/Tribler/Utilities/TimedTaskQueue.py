@@ -1,3 +1,4 @@
+import time 
 # Written by Arno Bakker
 # see LICENSE.txt for license information
 #
@@ -39,7 +40,7 @@ class TimedTaskQueue:
         self.cond.acquire()
         when = time()+t
         if DEBUG:
-            print >>sys.stderr,"ttqueue: ADD EVENT",t,task
+            print >>sys.stderr,time.asctime(),'-', "ttqueue: ADD EVENT",t,task
             
         if id != None:  # remove all redundant tasks
             self.queue = filter(lambda item:item[2]!=id, self.queue)
@@ -69,18 +70,18 @@ class TimedTaskQueue:
                 
                 (when,count,task,id) = self.queue[0]
                 if DEBUG:
-                    print >>sys.stderr,"ttqueue: EVENT IN QUEUE",when,task
+                    print >>sys.stderr,time.asctime(),'-', "ttqueue: EVENT IN QUEUE",when,task
                 now = time()
                 if now < when:
                     # Event not due, wait some more
                     if DEBUG:
-                        print >>sys.stderr,"ttqueue: EVENT NOT TILL",when-now
+                        print >>sys.stderr,time.asctime(),'-', "ttqueue: EVENT NOT TILL",when-now
                     timeout = when-now
                     flag = True
                 else:
                     # Event due, execute
                     if DEBUG:
-                        print >>sys.stderr,"ttqueue: EVENT DUE"
+                        print >>sys.stderr,time.asctime(),'-', "ttqueue: EVENT DUE"
                     self.queue.pop(0)
                     break
             self.cond.release()

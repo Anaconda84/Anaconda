@@ -1,3 +1,4 @@
+import time 
 # Written by Arno Bakker
 # see LICENSE.txt for license information
 #
@@ -32,9 +33,9 @@ class TestG2G(TestAsServer):
     def setUp(self):
         """ override TestAsServer """
         TestAsServer.setUp(self)
-        print >>sys.stderr,"test: Giving MyLaunchMany time to startup"
+        print >>sys.stderr,time.asctime(),'-', "test: Giving MyLaunchMany time to startup"
         time.sleep(3)
-        print >>sys.stderr,"test: MyLaunchMany should have started up"
+        print >>sys.stderr,time.asctime(),'-', "test: MyLaunchMany should have started up"
     
     def setUpPostSession(self):
         """ override TestAsServer """
@@ -116,7 +117,7 @@ class TestG2G(TestAsServer):
             self.assert_(resp[0] == EXTEND)
             self.check_tribler_extend_hs_v2(resp[1:])
         except socket.timeout:
-            print >> sys.stderr,"test: Timeout, bad, peer didn't reply with EXTEND HS message"
+            print >> sys.stderr,time.asctime(),'-', "test: Timeout, bad, peer didn't reply with EXTEND HS message"
             self.assert_(False)
 
         # Tribler should send an g2g_v2 message after a while
@@ -139,7 +140,7 @@ class TestG2G(TestAsServer):
                     s.close()
                     break
         except socket.timeout:
-            print >> sys.stderr,"test: Timeout, bad, peer didn't reply with EXTEND g2g_v2 message"
+            print >> sys.stderr,time.asctime(),'-', "test: Timeout, bad, peer didn't reply with EXTEND g2g_v2 message"
             self.assert_(False)
 
         
@@ -177,7 +178,7 @@ class TestG2G(TestAsServer):
         self.assert_(data[0] == chr(g2g_id))
         d = bdecode(data[1:])
         
-        print >>sys.stderr,"test: l is",`d`
+        print >>sys.stderr,time.asctime(),'-', "test: l is",`d`
         
         self.assert_(type(d) == DictType)
         for k,v in d.iteritems():
@@ -208,7 +209,7 @@ class TestG2G(TestAsServer):
     def _test_bad(self,gen_drequest_func):
         options = '\x00\x00\x00\x00\x00\x10\x00\x00'
         s = BTConnection('localhost',self.hisport,user_option_pattern=options,user_infohash=self.infohash)
-        print >> sys.stderr,"\ntest: ",gen_drequest_func
+        print >> sys.stderr,time.asctime(),'-', "\ntest: ",gen_drequest_func
         
         hsmsg = self.create_good_tribler_extend_hs_v2()
         s.send(hsmsg)
@@ -224,14 +225,14 @@ class TestG2G(TestAsServer):
             while True:
                 resp = s.recv()
                 if len(resp) > 0:
-                    print >>sys.stderr,"test: Got",getMessageName(resp[0]),"from peer"
+                    print >>sys.stderr,time.asctime(),'-', "test: Got",getMessageName(resp[0]),"from peer"
                     self.assert_(resp[0] == EXTEND or resp[0]==UNCHOKE)
                 else:
                     self.assert_(len(resp)==0)
                     s.close()
                     break
         except socket.timeout:
-            print >> sys.stderr,"test: Timeout, bad, peer didn't close connection"
+            print >> sys.stderr,time.asctime(),'-', "test: Timeout, bad, peer didn't close connection"
             self.assert_(False)
 
     #

@@ -1,3 +1,4 @@
+import time 
 # Written by Boudewijn Schoon
 # see LICENSE.txt for license information
 
@@ -36,7 +37,7 @@ class TestSeedingStats(TestCrawler):
         Send a CRAWLER_SEEDINGSTATS_QUERY message to the Tribler
         instance. Execute an invalid SQL query.
         """
-        print >>sys.stderr, "-"*80, "\ntest: subtest_invalid_query"
+        print >>sys.stderr, time.asctime(),'-', "-"*80, "\ntest: subtest_invalid_query"
 
         # make sure that the OLConnection IS in the crawler_db
         crawler_db = CrawlerDBHandler.getInstance()
@@ -51,7 +52,7 @@ class TestSeedingStats(TestCrawler):
             error, payload = self.receive_crawler_reply(s, CRAWLER_SEEDINGSTATS_QUERY, 0)
             assert error != 0, error
             if DEBUG:
-                print >>sys.stderr, "test_seeding_stats:", payload
+                print >>sys.stderr, time.asctime(),'-', "test_seeding_stats:", payload
 
 #        time.sleep(1)
         
@@ -60,7 +61,7 @@ class TestSeedingStats(TestCrawler):
         Send a CRAWLER_SEEDINGSTATS_QUERY message to the Tribler
         instance. Execute a valid SQL query.
         """
-        print >>sys.stderr, "-"*80, "\ntest: subtest_valid_query"
+        print >>sys.stderr, time.asctime(),'-', "-"*80, "\ntest: subtest_valid_query"
 
         # make sure that the OLConnection IS in the crawler_db
         crawler_db = CrawlerDBHandler.getInstance()
@@ -80,7 +81,7 @@ class TestSeedingStats(TestCrawler):
             assert error == 0, (error, payload)
 
             if DEBUG:
-                print >>sys.stderr, "test_seeding_stats:", cPickle.loads(payload)
+                print >>sys.stderr, time.asctime(),'-', "test_seeding_stats:", cPickle.loads(payload)
 
 #        time.sleep(1)
 

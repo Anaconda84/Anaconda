@@ -1,3 +1,4 @@
+import time 
 # Written by Boudewijn Schoon
 # see LICENSE.txt for license information
 
@@ -147,7 +148,7 @@ class Crawler:
             # create a buffer to receive the reply
             channels[channel_id] = [time.time() + CHANNEL_TIMEOUT, "", channel_data]
 
-        # print >>sys.stderr, "crawler: _acquire_channel_id:", show_permid_short(permid), len(channels), "channels used"
+        # print >>sys.stderr, time.asctime(),'-', "crawler: _acquire_channel_id:", show_permid_short(permid), len(channels), "channels used"
 
         # a valid channel-id or 0 when no channel-id is left
         return channel_id
@@ -204,16 +205,16 @@ class Crawler:
             self._post_connection_attempt(permid, not exc)
             if exc:
                 # could not connect.
-                if DEBUG: print >>sys.stderr, "crawler: could not connect", dns, show_permid_short(permid), exc
+                if DEBUG: print >>sys.stderr, time.asctime(),'-', "crawler: could not connect", dns, show_permid_short(permid), exc
                 self._release_channel_id(permid, channel_id)
                 if callback:
                     callback(exc, permid)
             else:
                 self._send_request(permid, message_id, channel_id, payload, frequency=frequency, callback=callback)
 
-#         if DEBUG: print >>sys.stderr, "crawler: connecting (send_request)...", show_permid_short(permid)
+#         if DEBUG: print >>sys.stderr, time.asctime(),'-', "crawler: connecting (send_request)...", show_permid_short(permid)
         if channel_id == 0:
-            if DEBUG: print >>sys.stderr, "crawler: send_request: Can not acquire channel-id", show_permid_short(permid)
+            if DEBUG: print >>sys.stderr, time.asctime(),'-', "crawler: send_request: Can not acquire channel-id", show_permid_short(permid)
         else:
             self._overlay_bridge.connect(permid, _after_connect)
         return channel_id
@@ -240,7 +241,7 @@ class Crawler:
         def _after_send_request(exc, permid):
             if DEBUG:
                 if exc:
-                    print >> sys.stderr, "crawler: could not send request to", show_permid_short(permid), exc
+                    print >> sys.stderr, time.asctime(),'-', "crawler: could not send request to", show_permid_short(permid), exc
             if exc:
                 self._release_channel_id(permid, channel_id)
 
@@ -248,7 +249,7 @@ class Crawler:
             if callback:
                 callback(exc, permid)
 
-        if DEBUG: print >> sys.stderr, "crawler: sending", getMessageName(CRAWLER_REQUEST+message_id), "with", len(payload), "bytes payload to", show_permid_short(permid)
+        if DEBUG: print >> sys.stderr, time.asctime(),'-', "crawler: sending", getMessageName(CRAWLER_REQUEST+message_id), "with", len(payload), "bytes payload to", show_permid_short(permid)
         self._overlay_bridge.send(permid, "".join((CRAWLER_REQUEST,
                                                    message_id,
                                                    chr(channel_id & 0xFF),
@@ -320,13 +321,13 @@ class Crawler:
             self._post_connection_attempt(permid, not exc)
             if exc:
                 # could not connect.
-                if DEBUG: print >>sys.stderr, "crawler: could not connect", dns, show_permid_short(permid), exc
+                if DEBUG: print >>sys.stderr, time.asctime(),'-', "crawler: could not connect", dns, show_permid_short(permid), exc
                 if callback:
                     callback(exc, permid)
             else:
                 self._send_reply(permid, message_id, channel_id, payload, error=error, callback=callback)
 
-#         if DEBUG: print >>sys.stderr, "crawler: connecting... (send_reply)", show_permid_short(permid)
+#         if DEBUG: print >>sys.stderr, time.asctime(),'-', "crawler: connecting... (send_reply)", show_permid_short(permid)
         self._overlay_bridge.connect(permid, _after_connect)
 
     def _send_reply(self, permid, message_id, channel_id, payload, error=0, callback=None):
@@ -358,7 +359,7 @@ class Crawler:
                 Called after the overlay attempted to send a reply message
                 """
                 if DEBUG:
-                    print >> sys.stderr, "crawler: _after_send_reply", show_permid_short(permid), exc
+                    print >> sys.stderr, time.asctime(),'-', "crawler: _after_send_reply", show_permid_short(permid), exc
                 if not exc:
                     self.send_reply(permid, message_id, channel_id, remaining_payload, error=error)
                 # call the optional callback supplied with send_request
@@ -376,7 +377,7 @@ class Crawler:
             def _after_send_reply(exc, permid):
                 if DEBUG:
                     if exc:
-                        print >> sys.stderr, "crawler: could not send request", show_permid_short(permid), exc
+                        print >> sys.stderr, time.asctime(),'-', "crawler: could not send request", show_permid_short(permid), exc
                 # call the optional callback supplied with send_request
                 if callback:
                     callback(exc, permid)
@@ -390,7 +391,7 @@ class Crawler:
                 if not self._channels[permid]:
                     del self._channels[permid]
 
-        if DEBUG: print >> sys.stderr, "crawler: sending", getMessageName(CRAWLER_REPLY+message_id), "with", len(payload), "bytes payload to", show_permid_short(permid)
+        if DEBUG: print >> sys.stderr, time.asctime(),'-', "crawler: sending", getMessageName(CRAWLER_REPLY+message_id), "with", len(payload), "bytes payload to", show_permid_short(permid)
         self._overlay_bridge.send(permid, "".join((CRAWLER_REPLY,
                                                    message_id,
                                                    chr(channel_id & 0xFF),
@@ -422,7 +423,7 @@ class Crawler:
                     # after a time (in case connection is lost before
                     # all parts are received)
 
-                    if DEBUG: print >> sys.stderr, "crawler: received", getMessageName(CRAWLER_REPLY+message_id), "with", len(message), "bytes payload from", show_permid_short(permid), "with", parts_left, "parts left"
+                    if DEBUG: print >> sys.stderr, time.asctime(),'-', "crawler: received", getMessageName(CRAWLER_REPLY+message_id), "with", len(message), "bytes payload from", show_permid_short(permid), "with", parts_left, "parts left"
                     # Can't do anything until all parts have been received
                     return True
                 else:
@@ -431,12 +432,12 @@ class Crawler:
                         if error == 253:
                             # unknown message error (probably because
                             # the crawler is newer than the peer)
-                            print >> sys.stderr, "crawler: received", getMessageName(CRAWLER_REPLY+message_id), "with", len(message), "bytes payload from", show_permid_short(permid), "indicating an unknown message error"
+                            print >> sys.stderr, time.asctime(),'-', "crawler: received", getMessageName(CRAWLER_REPLY+message_id), "with", len(message), "bytes payload from", show_permid_short(permid), "indicating an unknown message error"
                         if error == 254:
                             # frequency error (we did this request recently)
-                            print >> sys.stderr, "crawler: received", getMessageName(CRAWLER_REPLY+message_id), "with", len(message), "bytes payload from", show_permid_short(permid), "indicating a frequency error"
+                            print >> sys.stderr, time.asctime(),'-', "crawler: received", getMessageName(CRAWLER_REPLY+message_id), "with", len(message), "bytes payload from", show_permid_short(permid), "indicating a frequency error"
                         else:
-                            print >> sys.stderr, "crawler: received", getMessageName(CRAWLER_REPLY+message_id), "with", len(payload), "bytes payload from", show_permid_short(permid)
+                            print >> sys.stderr, time.asctime(),'-', "crawler: received", getMessageName(CRAWLER_REPLY+message_id), "with", len(payload), "bytes payload from", show_permid_short(permid)
                     if not self._channels[permid]:
                         del self._channels[permid]
 
@@ -453,14 +454,14 @@ class Crawler:
                     return True
             else:
                 # reply from unknown permid or channel
-                if DEBUG: print >> sys.stderr, "crawler: received", getMessageName(CRAWLER_REPLY+message_id), "with", len(payload), "bytes payload from", show_permid_short(permid), "from unknown peer or unused channel"
+                if DEBUG: print >> sys.stderr, time.asctime(),'-', "crawler: received", getMessageName(CRAWLER_REPLY+message_id), "with", len(payload), "bytes payload from", show_permid_short(permid), "from unknown peer or unused channel"
                 
         if DEBUG:
             if len(message) >= 2:
                 message_id = message[1]
             else:
                 message_id = ""
-            print >> sys.stderr, "crawler: received", getMessageName(CRAWLER_REPLY+message_id), "with", len(message), "bytes from", show_permid_short(permid), "from unknown peer or unused channel"
+            print >> sys.stderr, time.asctime(),'-', "crawler: received", getMessageName(CRAWLER_REPLY+message_id), "with", len(message), "bytes from", show_permid_short(permid), "from unknown peer or unused channel"
         return False
 
     def handle_connection(self, exc, permid, selversion, locally_initiated):
@@ -472,8 +473,8 @@ class Crawler:
         if exc:
             # connection lost
             if DEBUG:
-                print >>sys.stderr, "crawler: overlay connection lost", show_permid_short(permid), exc
-                print >>sys.stderr, repr(permid)
+                print >>sys.stderr, time.asctime(),'-', "crawler: overlay connection lost", show_permid_short(permid), exc
+                print >>sys.stderr, time.asctime(),'-', repr(permid)
 
         elif selversion >= OLPROTO_VER_SEVENTH:
             # verify that we do not already have deadlines for this permid
@@ -485,8 +486,8 @@ class Crawler:
 
             if not already_known:
                 if DEBUG:
-                    print >>sys.stderr, "crawler: new overlay connection", show_permid_short(permid)
-                    print >>sys.stderr, repr(permid)
+                    print >>sys.stderr, time.asctime(),'-', "crawler: new overlay connection", show_permid_short(permid)
+                    print >>sys.stderr, time.asctime(),'-', repr(permid)
                 for initiator_callback, frequency, accept_frequency in self._crawl_initiators:
                     self._initiator_deadlines.append([0, frequency, accept_frequency, initiator_callback, permid, selversion, 0])
 
@@ -496,8 +497,8 @@ class Crawler:
                 self._check_deadlines(False)
         else:
             if DEBUG:
-                print >>sys.stderr, "crawler: new overlay connection (can not use version %d)" % selversion, show_permid_short(permid)
-                print >>sys.stderr, repr(permid)
+                print >>sys.stderr, time.asctime(),'-', "crawler: new overlay connection (can not use version %d)" % selversion, show_permid_short(permid)
+                print >>sys.stderr, time.asctime(),'-', repr(permid)
             
     def _check_deadlines(self, resubmit):
         """
@@ -534,9 +535,9 @@ class Crawler:
             def _after_connect(exc, dns, permid, selversion):
                 if DEBUG:
                     if exc:
-                        print >>sys.stderr, "crawler: dialback to crawler failed", dns, show_permid_short(permid), exc
+                        print >>sys.stderr, time.asctime(),'-', "crawler: dialback to crawler failed", dns, show_permid_short(permid), exc
                     else:
-                        print >>sys.stderr, "crawler: dialback to crawler established", dns, show_permid_short(permid)
+                        print >>sys.stderr, time.asctime(),'-', "crawler: dialback to crawler established", dns, show_permid_short(permid)
 
             for message_id, (deadline, permid) in self._dialback_deadlines.items():
                 if now > deadline + FREQUENCY_FLEXIBILITY:

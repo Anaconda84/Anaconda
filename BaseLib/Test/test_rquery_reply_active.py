@@ -1,3 +1,4 @@
+import time 
 # Written by Arno Bakker
 # see LICENSE.txt for license information
 
@@ -40,9 +41,9 @@ class TestQueryReplyActive(TestAsServer):
 
     def setUpPreSession(self):
         """ override TestAsServer """
-        print >> sys.stderr,"test: Pre Tribler Init"
+        print >> sys.stderr,time.asctime(),'-', "test: Pre Tribler Init"
         TestAsServer.setUpPreSession(self)
-        print >> sys.stderr,"test: Pre Tribler Init: config_path",self.config_path
+        print >> sys.stderr,time.asctime(),'-', "test: Pre Tribler Init: config_path",self.config_path
         # Enable remote querying
         self.config.set_remote_query(True)
 
@@ -79,7 +80,7 @@ class TestQueryReplyActive(TestAsServer):
 
     def query_usercallback(self,permid,query,hits):
         
-        print >>sys.stderr,"test: query_usercallback:",`permid`,`query`,`hits`
+        print >>sys.stderr,time.asctime(),'-', "test: query_usercallback:",`permid`,`query`,`hits`
         
         self.assert_(query == self.query)
         self.assert_(permid == self.my_permid)
@@ -139,17 +140,17 @@ class TestQueryReplyActive(TestAsServer):
     # Main test code
     #
     def _test_qreply(self,gen_qreply,good):
-        print >> sys.stderr,"test: waiting for reply"
+        print >> sys.stderr,time.asctime(),'-', "test: waiting for reply"
         s = self.openconn
 
         msg = s.recv()
         self.assert_(len(msg) > 0)
-        print >> sys.stderr,"test: Received overlay message",getMessageName(msg[0])
+        print >> sys.stderr,time.asctime(),'-', "test: Received overlay message",getMessageName(msg[0])
         self.assert_(msg[0] == QUERY)
         id = self.check_rquery(msg[1:])
         
         resp = gen_qreply(id)
-        print >> sys.stderr,"test: sending QUERY_REPLY"
+        print >> sys.stderr,time.asctime(),'-', "test: sending QUERY_REPLY"
         s.send(resp)
         if good:
             time.sleep(10)

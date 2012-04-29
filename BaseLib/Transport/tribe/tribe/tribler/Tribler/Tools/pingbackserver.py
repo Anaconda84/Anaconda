@@ -1,3 +1,4 @@
+import time 
 # Written by Lucia D'Acunto
 # see LICENSE.txt for license information
 
@@ -28,12 +29,12 @@ def serveclient(message, udpsock, clientaddr):
     if data[0] == "ping":
 
         if DEBUG:
-            print >> sys.stderr, "received ping with delay", data[1], "from", clientaddr
+            print >> sys.stderr, time.asctime(),'-', "received ping with delay", data[1], "from", clientaddr
 
         time.sleep(int(data[1]))
 
         if DEBUG:
-            print >> sys.stderr, "sending pong back after", data[1], "seconds", "to", clientaddr
+            print >> sys.stderr, time.asctime(),'-', "sending pong back after", data[1], "seconds", "to", clientaddr
 
         pongMsg = (str("pong:"+data[1]))
         udpsock.sendto(pongMsg, clientaddr)
@@ -55,7 +56,7 @@ if __name__=="__main__" :
 
     except ValueError, strerror :
         if DEBUG:
-            print >> sys.stderr, "ValueError: ", strerror
+            print >> sys.stderr, time.asctime(),'-', "ValueError: ", strerror
         usage()
         sys.exit(1)
 
@@ -72,14 +73,14 @@ if __name__=="__main__" :
             udpsock.close()
 
         if DEBUG:
-            print >> sys.stderr, "Could not open socket: %s" % (strerror)
+            print >> sys.stderr, time.asctime(),'-', "Could not open socket: %s" % (strerror)
         sys.stdout.flush()
 
         sys.exit(1)
 
     
     if DEBUG:
-        print >> sys.stderr, "waiting for connection..."
+        print >> sys.stderr, time.asctime(),'-', "waiting for connection..."
 
     # Loop forever receiving pings and sending pongs
     while True: 
@@ -93,7 +94,7 @@ if __name__=="__main__" :
         except error:
             continue
 
-        print >> sys.stderr, time.strftime("%Y/%m/%d %H:%M:%S"), "...connected from:", clientaddr
+        print >> sys.stderr, time.asctime(),'-', time.strftime("%Y/%m/%d %H:%M:%S"), "...connected from:", clientaddr
         log.write("%i %s %i\n" % (time.time(), str(clientaddr[0]), clientaddr[1]))
         log.flush()
 

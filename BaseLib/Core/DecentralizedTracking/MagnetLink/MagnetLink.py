@@ -1,3 +1,4 @@
+import time 
 # Written by Boudewijn Schoon
 # see LICENSE.txt for license information
 """
@@ -176,7 +177,7 @@ class MagnetLink:
         xt = None
         tr = None
 
-        if DEBUG: print >> sys.stderr, "Magnet._parse_url()", url
+        if DEBUG: print >> sys.stderr, time.asctime(),'-', "Magnet._parse_url()", url
 
         schema, netloc, path, query, fragment = urlsplit(url)
         if schema == "magnet":
@@ -201,8 +202,8 @@ class MagnetLink:
                 elif key == "tr":
                     tr = value
 
-            if DEBUG: print >> sys.stderr, "Magnet._parse_url() NAME:", dn
-            if DEBUG: print >> sys.stderr, "Magnet._parse_url() HASH:", xt
-            if DEBUG: print >> sys.stderr, "Magnet._parse_url() TRAC:", tr
+            if DEBUG: print >> sys.stderr, time.asctime(),'-', "Magnet._parse_url() NAME:", dn
+            if DEBUG: print >> sys.stderr, time.asctime(),'-', "Magnet._parse_url() HASH:", xt
+            if DEBUG: print >> sys.stderr, time.asctime(),'-', "Magnet._parse_url() TRAC:", tr
 
         return (dn, xt, tr)

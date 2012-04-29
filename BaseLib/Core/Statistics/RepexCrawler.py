@@ -1,3 +1,4 @@
+import time 
 # Based on DatabaseCrawler.py written by Boudewijn Schoon
 # Modified by Raynor Vliegendhart
 # see LICENSE.txt for license information
@@ -52,7 +53,7 @@ class RepexCrawler:
         @param selversion The overlay protocol version
         @param request_callback Call this function one or more times to send the requests: request_callback(message_id, payload)
         """
-        if DEBUG: print >>sys.stderr, "repexcrawler: query_initiator", show_permid_short(permid)
+        if DEBUG: print >>sys.stderr, time.asctime(),'-', "repexcrawler: query_initiator", show_permid_short(permid)
         
         request_callback(CRAWLER_REPEX_QUERY, '', callback=self._after_request_callback)
 
@@ -62,7 +63,7 @@ class RepexCrawler:
         call in the query_initiator method.
         """
         if not exc:
-            if DEBUG: print >>sys.stderr, "repexcrawler: request sent to", show_permid_short(permid)
+            if DEBUG: print >>sys.stderr, time.asctime(),'-', "repexcrawler: request sent to", show_permid_short(permid)
             self._file.write("; ".join((strftime("%Y/%m/%d %H:%M:%S"), "REQUEST", show_permid(permid), "\n")))
             self._file.flush()
 
@@ -76,7 +77,7 @@ class RepexCrawler:
         @param reply_callback Call this function once to send the reply: reply_callback(payload [, error=123])
         """
         if DEBUG:
-            print >> sys.stderr, "repexcrawler: handle_crawler_request", show_permid_short(permid), message
+            print >> sys.stderr, time.asctime(),'-', "repexcrawler: handle_crawler_request", show_permid_short(permid), message
 
         # retrieve repex history
         try:
@@ -99,14 +100,14 @@ class RepexCrawler:
         """
         if error:
             if DEBUG:
-                print >> sys.stderr, "repexcrawler: handle_crawler_reply", error, message
+                print >> sys.stderr, time.asctime(),'-', "repexcrawler: handle_crawler_reply", error, message
 
             self._file.write("; ".join((strftime("%Y/%m/%d %H:%M:%S"), "  REPLY", show_permid(permid), str(error), message, "\n")))
             self._file.flush()
 
         else:
             if DEBUG:
-                print >> sys.stderr, "repexcrawler: handle_crawler_reply", show_permid_short(permid), cPickle.loads(message)
+                print >> sys.stderr, time.asctime(),'-', "repexcrawler: handle_crawler_reply", show_permid_short(permid), cPickle.loads(message)
             
             # The message is pickled, which we will just write to file.
             # To make later parsing easier, we base64 encode it

@@ -1,3 +1,4 @@
+import time 
 # Written by Jan David Mol, Arno Bakker
 # see LICENSE.txt for license information
 
@@ -119,7 +120,7 @@ class VideoStatus:
             return self.piecelen
 
     def set_bitrate( self, bitrate ):
-        #print >>sys.stderr,"vodstatus: set_bitrate",bitrate
+        #print >>sys.stderr,time.asctime(),'-', "vodstatus: set_bitrate",bitrate
         self.bitrate_set = True
         self.bitrate = bitrate
         self.sec_per_piece = 1.0 * bitrate / self.piecelen
@@ -131,7 +132,7 @@ class VideoStatus:
             else:
                 oldrange = self.live_get_valid_range()
             if DEBUG:
-                print >>sys.stderr,"vodstatus: set_live_pos: old",oldrange
+                print >>sys.stderr,time.asctime(),'-', "vodstatus: set_live_pos: old",oldrange
         self.live_startpos = pos
         self.playback_pos = pos
         for o in self.playback_pos_observers:
@@ -140,7 +141,7 @@ class VideoStatus:
         if self.wraparound:
             newrange = self.live_get_valid_range()
             if DEBUG:
-                print >>sys.stderr,"vodstatus: set_live_pos: new",newrange
+                print >>sys.stderr,time.asctime(),'-', "vodstatus: set_live_pos: new",newrange
             return self.get_range_diff(oldrange,newrange)
         else:
             return (Set(),[])
@@ -212,7 +213,7 @@ class VideoStatus:
                 (begin,end) = self.live_get_valid_range()
                 ret = self.in_range(begin,end,piece)
                 if ret == False:
-                    print >>sys.stderr,"vod: status: NOT in_valid_range:",begin,"<",piece,"<",end
+                    print >>sys.stderr,time.asctime(),'-', "vod: status: NOT in_valid_range:",begin,"<",piece,"<",end
                 return ret
         else:
             return self.first_piece <= piece <= self.last_piece
@@ -223,7 +224,7 @@ class VideoStatus:
         return (begin,end)
         
     def live_piece_to_invalidate(self):
-        #print >>sys.stderr,"vod: live_piece_to_inval:",self.playback_pos,self.wraparound_delta,self.movie_numpieces
+        #print >>sys.stderr,time.asctime(),'-', "vod: live_piece_to_inval:",self.playback_pos,self.wraparound_delta,self.movie_numpieces
         return self.normalize(self.playback_pos - self.wraparound_delta)
 
     def get_range_diff(self,oldrange,newrange):
@@ -236,14 +237,14 @@ class VideoStatus:
                 # 100-500, diff is 0-99 + 501-7200
                 a = (oldrange[0],newrange[0]-1)
                 b = (newrange[1]+1,oldrange[1])
-                #print >>sys.stderr,"get_range_diff: ranges",a,b
+                #print >>sys.stderr,time.asctime(),'-', "get_range_diff: ranges",a,b
                 rlist = [a,b]
                 return (None,rlist)
                 #return Set(range(a[0],a[1]) + range(b[0],b[1]))
             else:
                 # 500-100, diff is 101-499
                 a = (newrange[1]+1,newrange[0]-1)
-                #print >>sys.stderr,"get_range_diff: range",a
+                #print >>sys.stderr,time.asctime(),'-', "get_range_diff: range",a
                 rlist = [a]
                 return (None,rlist)
                 #return Set(xrange(a[0],a[1]))
@@ -302,7 +303,7 @@ class VideoStatus:
         if self.high_prob_curr_pieces > self.high_prob_curr_pieces_limit[1]:
             self.high_prob_curr_pieces = self.high_prob_curr_pieces_limit[1]
 
-        if DEBUG: print >>sys.stderr, "VideoStatus:increase_high_range", self.high_prob_curr_time, "seconds or", self.high_prob_curr_pieces, "pieces"
+        if DEBUG: print >>sys.stderr, time.asctime(),'-', "VideoStatus:increase_high_range", self.high_prob_curr_time, "seconds or", self.high_prob_curr_pieces, "pieces"
 
     def decrease_high_range(self, factor=1):
         """
@@ -317,7 +318,7 @@ class VideoStatus:
         if self.high_prob_curr_pieces < self.high_prob_curr_pieces_limit[0]:
             self.high_prob_curr_pieces = self.high_prob_curr_pieces_limit[0]
 
-        if DEBUG: print >>sys.stderr, "VideoStatus:decrease_high_range", self.high_prob_curr_time, "seconds or", self.high_prob_curr_pieces, "pieces"
+        if DEBUG: print >>sys.stderr, time.asctime(),'-', "VideoStatus:decrease_high_range", self.high_prob_curr_time, "seconds or", self.high_prob_curr_pieces, "pieces"
 
     def set_high_range(self, seconds=None, pieces=None):
         """

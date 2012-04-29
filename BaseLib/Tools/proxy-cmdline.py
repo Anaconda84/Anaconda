@@ -1,3 +1,4 @@
+import time 
 # Written by Arno Bakker, George Milescu 
 # see LICENSE.txt for license information
 #
@@ -72,8 +73,8 @@ def print_version():
 # Print torrent statistics
 def state_callback(ds):
     d = ds.get_download()
-#    print >>sys.stderr,`d.get_def().get_name()`,dlstatus_strings[ds.get_status()],ds.get_progress(),"%",ds.get_error(),"up",ds.get_current_speed(UPLOAD),"down",ds.get_current_speed(DOWNLOAD)
-    print >>sys.stderr, '%s %s %5.2f%% %s up %8.2fKB/s down %8.2fKB/s' % \
+#    print >>sys.stderr,time.asctime(),'-', `d.get_def().get_name()`,dlstatus_strings[ds.get_status()],ds.get_progress(),"%",ds.get_error(),"up",ds.get_current_speed(UPLOAD),"down",ds.get_current_speed(DOWNLOAD)
+    print >>sys.stderr, time.asctime(),'-', '%s %s %5.2f%% %s up %8.2fKB/s down %8.2fKB/s' % \
             (d.get_def().get_name(), \
             dlstatus_strings[ds.get_status()], \
             ds.get_progress() * 100, \

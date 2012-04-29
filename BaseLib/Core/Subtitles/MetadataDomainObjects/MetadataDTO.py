@@ -1,3 +1,4 @@
+import time 
 # Written by Andrea Reale
 # see LICENSE.txt for license information
 
@@ -230,7 +231,7 @@ class MetadataDTO(object):
                     sub.computueCheksum()
                 else :
                     if DEBUG:
-                        print >> sys.stderr, "Warning: Cannot get checksum for " + sub.lang \
+                        print >> sys.stderr, time.asctime(),'-', "Warning: Cannot get checksum for " + sub.lang \
                                 +" subtitle. Skipping it."
                     continue
             languagesList.append(sub.lang)

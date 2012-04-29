@@ -1,3 +1,4 @@
+import time 
 # Written by Arno Bakker
 # see LICENSE.txt for license information
 
@@ -54,7 +55,7 @@ class TestBuddyCastMsg(TestAsServer):
         self.myhash = sha(self.mypermid).digest()
 
         # Give Tribler some download history
-        print >>sys.stderr,"test: Populating MYPREFERENCES table"
+        print >>sys.stderr,time.asctime(),'-', "test: Populating MYPREFERENCES table"
         self.myprefdb = self.session.open_dbhandler(NTFY_MYPREFERENCES)
         data = {'destination_path':'.'}
         infohashes = self.create_good_my_prefs(self,btconn.current_version)
@@ -63,7 +64,7 @@ class TestBuddyCastMsg(TestAsServer):
             self.myprefdb.addMyPreference(infohashes[i], data, commit=commit)
 
         # Give Tribler some peers
-        print >>sys.stderr,"test: Populating PEERS table"
+        print >>sys.stderr,time.asctime(),'-', "test: Populating PEERS table"
         self.peerdb = self.session.open_dbhandler(NTFY_PEERS)
         past = int(time.time())-1000000000
         peers = self.create_good_random_peers(btconn.current_version,num=200)
@@ -130,7 +131,7 @@ class TestBuddyCastMsg(TestAsServer):
         """ 
             test good BUDDYCAST messages
         """
-        print >>sys.stderr,"test: good BUDDYCAST",oversion
+        print >>sys.stderr,time.asctime(),'-', "test: good BUDDYCAST",oversion
         s = OLConnection(self.my_keypair,'localhost',self.hisport,myoversion=oversion)
         msg = self.create_good_buddycast_payload(oversion)
         s.send(msg)
@@ -140,7 +141,7 @@ class TestBuddyCastMsg(TestAsServer):
             while True:
                 resp = s.recv()
                 self.assert_(len(resp) > 0)
-                print >>sys.stderr,"test: good BUDDYCAST: Got reply",getMessageName(resp[0])
+                print >>sys.stderr,time.asctime(),'-', "test: good BUDDYCAST: Got reply",getMessageName(resp[0])
                 if resp[0] == BUDDYCAST:
                     break
                 elif resp[0] == GET_METADATA:
@@ -149,10 +150,10 @@ class TestBuddyCastMsg(TestAsServer):
                     if oversion >= 3:
                         self.check_keep_alive(resp[1:])
                     else:
-                        print >> sys.stderr,"test: Tribler sent KEEP_ALIVE, not allowed in olproto ver",oversion
+                        print >> sys.stderr,time.asctime(),'-', "test: Tribler sent KEEP_ALIVE, not allowed in olproto ver",oversion
                         self.assert_(False)
         except socket.timeout:
-            print >> sys.stderr,"test: Timeout, bad, peer didn't reply with BUDDYCAST message"
+            print >> sys.stderr,time.asctime(),'-', "test: Timeout, bad, peer didn't reply with BUDDYCAST message"
             self.assert_(False)
 
         self.check_buddycast(resp[1:],oversion)
@@ -190,7 +191,7 @@ class TestBuddyCastMsg(TestAsServer):
             d['nfiles'] = 4027
             d['ndls'] = 4553
 
-        #print >>sys.stderr,"test: Sending",`d`
+        #print >>sys.stderr,time.asctime(),'-', "test: Sending",`d`
         
         return d
 
@@ -244,8 +245,8 @@ class TestBuddyCastMsg(TestAsServer):
     def check_buddycast(self,data,oversion):
         d = bdecode(data)
         
-        print >>sys.stderr,"test: Got BUDDYCAST",d.keys()
-        #print >>sys.stderr,"test: Got CONTENT",`d`
+        print >>sys.stderr,time.asctime(),'-', "test: Got BUDDYCAST",d.keys()
+        #print >>sys.stderr,time.asctime(),'-', "test: Got CONTENT",`d`
         
         self.assert_(type(d) == DictType)
         self.assert_('ip' in d)
@@ -263,7 +264,7 @@ class TestBuddyCastMsg(TestAsServer):
                                 )
         if oversion >= 3:
             self.assert_('connectable' in d)
-            #print >>sys.stderr,"CONNECTABLE TYPE",type(d['connectable'])
+            #print >>sys.stderr,time.asctime(),'-', "CONNECTABLE TYPE",type(d['connectable'])
             self.assert_(type(d['connectable']) == IntType)
         if oversion >= 4:
             self.assert_('collected torrents' in d)
@@ -364,7 +365,7 @@ class TestBuddyCastMsg(TestAsServer):
             self.make_bad_preferences,
             self.make_bad_collected_torrents]
         for method in methods:
-            print >> sys.stderr,"\ntest: ",method,
+            print >> sys.stderr,time.asctime(),'-', "\ntest: ",method,
             self._test_bad(method)
         
         
@@ -404,7 +405,7 @@ class TestBuddyCastMsg(TestAsServer):
             d['taste buddies'] = method()
             func = lambda:self.create_payload(d)
             
-            print >> sys.stderr,"\ntest: ",method,
+            print >> sys.stderr,time.asctime(),'-', "\ntest: ",method,
             self._test_bad(func)
 
     def make_bad_tb_not_list(self):
@@ -444,11 +445,11 @@ class TestBuddyCastMsg(TestAsServer):
             d['taste buddies'] = method()
             func = lambda:self.create_payload(d)
             
-            print >> sys.stderr,"\ntest: ",method,
+            print >> sys.stderr,time.asctime(),'-', "\ntest: ",method,
             self._test_bad(func)
     
     def _test_bad(self,gen_buddycast_func):
-        print >>sys.stderr,"test: bad BUDDYCAST",gen_buddycast_func
+        print >>sys.stderr,time.asctime(),'-', "test: bad BUDDYCAST",gen_buddycast_func
         s = OLConnection(self.my_keypair,'localhost',self.hisport)
         msg = gen_buddycast_func()
         s.send(msg)

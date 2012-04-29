@@ -1,3 +1,4 @@
+import time 
 # Written by Jie Yang
 # see LICENSE.txt for license information
 
@@ -43,7 +44,7 @@ def init():
     db = SQLiteCacheDB.getInstance()
     db.initDB(TRIBLER_DB_PATH, busytimeout=BUSYTIMEOUT)
     
-    print >>sys.stderr,"OPENING DB",TRIBLER_DB_PATH
+    print >>sys.stderr,time.asctime(),'-', "OPENING DB",TRIBLER_DB_PATH
     
     #db.execute_write('drop index Torrent_relevance_idx')
     TorrentDBHandler.getInstance().register(Category.getInstance('..'),'.')
@@ -190,7 +191,7 @@ class TestBuddyCast(unittest.TestCase):
         from BaseLib.Test.log_parser import get_buddycast_data
         
         #start_time = time()
-        #print >> sys.stderr, "buddycast: ******************* start local test"
+        #print >> sys.stderr, time.asctime(),'-', "buddycast: ******************* start local test"
         costs = []
         self.data_handler.postInit(updatesim=False)
         for permid, selversion, msg in get_buddycast_data(os.path.join(FILES_DIR,'superpeer120070902sp7001.log')):

@@ -1,3 +1,4 @@
+import time 
 # Written by Jie Yang
 # see LICENSE.txt for license information
 #
@@ -317,7 +318,7 @@ class BuddyCastFactory:
         self.max_peers = 2500   # was 2500
         self.ranonce = False # Nicolas: had the impression that BuddyCast can be tested more reliably if I wait until it has gone through buddycast_core.work() successfully once
         if self.superpeer:
-            print >>sys.stderr,"bc: Starting in SuperPeer mode"
+            print >>sys.stderr,time.asctime(),'-', "bc: Starting in SuperPeer mode"
         
     def getInstance(*args, **kw):
         if BuddyCastFactory.__single is None:
@@ -348,12 +349,12 @@ class BuddyCastFactory:
         # prevent concurrencty on singletons
         if self.registered:
             if debug:
-                print >> sys.stderr, "bc: Register BuddyCast", currentThread().getName()
+                print >> sys.stderr, time.asctime(),'-', "bc: Register BuddyCast", currentThread().getName()
             self.overlay_bridge.add_task(self.olthread_register, 0)
 
     def olthread_register(self, start=True):
         if debug:
-            print >> sys.stderr, "bc: OlThread Register", currentThread().getName()
+            print >> sys.stderr, time.asctime(),'-', "bc: OlThread Register", currentThread().getName()
             
         self.data_handler = DataHandler(self.launchmany, self.overlay_bridge, max_num_peers=self.max_peers) 
         
@@ -389,14 +390,14 @@ class BuddyCastFactory:
             #       after 6 seconds initially and later, at every 2 hour interval
             self.overlay_bridge.add_task(self.channelcast_core.updateMySubscribedChannels, 6)
             
-            print >> sys.stderr, "BuddyCast starts up",waitt
+            print >> sys.stderr, time.asctime(),'-', "BuddyCast starts up",waitt
         
     def doBuddyCast(self):
         if not self.running:
             return
         
         if debug:
-            print >>sys.stderr,"bc: doBuddyCast!", currentThread().getName()
+            print >>sys.stderr,time.asctime(),'-', "bc: doBuddyCast!", currentThread().getName()
         
         # Reschedule ourselves for next round
         buddycast_interval = self.getCurrrentInterval()
@@ -449,7 +450,7 @@ class BuddyCastFactory:
         
         if not self.registered or not self.running:
             if DEBUG:
-                print >> sys.stderr, "bc: handleMessage got message, but we're not enabled or running"
+                print >> sys.stderr, time.asctime(),'-', "bc: handleMessage got message, but we're not enabled or running"
             return False
         
         t = message[0]
@@ -464,25 +465,25 @@ class BuddyCastFactory:
             
         elif t == VOTECAST:
             if DEBUG:
-                print >> sys.stderr, "bc: Received votecast message"
+                print >> sys.stderr, time.asctime(),'-', "bc: Received votecast message"
             if self.votecast_core != None:
                 return self.votecast_core.gotVoteCastMessage(message[1:], permid, selversion)
  
         elif t == CHANNELCAST:
             if DEBUG:
-                print >> sys.stderr, "bc: Received channelcast message"
+                print >> sys.stderr, time.asctime(),'-', "bc: Received channelcast message"
             if self.channelcast_core != None:
                 return self.channelcast_core.gotChannelCastMessage(message[1:], permid, selversion)           
                 
         elif t == BARTERCAST:
             if DEBUG:
-                print >> sys.stderr, "bc: Received bartercast message"
+                print >> sys.stderr, time.asctime(),'-', "bc: Received bartercast message"
             if self.bartercast_core != None:
                 return self.bartercast_core.gotBarterCastMessage(message[1:], permid, selversion)
             
         else:
             if DEBUG:
-                print >> sys.stderr, "bc: wrong message to buddycast", ord(t), "Round", self.buddycast_core.round
+                print >> sys.stderr, time.asctime(),'-', "bc: wrong message to buddycast", ord(t), "Round", self.buddycast_core.round
             return False
         
     def gotBuddyCastMessage(self, msg, permid, selversion):
@@ -500,7 +501,7 @@ class BuddyCastFactory:
     def handleConnection(self,exc,permid,selversion,locally_initiated):
         
         if DEBUG:
-            print >> sys.stderr, "bc: handleConnection",exc,show_permid_short(permid),selversion,locally_initiated,currentThread().getName()
+            print >> sys.stderr, time.asctime(),'-', "bc: handleConnection",exc,show_permid_short(permid),selversion,locally_initiated,currentThread().getName()
 
         if not self.registered:
             return
@@ -508,11 +509,11 @@ class BuddyCastFactory:
         if DEBUG:
             nconn = 0
             conns = self.buddycast_core.connections
-            print >> sys.stderr, "\nbc: conn in buddycast", len(conns)
+            print >> sys.stderr, time.asctime(),'-', "\nbc: conn in buddycast", len(conns)
             for peer_permid in conns:
                 _permid = show_permid_short(peer_permid)
                 nconn += 1
-                print >> sys.stderr, "bc: ", nconn, _permid, conns[peer_permid]
+                print >> sys.stderr, time.asctime(),'-', "bc: ", nconn, _permid, conns[peer_permid]
                 
         if self.running or exc is not None:    # if not running, only close connection
             self.buddycast_core.handleConnection(exc,permid,selversion,locally_initiated)
@@ -541,7 +542,7 @@ class BuddyCastCore:
         self.buddycast_interval = buddycast_interval
         self.superpeer = superpeer
         #print_stack()
-        #print >> sys.stderr, 'debug buddycast'
+        #print >> sys.stderr, time.asctime(),'-', 'debug buddycast'
         #superpeer    # change it for superpeers
         #self.superpeer_set = Set(self.data_handler.getSuperPeers())
         self.log = log
@@ -647,14 +648,14 @@ class BuddyCastCore:
         try:
             self.round += 1
             if DEBUG:
-                print >> sys.stderr, 'bc: Initiate exchange'
+                print >> sys.stderr, time.asctime(),'-', 'bc: Initiate exchange'
             self.print_debug_info('Active', 2)
             if self.log:
                 nPeer, nPref, nCc, nBs, nBr, nSO, nCo, nCt, nCr, nCu = self.get_stats()
                 self.overlay_log('BUCA_STA', self.round, (nPeer,nPref,nCc), (nBs,nBr), (nSO,nCo), (nCt,nCr,nCu))
         
             self.print_debug_info('Active', 3)
-            #print >> sys.stderr, 'bc: ************ working buddycast 2'
+            #print >> sys.stderr, time.asctime(),'-', 'bc: ************ working buddycast 2'
             self.updateSendBlockList()
             
             _now = now()
@@ -780,7 +781,7 @@ class BuddyCastCore:
         for p in self.send_block_list.keys():    # don't call isBlocked() for performance reason
             if _now >= self.send_block_list[p] - self.network_delay:
                 if debug:
-                    print >>sys.stderr,"bc: *** unblock peer in send block list" + self.get_peer_info(p) + \
+                    print >>sys.stderr,time.asctime(),'-', "bc: *** unblock peer in send block list" + self.get_peer_info(p) + \
                         "expiration:", ctime(self.send_block_list[p])
                 self.send_block_list.pop(p)
                     
@@ -815,7 +816,7 @@ class BuddyCastCore:
                 self.overlay_bridge.send(peer_permid, KEEP_ALIVE+keepalive_msg, 
                                      self.keepaliveSendCallback)
             if debug:
-                print >>sys.stderr,"bc: *** Send keep alive to peer", self.get_peer_info(peer_permid),  \
+                print >>sys.stderr,time.asctime(),'-', "bc: *** Send keep alive to peer", self.get_peer_info(peer_permid),  \
                     "overlay version", overlay_protocol_version
         
     def isConnected(self, peer_permid):
@@ -826,21 +827,21 @@ class BuddyCastCore:
             pass
         else:
             if debug:
-                print >> sys.stderr, "bc: error - send keep alive msg", exc, \
+                print >> sys.stderr, time.asctime(),'-', "bc: error - send keep alive msg", exc, \
                 self.get_peer_info(peer_permid), "Round", self.round
             self.closeConnection(peer_permid, 'keepalive:'+str(exc))
         
     def gotKeepAliveMessage(self, peer_permid):
         if self.isConnected(peer_permid):
             if debug:
-                print >> sys.stderr, "bc: Got keep alive from", self.get_peer_info(peer_permid)
+                print >> sys.stderr, time.asctime(),'-', "bc: Got keep alive from", self.get_peer_info(peer_permid)
             # 04/08/10 boudewijn: a crawler can no longer disconnect.
             # Staying connected means that the crawler is returned in
             # buddycast messages, otherwise not.
             return True
         else:
             if DEBUG:
-                print >> sys.stderr, "bc: error - got keep alive from a not connected peer. Round", \
+                print >> sys.stderr, time.asctime(),'-', "bc: error - got keep alive from a not connected peer. Round", \
                     self.round
             return False
         
@@ -896,7 +897,7 @@ class BuddyCastCore:
         
         if not self.isBlocked(target_permid, self.send_block_list):
             if debug:
-                print >> sys.stderr, 'bc: connect a peer', show_permid_short(target_permid), currentThread().getName()
+                print >> sys.stderr, time.asctime(),'-', 'bc: connect a peer', show_permid_short(target_permid), currentThread().getName()
             self.overlay_bridge.connect(target_permid, self.buddycastConnectCallback)
                         
             self.print_debug_info('Active', 12, target_permid)
@@ -916,7 +917,7 @@ class BuddyCastCore:
 
         else:
             if DEBUG:
-                print >> sys.stderr, 'buddycast: peer', self.get_peer_info(target_permid), \
+                print >> sys.stderr, time.asctime(),'-', 'buddycast: peer', self.get_peer_info(target_permid), \
                     'is blocked while starting buddycast to it.', "Round", self.round
         
     def buddycastConnectCallback(self, exc, dns, target_permid, selversion):
@@ -944,24 +945,24 @@ class BuddyCastCore:
 
             except:
                 print_exc()
-                print >> sys.stderr, "bc: error in reply buddycast msg",\
+                print >> sys.stderr, time.asctime(),'-', "bc: error in reply buddycast msg",\
                     exc, dns, show_permid_short(target_permid), selversion, "Round", self.round, 
 
         else:
             if debug:
-                print >> sys.stderr, "bc: warning - connecting to",\
+                print >> sys.stderr, time.asctime(),'-', "bc: warning - connecting to",\
                     show_permid_short(target_permid),exc,dns, ctime(now())
                     
     def createAndSendBuddyCastMessage(self, target_permid, selversion, active):
         
-        #print >>sys.stderr,"bc: SENDING BC to",show_permid_short(target_permid)
+        #print >>sys.stderr,time.asctime(),'-', "bc: SENDING BC to",show_permid_short(target_permid)
         #target_permid ="""MFIwEAYHKoZIzj0CAQYFK4EEABoDPgAEAGbSaE3xVUvdMYGkj+x/mE24f/f4ZId7kNPVkALbAa2bQNjCKRDSPt+oE1nzr7It/CfxvCTK+sjOYAjr""" 
         
         #selversion = 12 # for test
         
         buddycast_data = self.createBuddyCastMessage(target_permid, selversion)
         if debug:
-            print >> sys.stderr, "bc: createAndSendBuddyCastMessage", len(buddycast_data), currentThread().getName()
+            print >> sys.stderr, time.asctime(),'-', "bc: createAndSendBuddyCastMessage", len(buddycast_data), currentThread().getName()
         try:
             buddycast_data['permid'] = self.permid
             #validBuddyCastData(buddycast_data, self.num_myprefs, 
@@ -970,7 +971,7 @@ class BuddyCastCore:
             buddycast_msg = bencode(buddycast_data)
         except:
             print_exc()
-            print >> sys.stderr, "error buddycast_data:", buddycast_data
+            print >> sys.stderr, time.asctime(),'-', "error buddycast_data:", buddycast_data
             return
             
         if active:
@@ -983,8 +984,8 @@ class BuddyCastCore:
         self.removeConnCandidate(target_permid)        
         
         if debug:
-            print >> sys.stderr, '****************--------------'*2
-            print >> sys.stderr, 'sent buddycast message to', show_permid_short(target_permid), len(buddycast_msg)
+            print >> sys.stderr, time.asctime(),'-', '****************--------------'*2
+            print >> sys.stderr, time.asctime(),'-', 'sent buddycast message to', show_permid_short(target_permid), len(buddycast_msg)
         
         if active:
             self.print_debug_info('Active', 17, target_permid)
@@ -1026,7 +1027,7 @@ class BuddyCastCore:
                 msg = repr(readableBuddyCastMsg(buddycast_data,selversion))    # from utilities
                 self.overlay_log('SEND_MSG', ip, port, show_permid(target_permid), selversion, MSG_ID, msg)
                 
-        #print >>sys.stderr,"bc: Created BC",`buddycast_data`
+        #print >>sys.stderr,time.asctime(),'-', "bc: Created BC",`buddycast_data`
                 
         return buddycast_data # Nicolas: for testing
                 
@@ -1045,7 +1046,7 @@ class BuddyCastCore:
         my_pref = self.data_handler.getMyLivePreferences(selversion, self.num_myprefs)       #[pref]
         
         if debug:
-            print >> sys.stderr, " bc:Amended preference list is:", str(my_pref)
+            print >> sys.stderr, time.asctime(),'-', " bc:Amended preference list is:", str(my_pref)
             
         taste_buddies = self.getTasteBuddies(self.num_tbs, self.num_tb_prefs, target_permid, target_ip, target_port, selversion)
         random_peers = self.getRandomPeers(self.num_rps, target_permid, target_ip, target_port, selversion)    #{peer:last_seen}
@@ -1153,11 +1154,11 @@ class BuddyCastCore:
         
         peers = []
         if DEBUG:
-            print >> sys.stderr, 'bc: ******** rplist nconn', len(rp_list), len(self.connected_connectable_peers)
-        #print >> sys.stderr, rp_list, self.connected_connectable_peers
+            print >> sys.stderr, time.asctime(),'-', 'bc: ******** rplist nconn', len(rp_list), len(self.connected_connectable_peers)
+        #print >> sys.stderr, time.asctime(),'-', rp_list, self.connected_connectable_peers
         for permid in rp_list:    
             # keys = ('ip', 'port', 'oversion', 'num_torrents')
-            #print >> sys.stderr, '**************', `self.connected_connectable_peers`, `rp_list`
+            #print >> sys.stderr, time.asctime(),'-', '**************', `self.connected_connectable_peers`, `rp_list`
             # TODO: Fix this bug: not consisitent
             if permid not in self.connected_connectable_peers:
                 continue
@@ -1210,11 +1211,11 @@ class BuddyCastCore:
     def buddycastSendCallback(self, exc, target_permid, other=0):
         if exc is None:
             if debug:
-                print >>sys.stderr,"bc: *** msg was sent successfully to peer", \
+                print >>sys.stderr,time.asctime(),'-', "bc: *** msg was sent successfully to peer", \
                     self.get_peer_info(target_permid)
         else:
             if debug:
-                print >>sys.stderr,"bc: *** warning - error in sending msg to",\
+                print >>sys.stderr,time.asctime(),'-', "bc: *** warning - error in sending msg to",\
                         self.get_peer_info(target_permid), exc
             self.closeConnection(target_permid, 'buddycast:'+str(exc))
             
@@ -1250,10 +1251,10 @@ class BuddyCastCore:
         """ Received a buddycast message and handle it. Reply if needed """
         
         if debug:
-            print >> sys.stderr, "bc: got and handle buddycast msg", currentThread().getName()
+            print >> sys.stderr, time.asctime(),'-', "bc: got and handle buddycast msg", currentThread().getName()
         
         if not sender_permid or sender_permid == self.permid:
-            print >> sys.stderr, "bc: error - got BuddyCastMsg from a None peer", \
+            print >> sys.stderr, time.asctime(),'-', "bc: error - got BuddyCastMsg from a None peer", \
                         sender_permid, recv_msg, "Round", self.round
             return False
         
@@ -1261,7 +1262,7 @@ class BuddyCastCore:
 
         if blocked:
             if DEBUG:
-                print >> sys.stderr, "bc: warning - got BuddyCastMsg from a recv blocked peer", \
+                print >> sys.stderr, time.asctime(),'-', "bc: warning - got BuddyCastMsg from a recv blocked peer", \
                         show_permid(sender_permid), "Round", self.round
             return True     # allow the connection to be kept. That peer may have restarted in 4 hours
         
@@ -1275,7 +1276,7 @@ class BuddyCastCore:
         # buddycast message should be around 6~7KBytes. So the reasonable 
         # length limitation might be 10KB for buddycast message. 
         if MAX_BUDDYCAST_LENGTH > 0 and len(recv_msg) > MAX_BUDDYCAST_LENGTH:
-            print >> sys.stderr, "bc: warning - got large BuddyCastMsg", len(recv_msg), "Round", self.round
+            print >> sys.stderr, time.asctime(),'-', "bc: warning - got large BuddyCastMsg", len(recv_msg), "Round", self.round
             return False
 
         active = self.isBlocked(sender_permid, self.send_block_list)
@@ -1295,7 +1296,7 @@ class BuddyCastCore:
                 except:
                     errmsg = repr(msg)
                 if DEBUG:
-                    print >> sys.stderr, "bc: warning, got invalid BuddyCastMsg:", errmsg, \
+                    print >> sys.stderr, time.asctime(),'-', "bc: warning, got invalid BuddyCastMsg:", errmsg, \
                     "Round", self.round   # ipv6
                 return False            
             buddycast_data.update({'permid':sender_permid})
@@ -1310,7 +1311,7 @@ class BuddyCastCore:
                     errmsg = repr(msg)
                 if DEBUG:
                     dns = self.dnsindb(sender_permid)
-                    print >> sys.stderr, "bc: warning, got invalid BuddyCastMsg:", errmsg, "From", dns, "Round", self.round   # ipv6
+                    print >> sys.stderr, time.asctime(),'-', "bc: warning, got invalid BuddyCastMsg:", errmsg, "From", dns, "Round", self.round   # ipv6
 
                 return False
            
@@ -1385,7 +1386,7 @@ class BuddyCastCore:
         self.launchmany.set_activity(NTFY_ACT_RECOMMEND, buf)
         
         if DEBUG:
-            print >> sys.stderr, "bc: Got BUDDYCAST message from",self.get_peer_info(sender_permid),active
+            print >> sys.stderr, time.asctime(),'-', "bc: Got BUDDYCAST message from",self.get_peer_info(sender_permid),active
         
         return True
 
@@ -1414,7 +1415,7 @@ class BuddyCastCore:
                 # let's accept it but complain
                 if buddycast_data['oversion'] >= OLPROTO_VER_EIGHTH:
                     if DEBUG:
-                        print >> sys.stderr, 'buddycast: received OLPROTO_VER_EIGHTH buddycast data containing old style preferences. only ok if talking to an earlier non-release version'
+                        print >> sys.stderr, time.asctime(),'-', 'buddycast: received OLPROTO_VER_EIGHTH buddycast data containing old style preferences. only ok if talking to an earlier non-release version'
                 return d
 
             # if the single prefs entries are lists, we have a more modern wire format
@@ -1472,12 +1473,12 @@ class BuddyCastCore:
         rps = buddycast_data.pop('random peers')
         buddycast_data['oversion'] = selversion
 
-        # print >> sys.stderr, "bc: \n" * 10 
-        # print >> sys.stderr, "bc: received", len(tbs), "and", len(rps), "tastebudies and randompeers, respectively"
+        # print >> sys.stderr, time.asctime(),'-', "bc: \n" * 10 
+        # print >> sys.stderr, time.asctime(),'-', "bc: received", len(tbs), "and", len(rps), "tastebudies and randompeers, respectively"
         # for peer in tbs:
-        #     print >> sys.stderr, "bc: tastebuddy", peer
+        #     print >> sys.stderr, time.asctime(),'-', "bc: tastebuddy", peer
         # for peer in rps:
-        #     print >> sys.stderr, "bc: randompeer", peer
+        #     print >> sys.stderr, time.asctime(),'-', "bc: randompeer", peer
         
         max_tb_sim = 1
 
@@ -1485,7 +1486,7 @@ class BuddyCastCore:
         bc_data = [buddycast_data] + tbs + rps 
         for peer in bc_data:
             
-            #print >>sys.stderr,"bc: Learned about peer",peer['ip']
+            #print >>sys.stderr,time.asctime(),'-', "bc: Learned about peer",peer['ip']
             
             peer_permid = peer['permid']
             if peer_permid == self.permid:
@@ -1625,7 +1626,7 @@ class BuddyCastCore:
         self.removeFromConnList(peer_permid)    
         
         if not self.isConnected(peer_permid):
-            #print >> sys.stderr, "bc: cannot add a unconnected peer to conn list", "Round", self.round
+            #print >> sys.stderr, time.asctime(),'-', "bc: cannot add a unconnected peer to conn list", "Round", self.round
             return
         
         _now = now()
@@ -1730,7 +1731,7 @@ class BuddyCastCore:
 
         self.connected_taste_buddies = tbs
         self.connected_random_peers = rps
-        #print >> sys.stderr, "#tbs:",len(tbs), ";#rps:", len(rps)
+        #print >> sys.stderr, time.asctime(),'-', "#tbs:",len(tbs), ";#rps:", len(rps)
         #for p in self.connected_taste_buddies:
         #    assert p in self.connected_connectable_peers
         #for p in self.connected_random_peers:
@@ -1784,10 +1785,10 @@ class BuddyCastCore:
     def replyBuddyCast(self, target_permid, selversion):
         """ Reply a buddycast message """
         
-        #print >> sys.stderr, '*************** replay buddycast message', show_permid_short(target_permid), self.isConnected(target_permid)
+        #print >> sys.stderr, time.asctime(),'-', '*************** replay buddycast message', show_permid_short(target_permid), self.isConnected(target_permid)
         
         if not self.isConnected(target_permid):
-            #print >> sys.stderr, 'buddycast: lost connection while replying buddycast', \
+            #print >> sys.stderr, time.asctime(),'-', 'buddycast: lost connection while replying buddycast', \
             #    "Round", self.round
             return
         
@@ -1808,7 +1809,7 @@ class BuddyCastCore:
             self.closeConnection(permid, 'overlayswarm:'+str(exc))
 
         if debug:
-            print >> sys.stderr, "bc: handle conn from overlay", exc, \
+            print >> sys.stderr, time.asctime(),'-', "bc: handle conn from overlay", exc, \
                 self.get_peer_info(permid), "selversion:", selversion, \
                 "local_init:", locally_initiated, ctime(now()), "; #connections:", len(self.connected_connectable_peers), \
                 "; #TB:", len(self.connected_taste_buddies), "; #RP:", len(self.connected_random_peers)
@@ -1817,7 +1818,7 @@ class BuddyCastCore:
         # add connection to connection list
         _now = now()
         if DEBUG:
-            print >> sys.stderr, "bc: addConnection", self.isConnected(peer_permid)
+            print >> sys.stderr, time.asctime(),'-', "bc: addConnection", self.isConnected(peer_permid)
         if not self.isConnected(peer_permid):
             # SecureOverlay has already added the peer to db
             self.connections[peer_permid] = selversion # add a new connection
@@ -1835,7 +1836,7 @@ class BuddyCastCore:
                     print_exc()
 
             if debug:
-                print >> sys.stderr, "bc: add connection", \
+                print >> sys.stderr, time.asctime(),'-', "bc: add connection", \
                     self.get_peer_info(peer_permid), "to", addto
             if self.log:
                 dns = self.dnsindb(peer_permid)
@@ -1847,7 +1848,7 @@ class BuddyCastCore:
         """ Close connection with a peer, and remove it from connection lists """
         
         if debug:
-            print >> sys.stderr, "bc: close connection:", self.get_peer_info(peer_permid)
+            print >> sys.stderr, time.asctime(),'-', "bc: close connection:", self.get_peer_info(peer_permid)
         
         if self.isConnected(peer_permid):
             self.connections.pop(peer_permid)
@@ -1879,39 +1880,39 @@ class BuddyCastCore:
         if not debug:
             return
         if DEBUG:
-            print >>sys.stderr,"bc: *****", thread, str(step), "-",
+            print >>sys.stderr,time.asctime(),'-', "bc: *****", thread, str(step), "-",
         if thread == 'Active':
             if step == 2:
-                print >> sys.stderr, "Working:", now() - self.start_time, \
+                print >> sys.stderr, time.asctime(),'-', "Working:", now() - self.start_time, \
                     "seconds since start. Round", self.round, "Time:", ctime(now())
                 nPeer, nPref, nCc, nBs, nBr, nSO, nCo, nCt, nCr, nCu = self.get_stats()
-                print >> sys.stderr, "bc: *** Status: nPeer nPref nCc: %d %d %d  nBs nBr: %d %d  nSO nCo nCt nCr nCu: %d %d %d %d %d" % \
+                print >> sys.stderr, time.asctime(),'-', "bc: *** Status: nPeer nPref nCc: %d %d %d  nBs nBr: %d %d  nSO nCo nCt nCr nCu: %d %d %d %d %d" % \
                                       (nPeer,nPref,nCc,           nBs,nBr,        nSO,nCo, nCt,nCr,nCu)
                 if nSO != nCo:
-                    print >> sys.stderr, "bc: warning - nSo and nCo is inconsistent"
+                    print >> sys.stderr, time.asctime(),'-', "bc: warning - nSo and nCo is inconsistent"
                 if nCc > self.max_conn_cand or nCt > self.max_conn_tb or nCr > self.max_conn_rp or nCu > self.max_conn_up:
-                    print >> sys.stderr, "bc: warning - nCC or nCt or nCr or nCu overloads"
+                    print >> sys.stderr, time.asctime(),'-', "bc: warning - nCC or nCt or nCr or nCu overloads"
                 _now = now()
                 buf = ""
                 i = 1
                 for p in self.connected_taste_buddies:
                     buf += "bc: %d taste buddies: "%i + self.get_peer_info(p) + str(_now-self.connected_connectable_peers[p]['connect_time']) + " version: " + str(self.connections[p]) + "\n"
                     i += 1
-                print >> sys.stderr, buf
+                print >> sys.stderr, time.asctime(),'-', buf
                 
                 buf = ""
                 i = 1
                 for p in self.connected_random_peers:
                     buf += "bc: %d random peers: "%i + self.get_peer_info(p) + str(_now-self.connected_connectable_peers[p]['connect_time']) + " version: " + str(self.connections[p]) + "\n"
                     i += 1
-                print >> sys.stderr, buf
+                print >> sys.stderr, time.asctime(),'-', buf
                 
                 buf = ""
                 i = 1
                 for p in self.connected_unconnectable_peers:
                     buf += "bc: %d unconnectable peers: "%i + self.get_peer_info(p) + str(_now-self.connected_unconnectable_peers[p]) + " version: " + str(self.connections[p]) + "\n"
                     i += 1
-                print >> sys.stderr, buf
+                print >> sys.stderr, time.asctime(),'-', buf
                 buf = ""
                 totalsim = 0
                 nsimpeers = 0
@@ -1931,26 +1932,26 @@ class BuddyCastCore:
                         meansim = totalsim/nsimpeers
                     else:
                         meansim = 0
-                    print >> sys.stderr, "bc: * sim peer: %d %.3f %.3f %.3f %.3f\n" % (nsimpeers, totalsim, meansim, minsim, maxsim)
+                    print >> sys.stderr, time.asctime(),'-', "bc: * sim peer: %d %.3f %.3f %.3f %.3f\n" % (nsimpeers, totalsim, meansim, minsim, maxsim)
 
             elif step == 3:
-                print >> sys.stderr, "check blocked peers: Round", self.round
+                print >> sys.stderr, time.asctime(),'-', "check blocked peers: Round", self.round
                 
             elif step == 4:
-                print >> sys.stderr, "keep connections with peers: Round", self.round
+                print >> sys.stderr, time.asctime(),'-', "keep connections with peers: Round", self.round
                 
             elif step == 6:
-                print >> sys.stderr, "idle loop:", self.next_initiate
+                print >> sys.stderr, time.asctime(),'-', "idle loop:", self.next_initiate
                 
             elif step == 9: 
-                print >> sys.stderr, "bootstrapping: select", self.bootstrap_num, \
+                print >> sys.stderr, time.asctime(),'-', "bootstrapping: select", self.bootstrap_num, \
                     "peers recently seen from Mega Cache"
                 if self.booted < 0:
-                    print >> sys.stderr, "bc: *** bootstrapped recently, so wait for a while"
+                    print >> sys.stderr, time.asctime(),'-', "bc: *** bootstrapped recently, so wait for a while"
                 elif self.booted == 0:
-                    print >> sys.stderr, "bc: *** no peers to bootstrap. Try next time"
+                    print >> sys.stderr, time.asctime(),'-', "bc: *** no peers to bootstrap. Try next time"
                 else:
-                    print >> sys.stderr, "bc: *** bootstrapped, got", len(self.connection_candidates), \
+                    print >> sys.stderr, time.asctime(),'-', "bc: *** bootstrapped, got", len(self.connection_candidates), \
                       "peers in Cc. Times of bootstrapped", self.total_bootstrapped_time
                     buf = ""
                     for p in self.connection_candidates:
@@ -1958,7 +1959,7 @@ class BuddyCastCore:
                     buf += "\nbc: Remote Search Peer Candidates:\n"
                     for p in self.remote_search_peer_candidates:
                         buf += "bc: * remote: %d "%p[0] + self.get_peer_info(p[1]) + "\n"
-                    print >> sys.stderr, buf
+                    print >> sys.stderr, time.asctime(),'-', buf
             
             elif step == 11:
                 buf = "select "
@@ -1975,76 +1976,76 @@ class BuddyCastCore:
                      ctime(self.data_handler.getPeerLastSeen(target_permid)))
                 else:
                     buf += "bc: *** no target to select. Skip this round"
-                print >> sys.stderr, buf
+                print >> sys.stderr, time.asctime(),'-', buf
 
             elif step == 12:
-                print >> sys.stderr, "connect a peer to start buddycast", self.get_peer_info(target_permid)
+                print >> sys.stderr, time.asctime(),'-', "connect a peer to start buddycast", self.get_peer_info(target_permid)
                 
             elif step == 13:
-                print >> sys.stderr, "block connected peer in send block list", \
+                print >> sys.stderr, time.asctime(),'-', "block connected peer in send block list", \
                     self.get_peer_info(target_permid)#, self.send_block_list[target_permid]
                     
             elif step == 14:
-                print >> sys.stderr, "remove connected peer from Cc", \
+                print >> sys.stderr, time.asctime(),'-', "remove connected peer from Cc", \
                     self.get_peer_info(target_permid)#, "removed?", target_permid not in self.connection_candidates
 
             elif step == 15:
-                print >> sys.stderr, "peer is connected", \
+                print >> sys.stderr, time.asctime(),'-', "peer is connected", \
                     self.get_peer_info(target_permid), "overlay version", selversion, currentThread().getName()
                 
             elif step == 16:
-                print >> sys.stderr, "create buddycast to send to", self.get_peer_info(target_permid)
+                print >> sys.stderr, time.asctime(),'-', "create buddycast to send to", self.get_peer_info(target_permid)
                 
             elif step == 17:
-                print >> sys.stderr, "send buddycast msg to", self.get_peer_info(target_permid)
+                print >> sys.stderr, time.asctime(),'-', "send buddycast msg to", self.get_peer_info(target_permid)
                 
             elif step == 18:
-                print >> sys.stderr, "receive buddycast message from peer %s" % self.get_peer_info(target_permid)
+                print >> sys.stderr, time.asctime(),'-', "receive buddycast message from peer %s" % self.get_peer_info(target_permid)
                 
             elif step == 19:
-                print >> sys.stderr, "store peers from incoming msg to cache and db"
+                print >> sys.stderr, time.asctime(),'-', "store peers from incoming msg to cache and db"
                 
             elif step == 20:
-                print >> sys.stderr, "add connected peer %s to connection list %s" % (self.get_peer_info(target_permid), addto)
+                print >> sys.stderr, time.asctime(),'-', "add connected peer %s to connection list %s" % (self.get_peer_info(target_permid), addto)
                 
             elif step == 21:
-                print >> sys.stderr, "block connected peer in recv block list", \
+                print >> sys.stderr, time.asctime(),'-', "block connected peer in recv block list", \
                     self.get_peer_info(target_permid), self.recv_block_list[target_permid]
                 
         if thread == 'Passive': 
             if step == 2:
-                print >> sys.stderr,  "receive buddycast message from peer %s" % self.get_peer_info(target_permid)
+                print >> sys.stderr,  time.asctime(),'-', "receive buddycast message from peer %s" % self.get_peer_info(target_permid)
                 
             elif step == 3:
-                print >> sys.stderr, "store peers from incoming msg to cache and db"
+                print >> sys.stderr, time.asctime(),'-', "store peers from incoming msg to cache and db"
                 
             elif step == 4:
-                print >> sys.stderr, "add connected peer %s to connection list %s" % (self.get_peer_info(target_permid), addto)
+                print >> sys.stderr, time.asctime(),'-', "add connected peer %s to connection list %s" % (self.get_peer_info(target_permid), addto)
         
             elif step == 5:
-                print >> sys.stderr, "block connected peer in recv block list", \
+                print >> sys.stderr, time.asctime(),'-', "block connected peer in recv block list", \
                     self.get_peer_info(target_permid), self.recv_block_list[target_permid]
             
             elif step == 6:
-                print >> sys.stderr, "create buddycast to reply to", self.get_peer_info(target_permid)
+                print >> sys.stderr, time.asctime(),'-', "create buddycast to reply to", self.get_peer_info(target_permid)
             
             elif step == 7:
-                print >> sys.stderr, "reply buddycast msg to", self.get_peer_info(target_permid)
+                print >> sys.stderr, time.asctime(),'-', "reply buddycast msg to", self.get_peer_info(target_permid)
                 
             elif step == 8:
-                print >> sys.stderr, "block connected peer in send block list", \
+                print >> sys.stderr, time.asctime(),'-', "block connected peer in send block list", \
                     self.get_peer_info(target_permid), self.send_block_list[target_permid]
         
             elif step == 9:
-                print >> sys.stderr, "remove connected peer from Cc", \
+                print >> sys.stderr, time.asctime(),'-', "remove connected peer from Cc", \
                     self.get_peer_info(target_permid)#, "removed?", target_permid not in self.connection_candidates
 
             elif step == 10:
-                print >> sys.stderr, "add idle loops", self.next_initiate
+                print >> sys.stderr, time.asctime(),'-', "add idle loops", self.next_initiate
         sys.stdout.flush()
         sys.stderr.flush()
         if DEBUG:
-            print >> sys.stderr, "bc: *****", thread, str(step), "-",
+            print >> sys.stderr, time.asctime(),'-', "bc: *****", thread, str(step), "-",
 
     def getAllTasteBuddies(self):
         return self.connected_taste_buddies
@@ -2071,7 +2072,7 @@ class BuddyCastCore:
         # TODO: How many peers?  Should these be part of the npeers?
         local_peers = self.data_handler.getLocalPeerList(max_peers=5,minoversion=minoversion)
         if DEBUG:
-            print >> sys.stderr, "bc: getRemoteSearchPeers: Selected %d local peers" % len(local_peers)
+            print >> sys.stderr, time.asctime(),'-', "bc: getRemoteSearchPeers: Selected %d local peers" % len(local_peers)
         
         return local_peers + peers
         
@@ -2180,7 +2181,7 @@ class DataHandler:
         for pid,tid in user_item_pairs:
             self.peers[pid][PEER_PREF_POS].append(tid)
         """
-        #print >> sys.stderr, '**************** loadAllPeers', len(self.peers)
+        #print >> sys.stderr, time.asctime(),'-', '**************** loadAllPeers', len(self.peers)
 
 #        for pid in self.peers:
 #            self.peers[pid][PEER_PREF_POS].sort()    # keep in order
@@ -2252,7 +2253,7 @@ class DataHandler:
                    sim = similarities[peer_id]
                    updates[peer_id] = sim
 
-        #print >> sys.stderr, '****************** update peer sim', len(updates), len(self.peers)        
+        #print >> sys.stderr, time.asctime(),'-', '****************** update peer sim', len(updates), len(self.peers)        
         if updates:
             self.cacheSimUpdates('peer', updates, delay, batch, update_interval)
                         
@@ -2288,7 +2289,7 @@ class DataHandler:
             old_rels = dict(res)
         else:
             old_rels = {}
-        #print >> sys.stderr, '********* update all item rel', len(old_rels), len(tids) #, old_rels[:10]
+        #print >> sys.stderr, time.asctime(),'-', '********* update all item rel', len(old_rels), len(tids) #, old_rels[:10]
         
         for tid in tids.keys():
             tids[tid] = tids[tid][0]/tids[tid][1] + tids[tid][1]
@@ -2296,7 +2297,7 @@ class DataHandler:
             if old_rel != None and abs(old_rel - tids[tid]) <= old_rel*0.05:
                 tids.pop(tid)   # don't update db
             
-        #print >> sys.stderr, '**************--- update all item rel', len(tids), len(old_rels) #, len(self.peers), nsimpeers, tids.items()[:10]  # 37307 2500
+        #print >> sys.stderr, time.asctime(),'-', '**************--- update all item rel', len(tids), len(old_rels) #, len(self.peers), nsimpeers, tids.items()[:10]  # 37307 2500
         if tids:
             self.cacheSimUpdates('torrent', tids, delay, batch, update_interval)
         """
@@ -2304,7 +2305,7 @@ class DataHandler:
     def sesscb_ntfy_myprefs(self,subject,changeType,objectID,*args):
         """ Called by SessionCallback thread """
         if DEBUG:
-            print >>sys.stderr,"bc: sesscb_ntfy_myprefs:",subject,changeType,`objectID`
+            print >>sys.stderr,time.asctime(),'-', "bc: sesscb_ntfy_myprefs:",subject,changeType,`objectID`
         if subject == NTFY_MYPREFERENCES:
             infohash = objectID
             if changeType == NTFY_INSERT:
@@ -2325,7 +2326,7 @@ class DataHandler:
         torrent_id = torrentdata[1]
         if secret:
             if DEBUG:
-                print >> sys.stderr, 'bc: Omitting secret download: %s' % torrentdata.get('info', {}).get('name', 'unknown')
+                print >> sys.stderr, time.asctime(),'-', 'bc: Omitting secret download: %s' % torrentdata.get('info', {}).get('name', 'unknown')
             return # do not buddycast secret downloads
         
         if torrent_id not in self.myprefs:
@@ -2387,7 +2388,7 @@ class DataHandler:
     def getPeerIDLastSeen(self, peer_id):
         if not peer_id or peer_id not in self.peers:
             return 0
-        #print >> sys.stderr, '***** getPeerLastSeen', self.peers[pefer_permid], `peer_permid`
+        #print >> sys.stderr, time.asctime(),'-', '***** getPeerLastSeen', self.peers[pefer_permid], `peer_permid`
         return self.peers[peer_id][PEER_LASTSEEN_POS]
     
     def getPeerPrefList(self, peer_permid):
@@ -2435,9 +2436,9 @@ class DataHandler:
             
         except KeyError:
             print_exc()
-            print >> sys.stderr, "bc: _addPeerToDB has KeyError"
+            print >> sys.stderr, time.asctime(),'-', "bc: _addPeerToDB has KeyError"
         except socket.gaierror:
-            print >> sys.stderr, "bc: _addPeerToDB cannot find host by name", peer_data['ip']
+            print >> sys.stderr, time.asctime(),'-', "bc: _addPeerToDB cannot find host by name", peer_data['ip']
         except:
             print_exc()
             
@@ -2469,7 +2470,7 @@ class DataHandler:
             infohash = pref['infohash'] # Nicolas: new dictionary format of OL 8 preferences
             torrent_id = self.torrent_db.getTorrentID(infohash)
             if not torrent_id:
-                print >> sys.stderr, "buddycast: DB Warning: infohash", bin2str(infohash), "should have been inserted into db, but was not found"
+                print >> sys.stderr, time.asctime(),'-', "buddycast: DB Warning: infohash", bin2str(infohash), "should have been inserted into db, but was not found"
                 continue
             pref['torrent_id'] = torrent_id
             if torrent_id not in cur_prefs:
@@ -2510,7 +2511,7 @@ class DataHandler:
             infohash = coll['infohash']
             torrent_id = self.torrent_db.getTorrentID(infohash)
             if not torrent_id:
-                print >> sys.stderr, "buddycast: DB Warning: infohash", bin2str(infohash), "should have been inserted into db, but was not found"
+                print >> sys.stderr, time.asctime(),'-', "buddycast: DB Warning: infohash", bin2str(infohash), "should have been inserted into db, but was not found"
                 continue
             coll['torrent_id'] = torrent_id
             pops2update.append(coll) 
@@ -2600,7 +2601,7 @@ class DataHandler:
         
         #self.data_handler.addPeerPreferences(sender_permid, prefs)
 
-        #print >>sys.stderr,"bc: handleBCData:",`cache_db_data`
+        #print >>sys.stderr,time.asctime(),'-', "bc: handleBCData:",`cache_db_data`
 
 
         ADD_PEER = 1

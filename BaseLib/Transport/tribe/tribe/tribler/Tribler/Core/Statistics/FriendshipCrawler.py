@@ -1,3 +1,4 @@
+import time 
 # Written by Ali Abbas
 # see LICENSE.txt for license information
 
@@ -33,7 +34,7 @@ class FriendshipCrawler:
         @param request_callback Call this function one or more times to send the requests: request_callback(message_id, payload)
         """
         if DEBUG: 
-            print >>sys.stderr, "FriendshipCrawler: friendship_query_initiator"
+            print >>sys.stderr, time.asctime(),'-', "FriendshipCrawler: friendship_query_initiator"
         
         get_last_updated_time = self.friendshipStatistics_db.getLastUpdateTimeOfThePeer(permid)
          
@@ -51,7 +52,7 @@ class FriendshipCrawler:
         @param reply_callback Call this function once to send the reply: reply_callback(payload [, error=123])
         """
         if DEBUG:
-            print >> sys.stderr, "FriendshipCrawler: handle_friendship_crawler_database_query_request", message
+            print >> sys.stderr, time.asctime(),'-', "FriendshipCrawler: handle_friendship_crawler_database_query_request", message
 
         try:
             d = bdecode(message)
@@ -80,8 +81,8 @@ class FriendshipCrawler:
 
         if error:
             if DEBUG:
-                print >> sys.stderr, "friendshipcrawler: handle_crawler_reply"
-                print >> sys.stderr, "friendshipcrawler: error", error, message
+                print >> sys.stderr, time.asctime(),'-', "friendshipcrawler: handle_crawler_reply"
+                print >> sys.stderr, time.asctime(),'-', "friendshipcrawler: error", error, message
 
         else:
             try:
@@ -90,8 +91,8 @@ class FriendshipCrawler:
                 print_exc()
             else:
                 if DEBUG:
-                    print >> sys.stderr, "friendshipcrawler: handle_crawler_reply"
-                    print >> sys.stderr, "friendshipcrawler: friendship: Got",`d`
+                    print >> sys.stderr, time.asctime(),'-', "friendshipcrawler: handle_crawler_reply"
+                    print >> sys.stderr, time.asctime(),'-', "friendshipcrawler: friendship: Got",`d`
 
                 self.saveFriendshipStatistics(permid,d['current time'],d['stats'])
 

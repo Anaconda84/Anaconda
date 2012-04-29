@@ -1,3 +1,4 @@
+import time 
 # Written by Arno Bakker, Bram Cohen
 # multitracker extensions by John Hoffman
 # modified for Merkle hashes and digital signatures by Arno Bakker
@@ -39,7 +40,7 @@ def make_torrent_file(input, userabortflag = None, userprogresscallback = lambda
         return (None,None)
 
     #if DEBUG:
-    #    print >>sys.stderr,"mktorrent: makeinfo returned",`info`
+    #    print >>sys.stderr,time.asctime(),'-', "mktorrent: makeinfo returned",`info`
     
     check_info(info)
     metainfo = {'info': info, 'encoding': input['encoding'], 'creation date': long(time())}
@@ -162,7 +163,7 @@ def makeinfo(input,userabortflag,userprogresscallback):
         outpath = file['outpath']
         
         if DEBUG:
-            print >>sys.stderr,"makeinfo: inpath",inpath,"outpath",outpath
+            print >>sys.stderr,time.asctime(),'-', "makeinfo: inpath",inpath,"outpath",outpath
         
         if os.path.isdir(inpath):
             dirsubs = subfiles(inpath)
@@ -356,13 +357,13 @@ def filename2pathlist(path,skipfirst=False):
     """ Convert a filename to a 'path' entry suitable for a multi-file torrent 
     file """ 
     #if DEBUG:
-    #    print >>sys.stderr,"mktorrent: filename2pathlist:",path,skipfirst
+    #    print >>sys.stderr,time.asctime(),'-', "mktorrent: filename2pathlist:",path,skipfirst
     
     h = path
     l = []
     while True:
         #if DEBUG:
-        #    print >>sys.stderr,"mktorrent: filename2pathlist: splitting",h
+        #    print >>sys.stderr,time.asctime(),'-', "mktorrent: filename2pathlist: splitting",h
         
         (h,t) = os.path.split(h)
         if h == '' and t == '':
@@ -374,7 +375,7 @@ def filename2pathlist(path,skipfirst=False):
             
     l.reverse()
     #if DEBUG:
-    #    print >>sys.stderr,"mktorrent: filename2pathlist: returning",l
+    #    print >>sys.stderr,time.asctime(),'-', "mktorrent: filename2pathlist: returning",l
 
     return l
 
@@ -449,10 +450,10 @@ def get_bitrate_from_metainfo(file,metainfo):
         try:
             playtime = None
             if info.has_key('playtime'):
-                #print >>sys.stderr,"TorrentDef: get_bitrate: Bitrate in info field"
+                #print >>sys.stderr,time.asctime(),'-', "TorrentDef: get_bitrate: Bitrate in info field"
                 playtime = parse_playtime_to_secs(info['playtime'])
             elif 'playtime' in metainfo: # HACK: encode playtime in non-info part of existing torrent
-                #print >>sys.stderr,"TorrentDef: get_bitrate: Bitrate in metainfo"
+                #print >>sys.stderr,time.asctime(),'-', "TorrentDef: get_bitrate: Bitrate in metainfo"
                 playtime = parse_playtime_to_secs(metainfo['playtime'])
             elif 'azureus_properties' in metainfo:
                 azprop = metainfo['azureus_properties']
@@ -460,11 +461,11 @@ def get_bitrate_from_metainfo(file,metainfo):
                     content = metainfo['azureus_properties']['Content']
                     if 'Speed Bps' in content:
                         bitrate = float(content['Speed Bps'])
-                        #print >>sys.stderr,"TorrentDef: get_bitrate: Bitrate in Azureus metainfo",bitrate
+                        #print >>sys.stderr,time.asctime(),'-', "TorrentDef: get_bitrate: Bitrate in Azureus metainfo",bitrate
             if playtime is not None:
                 bitrate = info['length']/playtime
                 if DEBUG:
-                    print >>sys.stderr,"TorrentDef: get_bitrate: Found bitrate",bitrate
+                    print >>sys.stderr,time.asctime(),'-', "TorrentDef: get_bitrate: Found bitrate",bitrate
         except:
             print_exc()
 
@@ -490,7 +491,7 @@ def get_bitrate_from_metainfo(file,metainfo):
                         content = metainfo['azureus_properties']['Content']
                         if 'Speed Bps' in content:
                             bitrate = float(content['Speed Bps'])
-                            #print >>sys.stderr,"TorrentDef: get_bitrate: Bitrate in Azureus metainfo",bitrate
+                            #print >>sys.stderr,time.asctime(),'-', "TorrentDef: get_bitrate: Bitrate in Azureus metainfo",bitrate
                     
                 if playtime is not None:
                     bitrate = x['length']/playtime
@@ -605,21 +606,21 @@ def get_files(metainfo,exts):
         for file in files:
             
             p = file['path']
-            #print >>sys.stderr,"TorrentDef: get_files: file is",p
+            #print >>sys.stderr,time.asctime(),'-', "TorrentDef: get_files: file is",p
             filename = ''
             for elem in p:
-                #print >>sys.stderr,"TorrentDef: get_files: elem is",elem
+                #print >>sys.stderr,time.asctime(),'-', "TorrentDef: get_files: elem is",elem
                 filename = os.path.join(filename,elem)
             
-            #print >>sys.stderr,"TorrentDef: get_files: composed filename is",filename    
+            #print >>sys.stderr,time.asctime(),'-', "TorrentDef: get_files: composed filename is",filename    
             (prefix,ext) = os.path.splitext(filename)
             if ext != '' and ext[0] == '.':
                 ext = ext[1:]
-            #print >>sys.stderr,"TorrentDef: get_files: ext",ext
+            #print >>sys.stderr,time.asctime(),'-', "TorrentDef: get_files: ext",ext
             if exts is None or ext.lower() in exts:
                 videofiles.append((filename, file['length']))
     else:
-        #print >>sys.stderr,"TorrentDef: get_files: Single-torrent file"
+        #print >>sys.stderr,time.asctime(),'-', "TorrentDef: get_files: Single-torrent file"
         
         filename = metainfo['info']['name'] # don't think we need fixed name here
         (prefix,ext) = os.path.splitext(filename)

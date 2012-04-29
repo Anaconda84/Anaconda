@@ -1,3 +1,4 @@
+import time 
 # Written by Arno Bakker
 # see LICENSE.txt for license information
 #
@@ -15,7 +16,7 @@ class SmartCachingStream:
     Currently specifically tuned to input streams as returned by Core.
     """
     def __init__(self,inputstream,blocksize=1024*1024):
-        print >>sys.stderr,"CachingStream: __init__"
+        print >>sys.stderr,time.asctime(),'-', "CachingStream: __init__"
         self.instream = inputstream
         self.inblocksize = blocksize 
         self.inpos = 0
@@ -27,8 +28,8 @@ class SmartCachingStream:
 
     def read(self,nwant=None):
         if DEBUG:
-            print >>sys.stderr,"read: ",nwant
-            print >>sys.stderr,"bufpos",self.bufpos,"inpos",self.inpos,"bufs",self.bufstart,"bufe",self.bufend
+            print >>sys.stderr,time.asctime(),'-', "read: ",nwant
+            print >>sys.stderr,time.asctime(),'-', "bufpos",self.bufpos,"inpos",self.inpos,"bufs",self.bufstart,"bufe",self.bufend
         
         if self.buffer is None:
             self.read_new(nwant)
@@ -48,7 +49,7 @@ class SmartCachingStream:
         
     def seek(self,offset,whence=0):
         if DEBUG:
-            print >>sys.stderr,"seek: ",offset
+            print >>sys.stderr,time.asctime(),'-', "seek: ",offset
         if self.buffer is not None:
             if self.bufstart <= offset and offset < self.bufend:
                 # Seeking within current buffer
@@ -67,7 +68,7 @@ class SmartCachingStream:
         
     def read_new(self,nwant):
         if DEBUG:
-            print >>sys.stderr,"read_new: ",nwant
+            print >>sys.stderr,time.asctime(),'-', "read_new: ",nwant
         avail = self.inblocksize
         
         # Core specific: we only return a single piece on each read, so
@@ -75,20 +76,20 @@ class SmartCachingStream:
         #
         buffer1 = self.instream.read(avail)
         if DEBUG:
-            print >>sys.stderr,"read_new: 1got",len(buffer1)
+            print >>sys.stderr,time.asctime(),'-', "read_new: 1got",len(buffer1)
         buffer2 = self.instream.read(avail)
         if DEBUG:
-            print >>sys.stderr,"read_new: 2got",len(buffer2)
+            print >>sys.stderr,time.asctime(),'-', "read_new: 2got",len(buffer2)
         buffer3 = self.instream.read(avail)
         if DEBUG:
-            print >>sys.stderr,"read_new: 3got",len(buffer3)
+            print >>sys.stderr,time.asctime(),'-', "read_new: 3got",len(buffer3)
         buffer4 = self.instream.read(avail)
         if DEBUG:
-            print >>sys.stderr,"read_new: 4got",len(buffer4)
+            print >>sys.stderr,time.asctime(),'-', "read_new: 4got",len(buffer4)
 
         self.buffer = buffer1 + buffer2 + buffer3 + buffer4
         if DEBUG:
-            print >>sys.stderr,"read_new: got",len(self.buffer)
+            print >>sys.stderr,time.asctime(),'-', "read_new: got",len(self.buffer)
         self.bufstart =  self.inpos
         self.inpos += len(self.buffer)
         self.bufend = self.inpos
@@ -96,14 +97,14 @@ class SmartCachingStream:
 
     def read_buf(self,nwant):
         if DEBUG:
-            print >>sys.stderr,"read_buf: ",nwant
+            print >>sys.stderr,time.asctime(),'-', "read_buf: ",nwant
         ngot = min(nwant,self.bufend-self.bufpos)
         bufoff = self.bufpos-self.bufstart
         ret = self.buffer[bufoff:bufoff+ngot]
         # TODO: opt if buffer == pos+nwant
         self.bufpos += ngot
         if DEBUG:
-            print >>sys.stderr,"read_buf: ngot",ngot,"returned",len(ret)
+            print >>sys.stderr,time.asctime(),'-', "read_buf: ngot",ngot,"returned",len(ret)
         return ret
             
 

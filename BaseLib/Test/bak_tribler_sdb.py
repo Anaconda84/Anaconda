@@ -1,3 +1,4 @@
+import time 
 import sys
 import os
 from traceback import print_exc
@@ -14,7 +15,7 @@ def init_bak_tribler_sdb():
     if not os.path.isfile(TRIBLER_DB_PATH_BACKUP):
         got = extract_db_files(FILES_DIR, 'bak_tribler.tar.gz')
         if not got:
-            print >> sys.stderr, "Missing bak_tribler.tar.gz"
+            print >> sys.stderr, time.asctime(),'-', "Missing bak_tribler.tar.gz"
             sys.exit(1)
 
     if os.path.isfile(TRIBLER_DB_PATH_BACKUP):

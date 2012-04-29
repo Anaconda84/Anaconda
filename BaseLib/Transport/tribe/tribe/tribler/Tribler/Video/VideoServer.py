@@ -1,3 +1,4 @@
+import time 
 # Written by Jan David Mol, Arno Bakker
 # see LICENSE.txt for license information
 #
@@ -105,7 +106,7 @@ class VideoHTTPServer(ThreadingMixIn,BaseHTTPServer.HTTPServer):
             if streaminfo is None:
                 for mapper in self.mappers:
                     streaminfo = mapper.get(urlpath)
-                    # print >>sys.stderr,"videoserv: get_inputstream: Got streaminfo",`streaminfo`,"from",`mapper`
+                    # print >>sys.stderr,time.asctime(),'-', "videoserv: get_inputstream: Got streaminfo",`streaminfo`,"from",`mapper`
                     if streaminfo is not None and streaminfo['statuscode'] == 200:
                         break
         finally:
@@ -154,7 +155,7 @@ class VideoHTTPServer(ThreadingMixIn,BaseHTTPServer.HTTPServer):
 
     def shutdown(self):
         if DEBUG:
-            print >>sys.stderr,"videoserv: Shutting down HTTP"
+            print >>sys.stderr,time.asctime(),'-', "videoserv: Shutting down HTTP"
         # Stop by closing listening socket of HTTP server
         self.socket.close()
 
@@ -176,19 +177,19 @@ class SimpleServer(BaseHTTPServer.BaseHTTPRequestHandler):
         """
         try:
             if DEBUG:
-                print >>sys.stderr,"videoserv: do_GET: Got request",self.path,self.headers.getheader('range'),currentThread().getName()
-                print >>sys.stderr,"videoserv: do_GET: Range",self.headers.getrawheader('Range'),currentThread().getName()
+                print >>sys.stderr,time.asctime(),'-', "videoserv: do_GET: Got request",self.path,self.headers.getheader('range'),currentThread().getName()
+                print >>sys.stderr,time.asctime(),'-', "videoserv: do_GET: Range",self.headers.getrawheader('Range'),currentThread().getName()
                 
             # 1. Get streaminfo for the data we should return in response
             nbytes2send = None
             nbyteswritten= 0
             streaminfo = self.server.acquire_inputstream(self.path)
-            #print >>sys.stderr,"videoserv: do_GET: Got streaminfo",`streaminfo`
+            #print >>sys.stderr,time.asctime(),'-', "videoserv: do_GET: Got streaminfo",`streaminfo`
             try:
                 if streaminfo is None or ('statuscode' in streaminfo and streaminfo['statuscode'] != 200):
                     # 2. Send error response
                     if DEBUG:
-                        print >>sys.stderr,"videoserv: do_GET: Cannot serve request",streaminfo['statuscode'],currentThread().getName()
+                        print >>sys.stderr,time.asctime(),'-', "videoserv: do_GET: Cannot serve request",streaminfo['statuscode'],currentThread().getName()
                         
                     self.send_response(streaminfo['statuscode'])
                     self.send_header("Content-Type","text/plain")
@@ -216,7 +217,7 @@ class SimpleServer(BaseHTTPServer.BaseHTTPRequestHandler):
         
                 #mimetype = 'application/x-mms-framed'
                 #mimetype = 'video/H264'
-                print >>sys.stderr,"videoserv: do_GET: MIME type is",mimetype,"length",length,"blocksize",blocksize,currentThread().getName()
+                print >>sys.stderr,time.asctime(),'-', "videoserv: do_GET: MIME type is",mimetype,"length",length,"blocksize",blocksize,currentThread().getName()
     
                 # 3. Support for HTTP range queries: 
                 # http://tools.ietf.org/html/rfc2616#section-14.35
@@ -292,7 +293,7 @@ class SimpleServer(BaseHTTPServer.BaseHTTPRequestHandler):
                     self.send_response(200)
             
             
-                print >>sys.stderr,"videoserv: do_GET: final range",firstbyte,lastbyte,nbytes2send,currentThread().getName()
+                print >>sys.stderr,time.asctime(),'-', "videoserv: do_GET: final range",firstbyte,lastbyte,nbytes2send,currentThread().getName()
             
             
                 # 4. Seek in stream to desired offset
@@ -320,7 +321,7 @@ class SimpleServer(BaseHTTPServer.BaseHTTPRequestHandler):
                         self.wfile.write(data)
                     elif len(data) == 0:
                         if DEBUG:
-                            print >>sys.stderr,"videoserv: svc: stream.read() no data" 
+                            print >>sys.stderr,time.asctime(),'-', "videoserv: svc: stream.read() no data" 
                 else:
                     # 6. Send body (completely, a Range: or an infinite stream in chunked encoding
                     done = False
@@ -329,7 +330,7 @@ class SimpleServer(BaseHTTPServer.BaseHTTPRequestHandler):
                         if len(data) == 0:
                             done = True
                         
-                        #print >>sys.stderr,"videoserv: HTTP: read",len(data),"bytes"
+                        #print >>sys.stderr,time.asctime(),'-', "videoserv: HTTP: read",len(data),"bytes"
                         
                         if length is None:
                             # If length unknown, use chunked encoding
@@ -353,14 +354,14 @@ class SimpleServer(BaseHTTPServer.BaseHTTPRequestHandler):
         
                         if done:
                             if DEBUG:
-                                print >>sys.stderr,"videoserv: do_GET: stream reached EOF or range query's send limit",currentThread().getName() 
+                                print >>sys.stderr,time.asctime(),'-', "videoserv: do_GET: stream reached EOF or range query's send limit",currentThread().getName() 
                             break
                             
                     if DEBUG:
-                        print >>sys.stderr,"videoserv: do_GET: Done sending data",currentThread().getName()
+                        print >>sys.stderr,time.asctime(),'-', "videoserv: do_GET: Done sending data",currentThread().getName()
                         
                     if nbyteswritten != nbytes2send:
-                        print >>sys.stderr,"videoserv: do_GET: Sent wrong amount, wanted",nbytes2send,"got",nbyteswritten,currentThread().getName()
+                        print >>sys.stderr,time.asctime(),'-', "videoserv: do_GET: Sent wrong amount, wanted",nbytes2send,"got",nbyteswritten,currentThread().getName()
             
                     stream.close()
                     if self.server.statuscallback is not None:
@@ -371,7 +372,7 @@ class SimpleServer(BaseHTTPServer.BaseHTTPRequestHandler):
             
         except Exception,e:
             if DEBUG:
-                print >>sys.stderr,"videoserv: Error occured while serving",currentThread().getName()
+                print >>sys.stderr,time.asctime(),'-', "videoserv: Error occured while serving",currentThread().getName()
             print_exc()
             self.error(e,self.path)
 
@@ -414,7 +415,7 @@ class VideoRawVLCServer:
         """
         self.lock.acquire()
         try:
-            print >>sys.stderr,"VLCRawServer: setting sid",sid
+            print >>sys.stderr,time.asctime(),'-', "VLCRawServer: setting sid",sid
             self.sid2streaminfo[sid] = streaminfo
             
             # workaround
@@ -436,10 +437,10 @@ class VideoRawVLCServer:
 
     def ReadDataCallback(self, bufc, buflen, sid):
         try:
-            print >>sys.stderr,"VideoRawVLCServer:ReadDataCallback: stream",sid,"wants", buflen,"thread",currentThread().getName()
+            print >>sys.stderr,time.asctime(),'-', "VideoRawVLCServer:ReadDataCallback: stream",sid,"wants", buflen,"thread",currentThread().getName()
             # workaround
             #sid = self.lastsid
-            #print >>sys.stderr,"VideoRawVLCServer:ReadDataCallback: stream override sid",sid
+            #print >>sys.stderr,time.asctime(),'-', "VideoRawVLCServer:ReadDataCallback: stream override sid",sid
             
             if self.oldsid is not None and self.oldsid != sid:
                 # Switched streams, garbage collect old
@@ -452,15 +453,15 @@ class VideoRawVLCServer:
             self.oldsid = sid
             
             streaminfo = self.get_inputstream(sid)
-            #print >>sys.stderr,"rawread: sid",sid,"n",buflen
+            #print >>sys.stderr,time.asctime(),'-', "rawread: sid",sid,"n",buflen
             data = streaminfo['stream'].read(buflen)
             size = len(data)
-            #print >>sys.stderr,"rawread: sid",sid,"GOT",size
+            #print >>sys.stderr,time.asctime(),'-', "rawread: sid",sid,"GOT",size
             if size == 0:
                 return 0
             else:
                 bufc[0:size]=data
-            #print >>sys.stderr,"VideoRawVLCServer:ReadDataCallback: bufc size ", len(bufc)
+            #print >>sys.stderr,time.asctime(),'-', "VideoRawVLCServer:ReadDataCallback: bufc size ", len(bufc)
             
             return size
         except:
@@ -471,7 +472,7 @@ class VideoRawVLCServer:
         try:
             # WARNING: CURRENT 0.8.6h binaries have bug in vlcglue.c: pos is just a long int , not a long long int.
             
-            print >>sys.stderr,"VideoRawVLCServer: SeekDataCallback: stream",sid,"seeking to", pos,"oldsid",self.oldsid
+            print >>sys.stderr,time.asctime(),'-', "VideoRawVLCServer: SeekDataCallback: stream",sid,"seeking to", pos,"oldsid",self.oldsid
             # Arno: TODO: add support for seeking
             if True:
                 streaminfo = self.get_inputstream(sid)

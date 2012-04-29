@@ -1,3 +1,4 @@
+import time 
 # Written by Arno Bakker, Michel Meulpolder
 # see LICENSE.txt for license information
 
@@ -80,13 +81,13 @@ class TestBarterCast(TestAsServer):
         """ 
             test good BARTERCAST messages
         """
-        print >>sys.stderr,"test: good BARTERCAST"
+        print >>sys.stderr,time.asctime(),'-', "test: good BARTERCAST"
         s = OLConnection(self.my_keypair,'localhost',self.hisport)
         msg = self.create_good_bartercast()
         s.send(msg)
         while True:
             resp = s.recv()
-            print >>sys.stderr,"test: reply message",getMessageName(resp[0])
+            print >>sys.stderr,time.asctime(),'-', "test: reply message",getMessageName(resp[0])
             if resp[0] == KEEP_ALIVE:
                 continue
             else:
@@ -166,7 +167,7 @@ class TestBarterCast(TestAsServer):
         self._test_bad(self.create_wrong_dict_keys)
 
     def _test_bad(self,gen_soverlap_func):
-        print >>sys.stderr,"test: bad BARTERCAST",gen_soverlap_func
+        print >>sys.stderr,time.asctime(),'-', "test: bad BARTERCAST",gen_soverlap_func
         s = OLConnection(self.my_keypair,'localhost',self.hisport)
         msg = gen_soverlap_func()
         s.send(msg)

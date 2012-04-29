@@ -1,3 +1,4 @@
+import time 
 # Written by Arno Bakker
 # see LICENSE.txt for license information
 #
@@ -57,23 +58,23 @@ class TestTracking(TestAsServer):
         self.check_http_presence(hexinfohash,True)
         
         self.session.remove_from_internal_tracker(tdef)
-        print >> sys.stderr,"test: Give network thread running tracker time to detect we removed the torrent file"
+        print >> sys.stderr,time.asctime(),'-', "test: Give network thread running tracker time to detect we removed the torrent file"
         time.sleep(2)
         
         self.check_http_presence(hexinfohash,False)
         self.check_disk_presence(hexinfohash,False)
 
     def check_http_presence(self,hexinfohash,present):
-        print >> sys.stderr,"test: infohash is",hexinfohash
+        print >> sys.stderr,time.asctime(),'-', "test: infohash is",hexinfohash
         url = 'http://127.0.0.1:'+str(self.session.get_listen_port())+'/'
-        print >> sys.stderr,"test: tracker lives at",url
+        print >> sys.stderr,time.asctime(),'-', "test: tracker lives at",url
         f = urlopen(url)
         data = f.read()
         f.close()
         
         # WARNING: this test depends on the output of the tracker. If that
         # is changed, also change this.
-        print >> sys.stderr,"test: tracker returned:",data
+        print >> sys.stderr,time.asctime(),'-', "test: tracker returned:",data
         if present:
             self.assert_(data.find(hexinfohash) != -1)
         else:
@@ -122,12 +123,12 @@ class TestTracking(TestAsServer):
             quoted = urllib.quote(httpseed)
             url = urlprefix+quoted
             #url = "http://www.cs.vu.nl/~arno/index.html"
-            print >>sys.stderr,"test: Asking tracker for",url
+            print >>sys.stderr,time.asctime(),'-', "test: Asking tracker for",url
             # F*ing BitTornado/Python crap: using normal urlopen here results in
             # an infinitely hanging read (even if read(1024))
             conn = urlopen(url)
             gotdata = conn.read()
-            print >>sys.stderr,"test: Tracker sent",len(gotdata)
+            print >>sys.stderr,time.asctime(),'-', "test: Tracker sent",len(gotdata)
             conn.close()
             self.assertEquals(wantdata,gotdata)
             

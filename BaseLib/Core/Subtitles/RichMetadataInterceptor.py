@@ -1,3 +1,4 @@
+import time 
 # Written by Andrea Reale
 # see LICENSE.txt for license information
 
@@ -65,7 +66,7 @@ class RichMetadataInterceptor(object):
         '''
         if not isinstance(enrichedChannelcastMessage, dict):
             if DEBUG:
-                print >> sys.stderr, "Invalid channelcast message received"
+                print >> sys.stderr, time.asctime(),'-', "Invalid channelcast message received"
             return None
         
         rmdData = list()
@@ -94,7 +95,7 @@ class RichMetadataInterceptor(object):
                         curMetadataDTO = deserialize(metadataEntry)
                     except SerializationException,e:
                         if DEBUG:
-                            print >> sys.stderr, "Invalid metadata message content: %s" % e
+                            print >> sys.stderr, time.asctime(),'-', "Invalid metadata message content: %s" % e
                         continue
                     
                     rmdData.append((curMetadataDTO,havemask))
@@ -114,7 +115,7 @@ class RichMetadataInterceptor(object):
           self._splitChannelcastAndRichMetadataContents(channelCastMessage)
           
         if DEBUG:
-            print >> sys.stderr, "Handling rich metadata from %s..." % show_permid_short(sender_permid)
+            print >> sys.stderr, time.asctime(),'-', "Handling rich metadata from %s..." % show_permid_short(sender_permid)
         i=0
         for md_and_have in metadataDTOs:
             md = md_and_have[0]
@@ -130,7 +131,7 @@ class RichMetadataInterceptor(object):
             #if announceStatsLog.isEnabledFor(logging.INFO):
             if DEBUG:
                 id = "RQ" if fromQuery else "R"
-                print >> sys.stderr, "%c, %s, %s, %s, %d, %d" % \
+                print >> sys.stderr, time.asctime(),'-', "%c, %s, %s, %s, %d, %d" % \
                                        (id, md.channel, md.infohash, \
                                         show_permid_short(sender_permid), md.timestamp,
                                         sizeList[i])
@@ -157,7 +158,7 @@ class RichMetadataInterceptor(object):
             # sender
             if vote == 2:
                 if DEBUG:
-                    print >> sys.stderr, "Subscribed to channel %s, trying to retrieve" \
+                    print >> sys.stderr, time.asctime(),'-', "Subscribed to channel %s, trying to retrieve" \
                          "all subtitle contents" % (show_permid_short(md.channel),)
                 
                 self._getAllSubtitles(md)
@@ -182,7 +183,7 @@ class RichMetadataInterceptor(object):
             self.subSupport.retrieveMultipleSubtitleContents(md.channel,md.infohash,
                                                              subtitles.values())
         except RichMetadataException,e:
-            print >> sys.stderr, "Warning: Retrievement of all subtitles failed: " + str(e)
+            print >> sys.stderr, time.asctime(),'-', "Warning: Retrievement of all subtitles failed: " + str(e)
         
     
     def addRichMetadataContent(self,channelCastMessage, destPermid = None, fromQuery = False):
@@ -198,14 +199,14 @@ class RichMetadataInterceptor(object):
         '''
         if not len(channelCastMessage) > 0:
             if DEBUG:
-                print >> sys.stderr, "no entries to enrich with rmd"
+                print >> sys.stderr, time.asctime(),'-', "no entries to enrich with rmd"
             return channelCastMessage
         
         if DEBUG:
             if fromQuery: 
-                print >> sys.stderr, "Intercepted a channelcast message as answer to a query"
+                print >> sys.stderr, time.asctime(),'-', "Intercepted a channelcast message as answer to a query"
             else:
-                print >> sys.stderr, "Intercepted a channelcast message as normal channelcast"
+                print >> sys.stderr, time.asctime(),'-', "Intercepted a channelcast message as normal channelcast"
         #otherwise I'm modifying the old one (even if there's nothing bad
         #it's not good for the caller to see its parameters changed :)
         newMessage = dict()
@@ -225,7 +226,7 @@ class RichMetadataInterceptor(object):
             if metadataDTO is not None:
                 try:
                     if DEBUG:
-                        print >> sys.stderr, "Enriching a channelcast message with subtitle contents"
+                        print >> sys.stderr, time.asctime(),'-', "Enriching a channelcast message with subtitle contents"
                     metadataPack = metadataDTO.serialize()
                     
                     # I can remove from the metadata pack the infohash, and channelId
@@ -248,12 +249,12 @@ class RichMetadataInterceptor(object):
                     
                         id = "SQ" if fromQuery else "S"
                         # format (S (for sent) | SQ (for sent as response to a query), channel, infohash, destination, timestampe, size)
-                        print >> sys.stderr, "%c, %s, %s, %s, %d, %d" % \
+                        print >> sys.stderr, time.asctime(),'-', "%c, %s, %s, %s, %d, %d" % \
                             (id, bin2str(metadataDTO.channel), \
                             bin2str(metadataDTO.infohash), \
                              dest, metadataDTO.timestamp, size)
                 except Exception,e:
-                    print >> sys.stderr, "Warning: Error serializing metadata: %s", str(e)
+                    print >> sys.stderr, time.asctime(),'-', "Warning: Error serializing metadata: %s", str(e)
                     return channelCastMessage
             else:
                 # better to put the field to None, or to avoid adding the
@@ -269,34 +270,34 @@ class RichMetadataInterceptor(object):
 def validMetadataEntry(entry):
     if entry is None or len(entry) != 6:
         if DEBUG:
-            print >> sys.stderr, "An invalid metadata entry was found in channelcast message"
+            print >> sys.stderr, time.asctime(),'-', "An invalid metadata entry was found in channelcast message"
         return False
     
     if not isinstance(entry[1], int) or entry[1] <= 0:
         if DEBUG:
-            print >> sys.stderr, "Invalid rich metadata: invalid timestamp"
+            print >> sys.stderr, time.asctime(),'-', "Invalid rich metadata: invalid timestamp"
         return False
    
     if not isinstance(entry[2], basestring) or not len(entry[2]) == 4: #32 bit subtitles mask
         if DEBUG:
-            print >> sys.stderr, "Invalid rich metadata: subtitles mask"
+            print >> sys.stderr, time.asctime(),'-', "Invalid rich metadata: subtitles mask"
         return False
     
     if not isinstance(entry[3], list):
         if DEBUG:
-            print >> sys.stderr, "Invalid rich metadata: subtitles' checsums"
+            print >> sys.stderr, time.asctime(),'-', "Invalid rich metadata: subtitles' checsums"
         return False
     else:
         for checksum in entry[3]:
             if not isinstance(entry[2], basestring) or not len(checksum) == 20:
                 if DEBUG:
-                    print >> sys.stderr, "Invalid rich metadata: subtitles' checsums"
+                    print >> sys.stderr, time.asctime(),'-', "Invalid rich metadata: subtitles' checsums"
                 return False
 
     
     if not isinstance(entry[2], basestring) or not len(entry[5]) == 4: #32 bit have mask
         if DEBUG:
-            print >> sys.stderr, "Invalid rich metadata: have mask"
+            print >> sys.stderr, time.asctime(),'-', "Invalid rich metadata: have mask"
         return False
     
     return True

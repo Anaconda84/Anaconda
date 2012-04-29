@@ -1,3 +1,4 @@
+import time 
 # Written by Boudewijn Schoon
 # see LICENSE.txt for license information
 
@@ -144,7 +145,7 @@ class VideoPlaybackDBHandler(BasicDBHandler):
             # unicode string, this will crash the database wrapper.
             key = b64encode(key)
 
-            if DEBUG: print >>sys.stderr, "VideoPlaybackDBHandler add_event", key, event
+            if DEBUG: print >>sys.stderr, time.asctime(),'-', "VideoPlaybackDBHandler add_event", key, event
             self._db.execute_write("INSERT INTO %s (key, timestamp, event) VALUES ('%s', %s, '%s')" % (self.table_name, key, time(), event))
 
     def flush(self):

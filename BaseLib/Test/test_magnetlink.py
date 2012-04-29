@@ -1,3 +1,4 @@
+import time 
 # Written by Boudewijn Schoon
 # see LICENSE.txt for license information
 
@@ -57,7 +58,7 @@ class MagnetHelpers:
         conn.s.settimeout(10.0)
         responce = conn.recv()
         self.assert_(len(responce) > 0)
-        # print >>sys.stderr,"test: Got reply", getMessageName(responce[0])
+        # print >>sys.stderr,time.asctime(),'-', "test: Got reply", getMessageName(responce[0])
         self.assert_(responce[0] == EXTEND)
         return self.metadata_id_from_extend_handshake(responce[1:])
 
@@ -66,7 +67,7 @@ class MagnetHelpers:
         while True:
             responce = conn.recv()
             assert len(responce) > 0
-            # print >>sys.stderr,"test: Got data", getMessageName(responce[0])
+            # print >>sys.stderr,time.asctime(),'-', "test: Got data", getMessageName(responce[0])
             if responce[0] == EXTEND:
                 break
 
@@ -86,7 +87,7 @@ class MagnetHelpers:
         while True:
             responce = conn.recv()
             assert len(responce) > 0
-            # print >>sys.stderr,"test: Got data", getMessageName(responce[0])
+            # print >>sys.stderr,time.asctime(),'-', "test: Got data", getMessageName(responce[0])
             if responce[0] == EXTEND:
                 break
 
@@ -103,7 +104,7 @@ class MagnetHelpers:
         while True:
             responce = conn.recv()
             assert len(responce) > 0
-            # print >>sys.stderr,"test: Got reject", getMessageName(responce[0])
+            # print >>sys.stderr,time.asctime(),'-', "test: Got reject", getMessageName(responce[0])
             if responce[0] == EXTEND:
                 break
 
@@ -151,9 +152,9 @@ class TestMagnetMiniBitTorrent(TestAsServer, MagnetHelpers):
 
         # startup the client
         TestAsServer.setUp(self)
-        print >>sys.stderr,"test: Giving MyLaunchMany time to startup"
+        print >>sys.stderr,time.asctime(),'-', "test: Giving MyLaunchMany time to startup"
         time.sleep(5)
-        print >>sys.stderr,"test: MyLaunchMany should have started up"
+        print >>sys.stderr,time.asctime(),'-', "test: MyLaunchMany should have started up"
 
     def create_good_url(self, infohash=None, title=None, tracker=None):
         url = "magnet:?xt=urn:btih:"
@@ -217,9 +218,9 @@ class TestMetadata(TestAsServer, MagnetHelpers):
     def setUp(self):
         """ override TestAsServer """
         TestAsServer.setUp(self)
-        print >>sys.stderr,"test: Giving MyLaunchMany time to startup"
+        print >>sys.stderr,time.asctime(),'-', "test: Giving MyLaunchMany time to startup"
         time.sleep(5)
-        print >>sys.stderr,"test: MyLaunchMany should have started up"
+        print >>sys.stderr,time.asctime(),'-', "test: MyLaunchMany should have started up"
     
         # the metadata that we want to transfer
         self.tdef = TorrentDef()
@@ -248,7 +249,7 @@ class TestMetadata(TestAsServer, MagnetHelpers):
             time.sleep(1)
             assert counter < 30, "timeout"
 
-        print >> sys.stderr, "test: setup_seeder() complete"
+        print >> sys.stderr, time.asctime(),'-', "test: setup_seeder() complete"
 
     def teardown_seeder(self):
         self.seeder_teardown_complete = False
@@ -260,13 +261,13 @@ class TestMetadata(TestAsServer, MagnetHelpers):
             time.sleep(1)
             assert counter < 30, "timeout"
 
-        print >> sys.stderr, "test: teardown_seeder() complete"
+        print >> sys.stderr, time.asctime(),'-', "test: teardown_seeder() complete"
 
     def seeder_state_callback(self,ds):
         assert not self.seeder_teardown_complete
         self.seeder_setup_complete = (ds.get_status() == DLSTATUS_DOWNLOADING)
         d = ds.get_download()
-        print >> sys.stderr, "test: seeder:", `d.get_def().get_name()`, dlstatus_strings[ds.get_status()], ds.get_progress()
+        print >> sys.stderr, time.asctime(),'-', "test: seeder:", `d.get_def().get_name()`, dlstatus_strings[ds.get_status()], ds.get_progress()
         if self.seeder_teardown:
             self.seeder_teardown_complete = True
         else:
@@ -340,6 +341,6 @@ if __name__ == "__main__":
     if len(sys.argv) == 2 and sys.argv[1] in test_dict:
         unittest.main(defaultTest=test_dict[sys.argv[1]])
     else:
-        print >> sys.stderr, "What test do you want to run? "
-        print >> sys.stderr, "Available:", test_dict.keys()
+        print >> sys.stderr, time.asctime(),'-', "What test do you want to run? "
+        print >> sys.stderr, time.asctime(),'-', "Available:", test_dict.keys()
 

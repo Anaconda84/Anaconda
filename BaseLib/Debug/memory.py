@@ -1,3 +1,4 @@
+import time 
 #!/usr/bin/python
 # Written by Boudewijn Schoon
 # see LICENSE.txt for license information
@@ -33,10 +34,10 @@ def _get_list_footprint(obj, depth):
         return 8 + 4 * len(obj)
     else:
         if len(obj) in (2, 3):
-            print >> sys.stderr, "Len:", type(obj[0]), type(obj[1])
-            print >> sys.stderr, `obj`
+            print >> sys.stderr, time.asctime(),'-', "Len:", type(obj[0]), type(obj[1])
+            print >> sys.stderr, time.asctime(),'-', `obj`
             return 42
-        print >> sys.stderr, "Len:", len(obj)
+        print >> sys.stderr, time.asctime(),'-', "Len:", len(obj)
         return 8 + 4 * len(obj) + sum(map(lambda obj:get_memory_footprint(obj, depth), obj))
 def _get_dict_footprint(obj, depth):
     if depth == 0:
@@ -123,7 +124,7 @@ def monitor(delay=10.0, interval=60.0, min_footprint=100000):
             history = history[-2:]
             low_foot = min(history)
             datetime = get_datetime()
-            print >> sys.stderr, "Memory:", datetime, "using minimal footprint:", byte_uint_to_human(low_foot)
+            print >> sys.stderr, time.asctime(),'-', "Memory:", datetime, "using minimal footprint:", byte_uint_to_human(low_foot)
 
             gc.collect()
             for obj in gc.get_objects():
@@ -131,16 +132,16 @@ def monitor(delay=10.0, interval=60.0, min_footprint=100000):
                     try:
                         footprint = get_memory_footprint(obj)
                     except:
-                        print >> sys.stderr, "Memory:", datetime, "unable to get footprint for", get_description(obj)
+                        print >> sys.stderr, time.asctime(),'-', "Memory:", datetime, "unable to get footprint for", get_description(obj)
                     else:
                         if footprint > high_foot:
                             high_foot = footprint
                         if footprint >= low_foot:
 
-                            print >> sys.stderr, "Memory:", datetime, get_description(obj), "footprint:", byte_uint_to_human(footprint)
+                            print >> sys.stderr, time.asctime(),'-', "Memory:", datetime, get_description(obj), "footprint:", byte_uint_to_human(footprint)
                             for referrer in gc.get_referrers(obj):
-                                print >> sys.stderr, "Memory:", datetime, "REF", get_description(referrer)
-                            print >> sys.stderr, "Memory"
+                                print >> sys.stderr, time.asctime(),'-', "Memory:", datetime, "REF", get_description(referrer)
+                            print >> sys.stderr, time.asctime(),'-', "Memory"
 
             history.append(high_foot)
             time.sleep(interval)

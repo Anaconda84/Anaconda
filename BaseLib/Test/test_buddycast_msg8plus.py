@@ -1,3 +1,4 @@
+import time 
 # Written by Nicolas Neubauer, Arno Bakker
 # see LICENSE.txt for license information
 #
@@ -76,7 +77,7 @@ class TestBuddyCastMsg8Plus(TestAsServer):
         os.makedirs(statsdir)
         
         superpeerfilename = os.path.join(spdir, 'superpeer.txt')
-        print >> sys.stderr,"test: writing empty superpeers to",superpeerfilename
+        print >> sys.stderr,time.asctime(),'-', "test: writing empty superpeers to",superpeerfilename
         f = open(superpeerfilename, "w")
         f.write('# Leeg')
         f.close()
@@ -88,7 +89,7 @@ class TestBuddyCastMsg8Plus(TestAsServer):
         for srcfile in srcfiles:
             sfn = os.path.join('..','..',srcfile)
             dfn = os.path.join(self.install_path,srcfile)
-            print >>sys.stderr,"test: copying",sfn,dfn
+            print >>sys.stderr,time.asctime(),'-', "test: copying",sfn,dfn
             shutil.copyfile(sfn,dfn)
 
         
@@ -224,21 +225,21 @@ class TestBuddyCastMsg8Plus(TestAsServer):
            For example, the messages always contain terms [1,2]
         """
            
-        print >>sys.stderr,"\ntest: subtest_good_buddycast_clicklog",i,"selversion",myoversion    
+        print >>sys.stderr,time.asctime(),'-', "\ntest: subtest_good_buddycast_clicklog",i,"selversion",myoversion    
            
         s = OLConnection(self.my_keypair,'localhost',self.hisport,myoversion=myoversion)
         
         prefmsg = self.get_good_clicklog_msg(i,myoversion)
         
-        print >>sys.stderr,myoversion,`prefmsg`
+        print >>sys.stderr,time.asctime(),'-', myoversion,`prefmsg`
         
         msg = self.create_payload(prefmsg)
         s.send(msg)
         resp = s.recv()
         if len(resp)>0:
-            print >>sys.stderr,"test: reply message %s:%s" % (getMessageName(resp[0]), resp[1:])
+            print >>sys.stderr,time.asctime(),'-', "test: reply message %s:%s" % (getMessageName(resp[0]), resp[1:])
         else:
-            print >>sys.stderr,"no reply message"
+            print >>sys.stderr,time.asctime(),'-', "no reply message"
         self.assert_(len(resp) > 0)
             
         #if we have survived this, check if the content of the remote database is correct
@@ -250,18 +251,18 @@ class TestBuddyCastMsg8Plus(TestAsServer):
         torrent_id = None
         while not torrent_id:
             hash = prefmsg['preferences'][0][0]
-            print >> sys.stderr, "hash: %s, bin2str: %s" % (hash, bin2str(hash))
+            print >> sys.stderr, time.asctime(),'-', "hash: %s, bin2str: %s" % (hash, bin2str(hash))
             torrent_data =  torrent_db.getTorrentID(hash)
-            print >> sys.stderr, "Torrent data for torrent %s: %s" % (prefmsg['preferences'][0][0], torrent_data)
+            print >> sys.stderr, time.asctime(),'-', "Torrent data for torrent %s: %s" % (prefmsg['preferences'][0][0], torrent_data)
             torrent_id = torrent_data
             if not torrent_id:
-                print >> sys.stderr, "torrent not yet saved, waiting..."
+                print >> sys.stderr, time.asctime(),'-', "torrent not yet saved, waiting..."
                 sleep(1)
         
 
         # self.getAll("rowid, peer_id, torrent_id, click_position,reranking_strategy", order_by="peer_id, torrent_id")
         real_prefs = pref_db.getAllEntries()
-        print >>sys.stderr,"test: getAllEntries returned",real_prefs
+        print >>sys.stderr,time.asctime(),'-', "test: getAllEntries returned",real_prefs
         
         my_peer_id = real_prefs[0][1] 
         real_terms = term_db.getAllEntries()
@@ -295,13 +296,13 @@ class TestBuddyCastMsg8Plus(TestAsServer):
             
                 
         
-        print >> sys.stderr, "real_prefs: %s" % real_prefs
-        print >> sys.stderr, "real_terms: %s" % real_terms
-        print >> sys.stderr, "real_search: %s " % real_search
+        print >> sys.stderr, time.asctime(),'-', "real_prefs: %s" % real_prefs
+        print >> sys.stderr, time.asctime(),'-', "real_terms: %s" % real_terms
+        print >> sys.stderr, time.asctime(),'-', "real_search: %s " % real_search
 
-        print >> sys.stderr, "wanted_prefs: %s" % wanted_prefs
-        print >> sys.stderr, "wanted_terms: %s" % wanted_terms
-        print >> sys.stderr, "wanted_search: %s " % wanted_search
+        print >> sys.stderr, time.asctime(),'-', "wanted_prefs: %s" % wanted_prefs
+        print >> sys.stderr, time.asctime(),'-', "wanted_terms: %s" % wanted_terms
+        print >> sys.stderr, time.asctime(),'-', "wanted_search: %s " % wanted_search
 
         self.assert_(self.lol_equals(real_search, wanted_search, "good buddycast %d: search" % i))
         self.assert_(self.lol_equals(real_terms, wanted_terms, "good buddycast %d: terms" % i))
@@ -310,7 +311,7 @@ class TestBuddyCastMsg8Plus(TestAsServer):
     def subtest_terms(self,myoversion):
         """assumes clicklog message 1 and 2 have been sent and digested"""
         
-        print >>sys.stderr,"\ntest: subtest_terms"
+        print >>sys.stderr,time.asctime(),'-', "\ntest: subtest_terms"
         
         term_db = self.session.open_dbhandler(NTFY_TERM)
         
@@ -322,19 +323,19 @@ class TestBuddyCastMsg8Plus(TestAsServer):
         self.assert_(len(resp) > 0)
         
         termid = term_db.getTermID(u"linux")
-        print >>sys.stderr, "TermID for Linux: %s" % termid
+        print >>sys.stderr, time.asctime(),'-', "TermID for Linux: %s" % termid
         #self.assert_(termid == 1)
         
         #self.assert_(term_db.getTerm(1)==bin2str(str(u"linux")))
         
         completedTerms = term_db.getTermsStartingWith("li")
-        print >> sys.stderr, "terms starting with l: %s" % completedTerms  
+        print >> sys.stderr, time.asctime(),'-', "terms starting with l: %s" % completedTerms  
         self.assert_(len(completedTerms)==1)
         self.assert_(u'linux' in completedTerms)
         
         term_db.insertTerm("asd#")
         completedTerms = term_db.getTermsStartingWith("asd")
-        print >> sys.stderr, "terms starting with asd: %s" % completedTerms  
+        print >> sys.stderr, time.asctime(),'-', "terms starting with asd: %s" % completedTerms  
         self.assert_(len(completedTerms)==1)
         # Arno, 2010-02-03: Nicolas had 'asd' here, but I don't see any place
         # where the # should have been stripped.
@@ -345,7 +346,7 @@ class TestBuddyCastMsg8Plus(TestAsServer):
 
 
     def subtest_create_mypref(self):
-        print >>sys.stderr,"\ntest: creating test MyPreference data"
+        print >>sys.stderr,time.asctime(),'-', "\ntest: creating test MyPreference data"
         
         torrent_db = self.session.open_dbhandler(NTFY_TORRENTS)
         torrent_db.addInfohash('mhashmhashmhashmhash')
@@ -363,7 +364,7 @@ class TestBuddyCastMsg8Plus(TestAsServer):
         
         # self.getAll("torrent_id, click_position, reranking_strategy", order_by="torrent_id")
         allEntries = mypref_db.getAllEntries()
-        print >> sys.stderr, "all mypref entries: %s" % allEntries
+        print >> sys.stderr, time.asctime(),'-', "all mypref entries: %s" % allEntries
         self.assert_(len(allEntries)==1)
         # (torrent_id, click_pos, rerank_strategy)
         mypref_wanted = [['?',1,2]]
@@ -377,14 +378,14 @@ class TestBuddyCastMsg8Plus(TestAsServer):
         
         
     def subtest_create_bc(self,myoversion):
-        print >>sys.stderr,"\ntest: creating test create_bc"
+        print >>sys.stderr,time.asctime(),'-', "\ntest: creating test create_bc"
         
         torrent_db = self.session.open_dbhandler(NTFY_TORRENTS)
         torrent_db._db.update("Torrent", status_id=1)
         pref_db = self.session.open_dbhandler(NTFY_MYPREFERENCES)
         pref_db.loadData()
         msg = self.buddycast.buddycast_core.createBuddyCastMessage(0, myoversion, target_ip="127.0.0.1", target_port=80)
-        print >> sys.stderr, "created bc pref: %s" % msg
+        print >> sys.stderr, time.asctime(),'-', "created bc pref: %s" % msg
         
         wantpref = ['mhashmhashmhashmhash',['linux','fedora'],1,2]
         if myoversion >= OLPROTO_VER_ELEVENTH:
@@ -402,11 +403,11 @@ class TestBuddyCastMsg8Plus(TestAsServer):
                 if e1=='?' or e2=='?':
                     continue
                 if not e1==e2:
-                    print >> sys.stderr, "%s != %s!" % (e1, e2)
+                    print >> sys.stderr, time.asctime(),'-', "%s != %s!" % (e1, e2)
                     ok = False
                     break
         if not ok:
-            print >> sys.stderr, "%s: lol != lol:\nreal   %s\nwanted %s" % (msg, lol1, lol2)
+            print >> sys.stderr, time.asctime(),'-', "%s: lol != lol:\nreal   %s\nwanted %s" % (msg, lol1, lol2)
         return ok
         
 

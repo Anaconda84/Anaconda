@@ -1,3 +1,4 @@
+import time 
 # Written by Jelle Roozenburg 
 # see LICENSE.txt for license information
 
@@ -78,7 +79,7 @@ class Notifier:
             except:
                 print_stack()
                 print_exc()
-                print >>sys.stderr,"notify: OIDs were",`oid`,`obj_id`
+                print >>sys.stderr,time.asctime(),'-', "notify: OIDs were",`oid`,`obj_id`
                 
         self.observerLock.release()
         args = [subject, changeType, obj_id] + list(args)

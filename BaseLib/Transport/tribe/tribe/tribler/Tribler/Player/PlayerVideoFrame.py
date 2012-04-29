@@ -1,3 +1,4 @@
+import time 
 # Written by Fabian van der Werf and Arno Bakker
 # see LICENSE.txt for license information
 
@@ -50,7 +51,7 @@ class VideoFrame(wx.Frame,VideoBaseFrame):
 
     def show_videoframe(self):
         if DEBUG:
-            print >>sys.stderr,"videoframe: Swap IN videopanel"
+            print >>sys.stderr,time.asctime(),'-', "videoframe: Swap IN videopanel"
             
         if self.videopanel is not None:
             if not self.showingframe:
@@ -70,7 +71,7 @@ class VideoFrame(wx.Frame,VideoBaseFrame):
     
     def hide_videoframe(self):
         if DEBUG:
-            print >>sys.stderr,"videoframe: Swap OUT videopanel"
+            print >>sys.stderr,time.asctime(),'-', "videoframe: Swap OUT videopanel"
         if self.videopanel is not None:
             self.videopanel.Reset()
             if self.showingframe:

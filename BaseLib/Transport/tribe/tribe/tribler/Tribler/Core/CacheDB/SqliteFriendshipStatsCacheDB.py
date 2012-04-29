@@ -1,3 +1,4 @@
+import time 
 # Written by Ali Abbas
 # see LICENSE.txt for license information
 
@@ -35,7 +36,7 @@ class FSCacheDBBaseV2(SQLiteCacheDBBase):
     """
     
     def updateDB(self,fromver,tover):
-        print >>sys.stderr,"fscachedb2: Upgrading",fromver,tover
+        print >>sys.stderr,time.asctime(),'-', "fscachedb2: Upgrading",fromver,tover
         if fromver == 1 and tover == 2:
             # Do ALTER TABLE stuff to add crawler_permid field.
             sql = "ALTER TABLE FriendshipStatistics ADD COLUMN crawled_permid TEXT DEFAULT client NOT NULL;"
@@ -130,7 +131,7 @@ class FriendshipStatisticsDBHandler(BasicDBHandler):
         res_list = self.getAll(value_name, where=where, offset= offset, limit=limit, order_by=order_by, source_permid=permidstr)
 
         if DEBUG:
-            print >>sys.stderr,"FriendshipStatisticsDBHandler: getAll: result is",res_list
+            print >>sys.stderr,time.asctime(),'-', "FriendshipStatisticsDBHandler: getAll: result is",res_list
         
         return res_list
     
@@ -160,7 +161,7 @@ class FriendshipStatisticsDBHandler(BasicDBHandler):
         sql_insert_friendstatistics = "UPDATE FriendshipStatistics SET response_time = "+str(current_time)+ ", modified_on = "+str(current_time)+" where source_permid = '"+my_permid+"' and target_permid = '"+target_permid+"'"
         
         if DEBUG:
-            print >> sys.stderr, sql_insert_friendstatistics
+            print >> sys.stderr, time.asctime(),'-', sql_insert_friendstatistics
         
         self._db.execute_write(sql_insert_friendstatistics,commit=commit)
         
@@ -168,8 +169,8 @@ class FriendshipStatisticsDBHandler(BasicDBHandler):
         
 #        sql_entry_exists_of_the_peer = "SELECT souce_permid FROM FriendshipStatistics where source_permid = " + my_permid
         if DEBUG:
-            print >> sys.stderr, 'Friendship record being inserted of permid'
-            print >> sys.stderr,  target_permid
+            print >> sys.stderr, time.asctime(),'-', 'Friendship record being inserted of permid'
+            print >> sys.stderr,  time.asctime(),'-', target_permid
         res = self._db.getOne('FriendshipStatistics', 'target_permid', target_permid=target_permid)
         
         if not res:
@@ -178,8 +179,8 @@ class FriendshipStatisticsDBHandler(BasicDBHandler):
             sql_insert_friendstatistics = "UPDATE FriendshipStatistics SET no_of_attempts = "+str(no_of_attempts)+", no_of_helpers = "+str(no_of_helpers)+", modified_on = "+str(current_time)+" where source_permid = '"+my_permid+"' and target_permid = '"+target_permid+"'"
         
         if DEBUG:
-            print >> sys.stderr, 'result is ', res
-            print >> sys.stderr, sql_insert_friendstatistics
+            print >> sys.stderr, time.asctime(),'-', 'result is ', res
+            print >> sys.stderr, time.asctime(),'-', sql_insert_friendstatistics
             
         try:    
             self._db.execute_write(sql_insert_friendstatistics,commit=commit)

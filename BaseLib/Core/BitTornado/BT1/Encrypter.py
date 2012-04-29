@@ -1,3 +1,4 @@
+import time 
 # Written by Bram Cohen, Pawel Garbacki, George Milescu
 # see LICENSE.txt for license information
 
@@ -103,7 +104,7 @@ class IncompleteCounter:
         #print_stack()
         self.c -= 1
     def toomany(self):
-        #print >>sys.stderr,"IncompleteCounter: c",self.c
+        #print >>sys.stderr,time.asctime(),'-', "IncompleteCounter: c",self.c
         return self.c >= MAX_INCOMPLETE
 
 # Arno: This is a global counter!!!!
@@ -153,12 +154,12 @@ class Connection:
         
         if self.locally_initiated or ext_handshake:
             if DEBUG:
-                print >>sys.stderr,"Encoder.Connection: writing protname + options + infohash"
+                print >>sys.stderr,time.asctime(),'-', "Encoder.Connection: writing protname + options + infohash"
             self.connection.write(chr(len(protocol_name)) + protocol_name + 
                 option_pattern + self.Encoder.download_id)
         if ext_handshake:
             if DEBUG:
-                print >>sys.stderr,"Encoder.Connection: writing my peer-ID"
+                print >>sys.stderr,time.asctime(),'-', "Encoder.Connection: writing my peer-ID"
             if coord_con:
                 # on the helper-coordinator BT communication a special peer id is used
                 proxy_peer_id = encode_challenge_in_peerid(self.Encoder.my_id, self.challenge)
@@ -206,11 +207,11 @@ class Connection:
         if r[0] & 0x10:    # left + 43 bit
             self.support_extend_messages = True
             if DEBUG:
-                print >>sys.stderr,"encoder: Peer supports EXTEND"
+                print >>sys.stderr,time.asctime(),'-', "encoder: Peer supports EXTEND"
         if r[0] & 0x20:    # left + 42 bit
             self.support_merklehash= True
             if DEBUG:
-                print >>sys.stderr,"encoder: Peer supports Merkle hashes"
+                print >>sys.stderr,time.asctime(),'-', "encoder: Peer supports Merkle hashes"
 # _overlay
 
     def read_header_len(self, s):
@@ -225,8 +226,8 @@ class Connection:
 
     def read_reserved(self, s):
         if DEBUG:
-            print >>sys.stderr,"encoder: Reserved bits:", show(s)
-            print >>sys.stderr,"encoder: Reserved bits=", show(option_pattern)
+            print >>sys.stderr,time.asctime(),'-', "encoder: Reserved bits:", show(s)
+            print >>sys.stderr,time.asctime(),'-', "encoder: Reserved bits=", show(option_pattern)
         self.set_options(s)
         return 20, self.read_download_id
 
@@ -273,7 +274,7 @@ class Connection:
         """
 # _2fastbt        
         if DEBUG:
-            print >>sys.stderr,"Encoder.Connection: read_peer_id"
+            print >>sys.stderr,time.asctime(),'-', "Encoder.Connection: read_peer_id"
 
         if not self.id:    # remote init or local init without remote peer's id or remote init
             self.id = s
@@ -281,17 +282,17 @@ class Connection:
         else:    # local init with remote id
             if s != self.id:
                 if DEBUG:
-                    print >>sys.stderr,"Encoder.Connection: read_peer_id: s != self.id, returning None"
+                    print >>sys.stderr,time.asctime(),'-', "Encoder.Connection: read_peer_id: s != self.id, returning None"
                 return None
         self.complete = self.Encoder.got_id(self)
         
         if DEBUG:
-            print >>sys.stderr,"Encoder.Connection: read_peer_id: complete is",self.complete
+            print >>sys.stderr,time.asctime(),'-', "Encoder.Connection: read_peer_id: complete is",self.complete
         
         
         if not self.complete:
             if DEBUG:
-                print >>sys.stderr,"Encoder.Connection: read_peer_id: self not complete!!!, returning None"
+                print >>sys.stderr,time.asctime(),'-', "Encoder.Connection: read_peer_id: self not complete!!!, returning None"
             return None
         if self.locally_initiated:
             if self.coord_con:
@@ -318,7 +319,7 @@ class Connection:
         if s != '':
             self.connecter.got_message(self, s)
         #else:
-        #    print >>sys.stderr,"encoder: got keepalive from",s.getpeername()
+        #    print >>sys.stderr,time.asctime(),'-', "encoder: got keepalive from",s.getpeername()
         return 4, self.read_len
 
     def read_dead(self, s):
@@ -327,7 +328,7 @@ class Connection:
     def _auto_close(self):
         if not self.complete and not self.is_coordinator_con():
             if DEBUG:
-                print >>sys.stderr,"encoder: autoclosing ",self.get_myip(),self.get_myport(),"to",self.get_ip(),self.get_port()
+                print >>sys.stderr,time.asctime(),'-', "encoder: autoclosing ",self.get_myip(),self.get_myport(),"to",self.get_ip(),self.get_port()
 
             self.Encoder._event_reporter.create_and_add_event("connection-timeout", [b64encode(self.Encoder.connecter.infohash), self.get_ip(), self.get_port()])
 
@@ -342,7 +343,7 @@ class Connection:
 
     def close(self,closeall=False):
         if DEBUG:
-            print >>sys.stderr,"encoder: closing connection",self.get_ip()
+            print >>sys.stderr,time.asctime(),'-', "encoder: closing connection",self.get_ip()
             #print_stack()
         
         if not self.closed:
@@ -397,7 +398,7 @@ class Connection:
                 raise
             if x is None:
                 if DEBUG:
-                    print >>sys.stderr,"encoder: function failed",self.next_func
+                    print >>sys.stderr,time.asctime(),'-', "encoder: function failed",self.next_func
                 self.close()
                 return
             self.next_len, self.next_func = x
@@ -412,7 +413,7 @@ class Connection:
 # 2fastbt_
     def is_coordinator_con(self):
         #if DEBUG:
-        #    print >>sys.stderr,"encoder: is_coordinator_con: coordinator is ",self.Encoder.coordinator_ip
+        #    print >>sys.stderr,time.asctime(),'-', "encoder: is_coordinator_con: coordinator is ",self.Encoder.coordinator_ip
         if self.coord_con:
             return True
         elif self.get_ip() == self.Encoder.coordinator_ip and self.get_ip() != '127.0.0.1': # Arno: for testing
@@ -439,7 +440,7 @@ class Connection:
         b = myip.split(".")
         if a[0] == b[0] and a[1] == b[1] and a[2] == b[2]:
             if DEBUG:
-                print >>sys.stderr,"encoder.connection: na: Found peer on local LAN",self.get_ip()
+                print >>sys.stderr,time.asctime(),'-', "encoder.connection: na: Found peer on local LAN",self.get_ip()
             self.na_address_distance = 0
         else:
             self.na_address_distance = 1
@@ -548,7 +549,7 @@ class Encoder:
         locally initiated?! """
         
         if DEBUG:
-            print >>sys.stderr,"encoder: adding",len(dnsidlist),"peers to queue, current len",len(self.to_connect)
+            print >>sys.stderr,time.asctime(),'-', "encoder: adding",len(dnsidlist),"peers to queue, current len",len(self.to_connect)
         if not self.to_connect:
             self.raw_server.add_task(self._start_connection_from_queue)
 
@@ -592,7 +593,7 @@ class Encoder:
             cons = len(self.connections)
             
             if DEBUG:
-                print >>sys.stderr,"encoder: conns",cons,"max conns",self.max_connections,"max init",max_initiate
+                print >>sys.stderr,time.asctime(),'-', "encoder: conns",cons,"max conns",self.max_connections,"max init",max_initiate
             
             if cons >= self.max_connections or cons >= max_initiate:
                 delay = 60.0
@@ -604,7 +605,7 @@ class Encoder:
                 self.start_connection(dns, id)
             if self.to_connect and sched:
                 if DEBUG:
-                    print >>sys.stderr,"encoder: start_from_queue delay",delay
+                    print >>sys.stderr,time.asctime(),'-', "encoder: start_from_queue delay",delay
                 self.raw_server.add_task(self._start_connection_from_queue, delay)
         except:
             print_exc()
@@ -613,43 +614,43 @@ class Encoder:
     def start_connection(self, dns, id, coord_con = False, forcenew = False, challenge = None):
         """ Locally initiated connection """
         if DEBUG:
-            print >>sys.stderr,"encoder: start_connection:",dns
-            print >>sys.stderr,"encoder: start_connection: qlen",len(self.to_connect),"nconns",len(self.connections),"maxi",self.config['max_initiate'],"maxc",self.config['max_connections']
+            print >>sys.stderr,time.asctime(),'-', "encoder: start_connection:",dns
+            print >>sys.stderr,time.asctime(),'-', "encoder: start_connection: qlen",len(self.to_connect),"nconns",len(self.connections),"maxi",self.config['max_initiate'],"maxc",self.config['max_connections']
         
         if ( self.paused
              or len(self.connections) >= self.max_connections
              or id == self.my_id
              or self.banned.has_key(dns[0]) ) and not forcenew:
             if DEBUG:
-                print >>sys.stderr,"encoder: start_connection: we're paused or too busy"
+                print >>sys.stderr,time.asctime(),'-', "encoder: start_connection: we're paused or too busy"
             return True
         for v in self.connections.values():    # avoid duplicated connection from a single ip
             if v is None:
                 continue
             if id and v.id == id and not forcenew:
                 if DEBUG:
-                    print >>sys.stderr,"encoder: start_connection: already connected to peer",`id`
+                    print >>sys.stderr,time.asctime(),'-', "encoder: start_connection: already connected to peer",`id`
                 return True
             ip = v.get_ip(True)
             port = v.get_port(False)
             
             if DEBUG:
-                print >>sys.stderr,"encoder: start_connection: candidate",ip,port,"want",dns[0],dns[1]
+                print >>sys.stderr,time.asctime(),'-', "encoder: start_connection: candidate",ip,port,"want",dns[0],dns[1]
 
             if self.config['security'] and ip != 'unknown' and ip == dns[0] and port == dns[1] and not forcenew:
                 if DEBUG:
-                    print >>sys.stderr,"encoder: start_connection: using existing",ip,"want port",dns[1],"existing port",port,"id",`id`
+                    print >>sys.stderr,time.asctime(),'-', "encoder: start_connection: using existing",ip,"want port",dns[1],"existing port",port,"id",`id`
                 return True
         try:
             if DEBUG:
-                print >>sys.stderr,"encoder: start_connection: Setting up new to peer", dns,"id",`id`
+                print >>sys.stderr,time.asctime(),'-', "encoder: start_connection: Setting up new to peer", dns,"id",`id`
             c = self.raw_server.start_connection(dns)
             con = Connection(self, c, id, dns = dns, coord_con = coord_con, challenge = challenge)
             self.connections[c] = con
             c.set_handler(con)
         except socketerror:
             if DEBUG:
-                print >>sys.stderr,"Encoder.connection failed"
+                print >>sys.stderr,time.asctime(),'-', "Encoder.connection failed"
             return False
         return True
 
@@ -666,7 +667,7 @@ class Encoder:
             # NETWORK AWARE
             ret = self.connecter.na_got_loopback(connection)
             if DEBUG:
-                print >>sys.stderr,"encoder: got_id: connection to myself? keep",ret
+                print >>sys.stderr,time.asctime(),'-', "encoder: got_id: connection to myself? keep",ret
             if ret == False:
                 self.connecter.external_connection_made -= 1
             return ret
@@ -679,16 +680,16 @@ class Encoder:
         
         if self.config['security'] and self.banned.has_key(ip):
             if DEBUG:
-                print >>sys.stderr,"encoder: got_id: security ban on IP"
+                print >>sys.stderr,time.asctime(),'-', "encoder: got_id: security ban on IP"
             return False
         for v in self.connections.values():
             if connection is not v:
                 # NETWORK AWARE
                 if DEBUG:
-                    print >>sys.stderr,"encoder: got_id: new internal conn from peer? ids",connection.id,v.id
+                    print >>sys.stderr,time.asctime(),'-', "encoder: got_id: new internal conn from peer? ids",connection.id,v.id
                 if connection.id == v.id:
                     if DEBUG:
-                        print >>sys.stderr,"encoder: got_id: new internal conn from peer? addrs",v.na_want_internal_conn_from,ip
+                        print >>sys.stderr,time.asctime(),'-', "encoder: got_id: new internal conn from peer? addrs",v.na_want_internal_conn_from,ip
                     if v.na_want_internal_conn_from == ip:
                         # We were expecting a connection from this peer that shares
                         # a NAT with us via the internal network. This is it.
@@ -696,20 +697,20 @@ class Encoder:
                         return True  
                     elif v.create_time < connection.create_time:
                         if DEBUG:
-                            print >>sys.stderr,"encoder: got_id: create time bad?!"
+                            print >>sys.stderr,time.asctime(),'-', "encoder: got_id: create time bad?!"
                     return False
                 # don't allow multiple connections from the same ip if security is set.
                 if self.config['security'] and ip != 'unknown' and ip == v.get_ip(True) and port == v.get_port(False):
-                    print >>sys.stderr,"encoder: got_id: closing duplicate connection"
+                    print >>sys.stderr,time.asctime(),'-', "encoder: got_id: closing duplicate connection"
                     v.close()
         return True
 
     def external_connection_made(self, connection):
         """ Remotely initiated connection """
         if DEBUG:
-            print >>sys.stderr,"encoder: external_conn_made",connection.get_ip()
+            print >>sys.stderr,time.asctime(),'-', "encoder: external_conn_made",connection.get_ip()
         if self.paused or len(self.connections) >= self.max_connections:
-            print >>sys.stderr,"encoder: external_conn_made: paused or too many"
+            print >>sys.stderr,time.asctime(),'-', "encoder: external_conn_made: paused or too many"
             connection.close()
             return False
         con = Connection(self, connection, None)
@@ -719,7 +720,7 @@ class Encoder:
 
     def externally_handshaked_connection_made(self, connection, options, msg_remainder):
         if DEBUG:
-            print >>sys.stderr,"encoder: external_handshaked_conn_made",connection.get_ip()
+            print >>sys.stderr,time.asctime(),'-', "encoder: external_handshaked_conn_made",connection.get_ip()
         # 2fastbt_
         if self.paused or len(self.connections) >= self.max_connections:
             connection.close()
@@ -739,7 +740,7 @@ class Encoder:
 
     def close_all(self):
         if DEBUG:
-            print >>sys.stderr,"encoder: closing all connections"
+            print >>sys.stderr,time.asctime(),'-', "encoder: closing all connections"
         copy = self.connections.values()[:]
         for c in copy:
             c.close(closeall=True)
@@ -763,9 +764,9 @@ class Encoder:
         del self.connections[conn]
         now = int(time())
         if DEBUG:
-            print >>sys.stderr,"encoder: admin_close: now-tt is",now-self.trackertime
+            print >>sys.stderr,time.asctime(),'-', "encoder: admin_close: now-tt is",now-self.trackertime
         if len(self.connections) == 0 and (now-self.trackertime) < 20:
             #if DEBUG:
-            #    print >>sys.stderr,"encoder: admin_close: Recontacting tracker, last request got just dead peers: TEMP DISABLED, ARNO WORKING ON IT"
+            #    print >>sys.stderr,time.asctime(),'-', "encoder: admin_close: Recontacting tracker, last request got just dead peers: TEMP DISABLED, ARNO WORKING ON IT"
             ###self.rerequest.encoder_wants_new_peers()
             pass

@@ -1,3 +1,4 @@
+import time 
 #!/usr/bin/python
 
 # injector.py is used to 'inject' .torrent files into the overlay
@@ -58,7 +59,7 @@ def main():
 
     session = Session(sscfg)
     
-    print >>sys.stderr, "permid: ", permid_for_user(session.get_permid())    
+    print >>sys.stderr, time.asctime(),'-', "permid: ", permid_for_user(session.get_permid())    
 
     if opt.rss:
         
@@ -70,9 +71,9 @@ def main():
             moderation.
             """
             if "info" in torrent_data and "name" in torrent_data["info"]:
-                print >>sys.stderr, "Creating moderation for %s" % torrent_data["info"]["name"]
+                print >>sys.stderr, time.asctime(),'-', "Creating moderation for %s" % torrent_data["info"]["name"]
             else:
-                print >>sys.stderr, "Creating moderation"
+                print >>sys.stderr, time.asctime(),'-', "Creating moderation"
 
             moderation = {}
             moderation['infohash'] = bin2str(infohash)
@@ -83,7 +84,7 @@ def main():
 
         torrent_feed_thread.register(session,120,1)
         for rss in opt.rss.split(";"):
-            print >>sys.stderr, "Adding RSS: %s" % rss
+            print >>sys.stderr, time.asctime(),'-', "Adding RSS: %s" % rss
             torrent_feed_thread.addURL(rss, on_torrent_callback=on_torrent_callback)
 
 

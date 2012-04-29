@@ -1,3 +1,4 @@
+import time 
 # Written by Bram Cohen
 # modified for multitracker by John Hoffman
 # modified for Merkle hashes and digital signatures by Arno Bakker
@@ -968,13 +969,13 @@ def make_meta_file(srcpath,params,userabortflag,progressCallback,torrentfilename
     if params['piece length']:
         tdef.set_piece_length(params['piece length'])
     if params['makehash_md5']:
-        print >>sys.stderr,"TorrentMaker: make MD5"
+        print >>sys.stderr,time.asctime(),'-', "TorrentMaker: make MD5"
         tdef.set_add_md5hash(params['makehash_md5'])
     if params['makehash_crc32']:
-        print >>sys.stderr,"TorrentMaker: make CRC32"
+        print >>sys.stderr,time.asctime(),'-', "TorrentMaker: make CRC32"
         tdef.set_add_crc32(params['makehash_crc32'])
     if params['makehash_sha1']:
-        print >>sys.stderr,"TorrentMaker: make SHA1"
+        print >>sys.stderr,time.asctime(),'-', "TorrentMaker: make SHA1"
         tdef.set_add_sha1hash(params['makehash_sha1'])
     if params['createmerkletorrent']:
         tdef.set_create_merkle_torrent(params['createmerkletorrent'])

@@ -1,3 +1,4 @@
+import time 
 # Written by Nitin Chiluka
 # see LICENSE.txt for license information
 
@@ -109,7 +110,7 @@ class ChannelCastCore:
         # compatibility
         if selversion < OLPROTO_VER_THIRTEENTH:
             if DEBUG:
-                print >> sys.stderr, "channelcast: Do not send to lower version peer:", selversion
+                print >> sys.stderr, time.asctime(),'-', "channelcast: Do not send to lower version peer:", selversion
             return
         
         # 3/5/2010 Andrea: adding the destination parameters to createChannelCastMessage for
@@ -118,7 +119,7 @@ class ChannelCastCore:
         channelcast_data = self.createChannelCastMessage(selversion, target_permid)
         if channelcast_data is None or len(channelcast_data)==0:
             if DEBUG:
-                print >>sys.stderr, "channelcast: No channels there.. hence we do not send"
+                print >>sys.stderr, time.asctime(),'-', "channelcast: No channels there.. hence we do not send"
             return
         channelcast_msg = bencode(channelcast_data)
         
@@ -132,7 +133,7 @@ class ChannelCastCore:
         
         data = CHANNELCAST + channelcast_msg
         self.overlay_bridge.send(target_permid, data, self.channelCastSendCallback)        
-        #if DEBUG: print >> sys.stderr, "channelcast: Sent channelcastmsg",repr(channelcast_data)
+        #if DEBUG: print >> sys.stderr, time.asctime(),'-', "channelcast: Sent channelcastmsg",repr(channelcast_data)
     
     def createChannelCastMessage(self, selversion, dest_permid=None):
         """ 
@@ -150,7 +151,7 @@ class ChannelCastCore:
         # enrichment
         
         if DEBUG: 
-            print >> sys.stderr, "channelcast: Creating channelcastmsg..."
+            print >> sys.stderr, time.asctime(),'-', "channelcast: Creating channelcastmsg..."
         
         hits = self.channelcastdb.getRecentAndRandomTorrents(NUM_OWN_RECENT_TORRENTS,NUM_OWN_RANDOM_TORRENTS,NUM_OTHERS_RECENT_TORRENTS,NUM_OTHERS_RECENT_TORRENTS)
         # 3/5/2010 Andrea:  
@@ -165,9 +166,9 @@ class ChannelCastCore:
     def channelCastSendCallback(self, exc, target_permid, other=0):
         if DEBUG:
             if exc is None:
-                print >> sys.stderr,"channelcast: *** msg was sent successfully to peer", show_permid_short(target_permid)
+                print >> sys.stderr,time.asctime(),'-', "channelcast: *** msg was sent successfully to peer", show_permid_short(target_permid)
             else:
-                print >> sys.stderr, "channelcast: *** warning - error in sending msg to", show_permid_short(target_permid), exc
+                print >> sys.stderr, time.asctime(),'-', "channelcast: *** warning - error in sending msg to", show_permid_short(target_permid), exc
  
     def gotChannelCastMessage(self, recv_msg, sender_permid, selversion):
         """ Receive and handle a ChannelCast message """
@@ -177,22 +178,22 @@ class ChannelCastCore:
         # Andrea: 2010-04-08: v14 can still receive v13 channelcast messages
         if selversion < OLPROTO_VER_THIRTEENTH:
             if DEBUG:
-                print >> sys.stderr, "channelcast: Do not receive from lower version peer:", selversion
+                print >> sys.stderr, time.asctime(),'-', "channelcast: Do not receive from lower version peer:", selversion
             return True
                 
         if DEBUG:
-            print >> sys.stderr,'channelcast: Received a msg from ', show_permid_short(sender_permid)
-            print >> sys.stderr,"channelcast: my_permid=", show_permid_short(self.my_permid)
+            print >> sys.stderr,time.asctime(),'-', 'channelcast: Received a msg from ', show_permid_short(sender_permid)
+            print >> sys.stderr,time.asctime(),'-', "channelcast: my_permid=", show_permid_short(self.my_permid)
 
         if not sender_permid or sender_permid == self.my_permid:
             if DEBUG:
-                print >> sys.stderr, "channelcast: warning - got channelcastMsg from a None/Self peer", \
+                print >> sys.stderr, time.asctime(),'-', "channelcast: warning - got channelcastMsg from a None/Self peer", \
                         show_permid_short(sender_permid), recv_msg
             return False
 
         #if len(recv_msg) > self.max_length:
         #    if DEBUG:
-        #        print >> sys.stderr, "channelcast: warning - got large channelCastHaveMsg", len(recv_msg)
+        #        print >> sys.stderr, time.asctime(),'-', "channelcast: warning - got large channelCastHaveMsg", len(recv_msg)
         #    return False
 
         channelcast_data = {}
@@ -200,12 +201,12 @@ class ChannelCastCore:
         try:
             channelcast_data = bdecode(recv_msg)
         except:
-            print >> sys.stderr, "channelcast: warning, invalid bencoded data"
+            print >> sys.stderr, time.asctime(),'-', "channelcast: warning, invalid bencoded data"
             return False
 
         # check message-structure
         if not validChannelCastMsg(channelcast_data):
-            print >> sys.stderr, "channelcast: invalid channelcast_message"
+            print >> sys.stderr, time.asctime(),'-', "channelcast: invalid channelcast_message"
             return False
 
         # 19/02/10 Boudewijn: validChannelCastMsg passes when
@@ -288,7 +289,7 @@ class ChannelCastCore:
                 if self.channelcastdb.addTorrent(hit):
                     self.hits.append(hit)
             else:
-                print >> sys.stderr, "channelcast: updatechannel: could not find infohash", bin2str(infohash)
+                print >> sys.stderr, time.asctime(),'-', "channelcast: updatechannel: could not find infohash", bin2str(infohash)
 
 
         for hit in listOfAdditions:
@@ -349,7 +350,7 @@ class ChannelCastCore:
         if selversion >= OLPROTO_VER_FOURTEENTH:
             enrichWithMetadata = True
             if DEBUG:
-                print >> sys.stderr, "channelcast: creating enriched messages"\
+                print >> sys.stderr, time.asctime(),'-', "channelcast: creating enriched messages"\
                     "since peer has version: ", selversion
         d = {}
         for hit in hits:

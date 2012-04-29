@@ -1,3 +1,4 @@
+import time 
 import sys
 import os
 
@@ -35,7 +36,7 @@ def parse_log_line(line, line_num):
         except KeyboardInterrupt:
             raise KeyboardInterrupt
         except Exception, msg:
-            print >> sys.stderr, "Error in parse the log on line %d:"%line_num, Exception, msg
+            print >> sys.stderr, time.asctime(),'-', "Error in parse the log on line %d:"%line_num, Exception, msg
             return None
             
     elif key == 'RECV_MSG' or key == 'SEND_MSG':
@@ -54,7 +55,7 @@ def parse_log_line(line, line_num):
         except KeyboardInterrupt:
             raise KeyboardInterrupt
         except Exception, msg:
-            print >> sys.stderr, "Error in eval the msg on line %d:"%line_num, Exception, msg
+            print >> sys.stderr, time.asctime(),'-', "Error in eval the msg on line %d:"%line_num, Exception, msg
             return None
     
     elif key == 'RECV_QRY':
@@ -68,7 +69,7 @@ def parse_log_line(line, line_num):
         except KeyboardInterrupt:
             raise KeyboardInterrupt
         except Exception, msg:
-            print >> sys.stderr, "Error in eval the msg on line %d:"%line_num, Exception, msg
+            print >> sys.stderr, time.asctime(),'-', "Error in eval the msg on line %d:"%line_num, Exception, msg
             return None
         
     elif key == 'RPLY_QRY':
@@ -133,12 +134,12 @@ def get_buddycast_data(file_path):
 
 if __name__ == '__main__':
     if len(sys.argv) < 2:
-        print >> sys.stderr, "Must specify the path or directory of logs"
+        print >> sys.stderr, time.asctime(),'-', "Must specify the path or directory of logs"
         sys.exit(1)
     
     i = 1
     for file_path in yield_files2load(sys.argv[1:]):
-        print >> sys.stderr, "load", i, file_path
+        print >> sys.stderr, time.asctime(),'-', "load", i, file_path
         i += 1
         #for ret in parse_log_file(file_path):
         for ret in get_buddycast_data(file_path):

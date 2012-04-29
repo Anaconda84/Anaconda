@@ -1,3 +1,4 @@
+import time 
 # Written by Arno Bakker, Choopan RATTANAPOKA, Jie Yang
 # see LICENSE.txt for license information
 #
@@ -80,7 +81,7 @@ class PlayerApp(BaseApp):
             # If already running, and user starts a new instance without a URL 
             # on the cmd line
             if not ALLOW_MULTIPLE and self.single_instance_checker.IsAnotherRunning():
-                print >> sys.stderr,"main: Another instance running, no URL on CMD, asking user"
+                print >> sys.stderr,time.asctime(),'-', "main: Another instance running, no URL on CMD, asking user"
                 torrentfilename = self.select_torrent_from_disk()
                 if torrentfilename is not None:
                     i2ic = Instance2InstanceClient(I2I_LISTENPORT,'START',torrentfilename)
@@ -109,7 +110,7 @@ class PlayerApp(BaseApp):
             else:
                 torrentfilename = self.select_torrent_from_disk()
                 if torrentfilename is None:
-                    print >>sys.stderr,"main: User selected no file"
+                    print >>sys.stderr,time.asctime(),'-', "main: User selected no file"
                     self.OnExit()
                     return False
 
@@ -162,21 +163,21 @@ class PlayerApp(BaseApp):
             tdef = TorrentDef.load_from_url(torrentfilename)
         else: 
             tdef = TorrentDef.load(torrentfilename)
-        print >>sys.stderr,"main: Starting download, infohash is",`tdef.get_infohash()`
+        print >>sys.stderr,time.asctime(),'-', "main: Starting download, infohash is",`tdef.get_infohash()`
         
         # Select which video to play (if multiple)
         videofiles = tdef.get_files(exts=videoextdefaults)
-        print >>sys.stderr,"main: Found video files",videofiles
+        print >>sys.stderr,time.asctime(),'-', "main: Found video files",videofiles
         
         if len(videofiles) == 0:
-            print >>sys.stderr,"main: No video files found! Let user select"
+            print >>sys.stderr,time.asctime(),'-', "main: No video files found! Let user select"
             # Let user choose any file
             videofiles = tdef.get_files(exts=None)
             
         if len(videofiles) > 1:
             selectedvideofile = self.ask_user_which_video_from_torrent(videofiles)
             if selectedvideofile is None:
-                print >>sys.stderr,"main: User selected no video"
+                print >>sys.stderr,time.asctime(),'-', "main: User selected no video"
                 return False
             dlfile = selectedvideofile
         else:
@@ -245,7 +246,7 @@ class PlayerApp(BaseApp):
     def i2ithread_readlinecallback(self,ic,cmd):
         """ Called by Instance2Instance thread """
         
-        print >>sys.stderr,"main: Another instance called us with cmd",cmd
+        print >>sys.stderr,time.asctime(),'-', "main: Another instance called us with cmd",cmd
         ic.close()
         
         if cmd.startswith('START '):
@@ -294,7 +295,7 @@ class PlayerApp(BaseApp):
         # Display stats for currently playing Download
         
         videoplayer_mediastate = self.videoplayer.get_state()
-        #print >>sys.stderr,"main: Stats: VideoPlayer state",videoplayer_mediastate
+        #print >>sys.stderr,time.asctime(),'-', "main: Stats: VideoPlayer state",videoplayer_mediastate
         
         [topmsg,msg,self.said_start_playback,self.decodeprogress] = get_status_msgs(ds,videoplayer_mediastate,self.appname,self.said_start_playback,self.decodeprogress,totalhelping,totalspeed)
         # Display helping info on "content name" line.
@@ -308,9 +309,9 @@ class PlayerApp(BaseApp):
             
         if False: # Only works if the sesscb_states_callback() method returns (x,True)
             peerlist = ds.get_peerlist()
-            print >>sys.stderr,"main: Connected to",len(peerlist),"peers"
+            print >>sys.stderr,time.asctime(),'-', "main: Connected to",len(peerlist),"peers"
             for peer in peerlist:
-                print >>sys.stderr,"main: Connected to",peer['ip'],peer['uprate'],peer['downrate']
+                print >>sys.stderr,time.asctime(),'-', "main: Connected to",peer['ip'],peer['uprate'],peer['downrate']
 
 
     def videoserver_set_status_guicallback(self,status):
@@ -354,7 +355,7 @@ class PlayerApp(BaseApp):
 
         dest_file_only = os.path.split(dest_file[1])[1]
         
-        print >> sys.stderr, 'Defaultpath:', defaultpath, 'Dest:', dest_file
+        print >> sys.stderr, time.asctime(),'-', 'Defaultpath:', defaultpath, 'Dest:', dest_file
         dlg = wx.FileDialog(self.videoFrame, 
                             message = self.utility.lang.get('savemedia'), 
                             defaultDir = defaultpath, 
@@ -367,8 +368,8 @@ class PlayerApp(BaseApp):
         
         if result == wx.ID_OK:
             path = dlg.GetPath()
-            print >> sys.stderr, 'Path:', path
-            print >> sys.stderr, 'Copy: %s to %s' % (dest_file[1], path)
+            print >> sys.stderr, time.asctime(),'-', 'Path:', path
+            print >> sys.stderr, time.asctime(),'-', 'Copy: %s to %s' % (dest_file[1], path)
             if sys.platform == 'win32':
                 try:
                     import win32file
@@ -404,7 +405,7 @@ def get_status_msgs(ds,videoplayer_mediastate,appname,said_start_playback,decode
     logmsgs = ds.get_log_messages()
     logmsg = None
     if len(logmsgs) > 0:
-        print >>sys.stderr,"main: Log",logmsgs[0]
+        print >>sys.stderr,time.asctime(),'-', "main: Log",logmsgs[0]
         logmsg = logmsgs[-1][1]
         
     preprogress = ds.get_vod_prebuffering_progress()
@@ -417,8 +418,8 @@ def get_status_msgs(ds,videoplayer_mediastate,appname,said_start_playback,decode
             break
         intime = eta_msg
     
-    #print >>sys.stderr,"main: playble",playable,"preprog",preprogress
-    #print >>sys.stderr,"main: ETA is",t,"secs"
+    #print >>sys.stderr,time.asctime(),'-', "main: playble",playable,"preprog",preprogress
+    #print >>sys.stderr,time.asctime(),'-', "main: ETA is",t,"secs"
     # if t > float(2 ** 30):
     #     intime = "inf"
     # elif t == 0.0:
@@ -434,7 +435,7 @@ def get_status_msgs(ds,videoplayer_mediastate,appname,said_start_playback,decode
     #     else:
     #         intime = "%dh:%02dm:%02ds" % (h,m,s)
             
-    #print >>sys.stderr,"main: VODStats",preprogress,playable,"%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+    #print >>sys.stderr,time.asctime(),'-', "main: VODStats",preprogress,playable,"%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
 
     if ds.get_status() == DLSTATUS_HASHCHECKING:
         genprogress = ds.get_progress()
@@ -525,7 +526,7 @@ class PlayerFrame(VideoFrame):
     
     def OnCloseWindow(self, event = None):
         
-        print >>sys.stderr,"main: ON CLOSE WINDOW"
+        print >>sys.stderr,time.asctime(),'-', "main: ON CLOSE WINDOW"
 
         # TODO: first event.Skip does not close window, second apparently does
         # Check how event differs
@@ -544,12 +545,12 @@ class PlayerFrame(VideoFrame):
             lookup = { wx.EVT_CLOSE.evtType[0]: "EVT_CLOSE", wx.EVT_QUERY_END_SESSION.evtType[0]: "EVT_QUERY_END_SESSION", wx.EVT_END_SESSION.evtType[0]: "EVT_END_SESSION" }
             if nr in lookup: 
                 nr = lookup[nr]
-            print >>sys.stderr,"main: Closing due to event ",nr
+            print >>sys.stderr,time.asctime(),'-', "main: Closing due to event ",nr
             event.Skip()
         else:
-            print >>sys.stderr,"main: Closing untriggered by event"
+            print >>sys.stderr,time.asctime(),'-', "main: Closing untriggered by event"
 
-        print >>sys.stderr,"main: Closing done"
+        print >>sys.stderr,time.asctime(),'-', "main: Closing done"
         # TODO: Show balloon in systray when closing window to indicate things continue there
 
 
@@ -614,7 +615,7 @@ def run_playerapp(appname,params = None):
     app = PlayerApp(0, appname, params, single_instance_checker, installdir, I2I_LISTENPORT, PLAYER_LISTENPORT)
     app.MainLoop()
     
-    print >>sys.stderr,"Sleeping seconds to let other threads finish"
+    print >>sys.stderr,time.asctime(),'-', "Sleeping seconds to let other threads finish"
     time.sleep(2)
     
     if not ALLOW_MULTIPLE:

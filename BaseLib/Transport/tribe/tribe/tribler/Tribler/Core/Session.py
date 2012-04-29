@@ -1,3 +1,4 @@
+import time 
 # Written by Arno Bakker 
 # see LICENSE.txt for license information
 """ A Session is a running instance of the Tribler Core and the Core's central class. """
@@ -153,7 +154,7 @@ class Session(SessionRuntimeConfig):
         # Let user handle that, he's got default_state_dir, etc.
 
         # Core init
-        #print >>sys.stderr,'Session: __init__ config is', self.sessconfig
+        #print >>sys.stderr,time.asctime(),'-', 'Session: __init__ config is', self.sessconfig
 
         if GOTM2CRYPTO:
             permidmod.init()
@@ -476,7 +477,7 @@ class Session(SessionRuntimeConfig):
             filename = self.get_internal_tracker_torrentfilename(infohash)
             tdef.save(filename)
             
-            print >>sys.stderr,"Session: add_to_int_tracker: saving to",filename,"url-compat",tdef.get_url_compat()
+            print >>sys.stderr,time.asctime(),'-', "Session: add_to_int_tracker: saving to",filename,"url-compat",tdef.get_url_compat()
             
             # Bring to attention of Tracker thread
             self.lm.tracker_rescan_dir()
@@ -503,7 +504,7 @@ class Session(SessionRuntimeConfig):
         try:
             filename = self.get_internal_tracker_torrentfilename(infohash)
             if DEBUG:
-                print >>sys.stderr,"Session: removing itracker entry",filename
+                print >>sys.stderr,time.asctime(),'-', "Session: removing itracker entry",filename
             if os.access(filename,os.F_OK):
                 os.remove(filename)
             # Bring to attention of Tracker thread
@@ -632,7 +633,7 @@ class Session(SessionRuntimeConfig):
         if overlay_loaded:
             self.lm.overlay_apps.setRequestPolicy(reqpol) # already threadsafe
         elif DEBUG:
-            print >>sys.stderr,"Session: overlay is disabled, so no overlay request policy needed"
+            print >>sys.stderr,time.asctime(),'-', "Session: overlay is disabled, so no overlay request policy needed"
 
 
     #
@@ -818,7 +819,7 @@ class Session(SessionRuntimeConfig):
 
             # Checkpoint all Downloads and stop NetworkThread
             if DEBUG:
-                print >>sys.stderr,"Session: checkpoint_shutdown"
+                print >>sys.stderr,time.asctime(),'-', "Session: checkpoint_shutdown"
             self.lm.checkpoint(stop=stop,checkpoint=checkpoint,gracetime=gracetime)
         finally:
             self.sesslock.release()

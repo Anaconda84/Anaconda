@@ -1,3 +1,4 @@
+import time 
 # Written by Pawel Garbacki, George Milescu
 # see LICENSE.txt for license information
 
@@ -87,8 +88,8 @@ class Helper:
 
     def test(self):
         result = self.reserve_piece(10,None)
-        print >> sys.stderr,"reserve piece returned: " + str(result)
-        print >> sys.stderr,"Test passed"
+        print >> sys.stderr,time.asctime(),'-', "reserve piece returned: " + str(result)
+        print >> sys.stderr,time.asctime(),'-', "Test passed"
 
 
 
@@ -100,10 +101,10 @@ class Helper:
         """
         if self.outstanding is None:
             if DEBUG:
-                print >> sys.stderr,"helper: notify: No continuation waiting?"
+                print >> sys.stderr,time.asctime(),'-', "helper: notify: No continuation waiting?"
         else:
             if DEBUG:
-                print >> sys.stderr,"helper: notify: Waking downloader"
+                print >> sys.stderr,time.asctime(),'-', "helper: notify: Waking downloader"
             sdownload = self.outstanding
             self.outstanding = None # must be not before calling self.restart!
             self.restart(sdownload)
@@ -173,12 +174,12 @@ class Helper:
             message = JOIN_HELPERS + self.torrent_hash
 
             if DEBUG:
-                print >> sys.stderr,"helper: olthread_join_helpers_connect_callback: Sending JOIN_HELPERS to",show_permid_short(permid)
+                print >> sys.stderr,time.asctime(),'-', "helper: olthread_join_helpers_connect_callback: Sending JOIN_HELPERS to",show_permid_short(permid)
 
             self.overlay_bridge.send(permid, message, self.olthread_join_helpers_send_callback)
         elif DEBUG:
             # The coordinator is unreachable
-            print >> sys.stderr,"helper: olthread_join_helpers_connect_callback: error connecting to",show_permid_short(permid),exc
+            print >> sys.stderr,time.asctime(),'-', "helper: olthread_join_helpers_connect_callback: error connecting to",show_permid_short(permid),exc
 
 
     def olthread_join_helpers_send_callback(self, exc, permid):
@@ -192,7 +193,7 @@ class Helper:
 
         if exc is not None:
             if DEBUG:
-                print >> sys.stderr,"helper: olthread_join_helpers_send_callback: error sending message to",show_permid_short(permid),exc
+                print >> sys.stderr,time.asctime(),'-', "helper: olthread_join_helpers_send_callback: error sending message to",show_permid_short(permid),exc
         
         pass
 
@@ -244,12 +245,12 @@ class Helper:
             message = PROXY_HAVE + self.torrent_hash + bencode(aggregated_string)
 
             if DEBUG:
-                print >> sys.stderr,"helper: olthread_proxy_have_connect_callback: Sending PROXY_HAVE to",show_permid_short(permid)
+                print >> sys.stderr,time.asctime(),'-', "helper: olthread_proxy_have_connect_callback: Sending PROXY_HAVE to",show_permid_short(permid)
 
             self.overlay_bridge.send(permid, message, self.olthread_proxy_have_send_callback)
         elif DEBUG:
             # The coordinator is unreachable
-            print >> sys.stderr,"helper: olthread_proxy_have_connect_callback: error connecting to",show_permid_short(permid),exc
+            print >> sys.stderr,time.asctime(),'-', "helper: olthread_proxy_have_connect_callback: error connecting to",show_permid_short(permid),exc
 
 
     def olthread_proxy_have_send_callback(self, exc, permid):
@@ -263,7 +264,7 @@ class Helper:
 
         if exc is not None:
             if DEBUG:
-                print >> sys.stderr,"helper: olthread_proxy_have_send_callback: error sending message to",show_permid_short(permid),exc
+                print >> sys.stderr,time.asctime(),'-', "helper: olthread_proxy_have_send_callback: error sending message to",show_permid_short(permid),exc
         
         pass
 
@@ -310,12 +311,12 @@ class Helper:
             message = RESIGN_AS_HELPER + self.torrent_hash
 
             if DEBUG:
-                print >> sys.stderr,"helper: olthread_resign_as_helper_connect_callback: Sending RESIGN_AS_HELPER to",show_permid_short(permid)
+                print >> sys.stderr,time.asctime(),'-', "helper: olthread_resign_as_helper_connect_callback: Sending RESIGN_AS_HELPER to",show_permid_short(permid)
 
             self.overlay_bridge.send(permid, message, self.olthread_resign_as_helper_send_callback)
         elif DEBUG:
             # The coordinator is unreachable
-            print >> sys.stderr,"helper: olthread_resign_as_helper_connect_callback: error connecting to",show_permid_short(permid),exc
+            print >> sys.stderr,time.asctime(),'-', "helper: olthread_resign_as_helper_connect_callback: error connecting to",show_permid_short(permid),exc
 
 
     def olthread_resign_as_helper_send_callback(self,exc,permid):
@@ -329,7 +330,7 @@ class Helper:
         
         if exc is not None:
             if DEBUG:
-                print >> sys.stderr,"helper: olthread_resign_as_helper_send_callback: error sending message to",show_permid_short(permid),exc
+                print >> sys.stderr,time.asctime(),'-', "helper: olthread_resign_as_helper_send_callback: error sending message to",show_permid_short(permid),exc
         
         pass
 
@@ -348,17 +349,17 @@ class Helper:
         @param challenge: The challenge sent by the coordinator
         """
         if DEBUG:
-            print >>sys.stderr,"helper: got_ask_for_help: will answer to the help request from", show_permid_short(permid)
+            print >>sys.stderr,time.asctime(),'-', "helper: got_ask_for_help: will answer to the help request from", show_permid_short(permid)
         if self.can_help(infohash):
             # Send JOIN_HELPERS
             if DEBUG:
-                print >>sys.stderr,"helper: got_ask_for_help: received a help request, going to send join_helpers"
+                print >>sys.stderr,time.asctime(),'-', "helper: got_ask_for_help: received a help request, going to send join_helpers"
             self.send_join_helpers(permid)
             self.challenge = challenge
         else:
             # Send RESIGN_AS_HELPER
             if DEBUG:
-                print >>sys.stderr,"helper: got_ask_for_help: received a help request, going to send resign_as_helper"
+                print >>sys.stderr,time.asctime(),'-', "helper: got_ask_for_help: received a help request, going to send resign_as_helper"
             self.send_resign_as_helper(permid)
             return False
 
@@ -426,7 +427,7 @@ class Helper:
         # Do this always, will return quickly when connection already exists
         dns = (self.coordinator_ip, self.coordinator_port)
         if DEBUG:
-            print >> sys.stderr,"helper: start_data_connection: Starting data connection to coordinator at", dns
+            print >> sys.stderr,time.asctime(),'-', "helper: start_data_connection: Starting data connection to coordinator at", dns
         
         self.encoder.start_connection(dns, id = None, coord_con = True, challenge = self.challenge)
 
@@ -462,13 +463,13 @@ class Helper:
         if len(self.requested_pieces) == 0:
             self.requested_pieces_lock.release()
             if DEBUG:
-                print >>sys.stderr,"helper: next_request: no requested pieces yet. Returning None"
+                print >>sys.stderr,time.asctime(),'-', "helper: next_request: no requested pieces yet. Returning None"
             return None
         else:
             next_piece = self.requested_pieces.popleft()
             self.requested_pieces_lock.release()
             if DEBUG:
-                print >>sys.stderr,"helper: next_request: Returning", next_piece
+                print >>sys.stderr,time.asctime(),'-', "helper: next_request: Returning", next_piece
             return next_piece
         
         

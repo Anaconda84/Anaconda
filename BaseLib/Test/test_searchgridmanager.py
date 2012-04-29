@@ -1,3 +1,4 @@
+import time 
 import os
 import sys
 import unittest
@@ -24,7 +25,7 @@ class Test_SearchGridManager(unittest.TestCase):
         manager.hits.append(hit)
         manager.sort()
         
-        print >> sys.stderr, repr(manager.hits)
+        print >> sys.stderr, time.asctime(),'-', repr(manager.hits)
         
         #
         # Process: for each factor, scale it (f - mean(f)) / sd(f). Then sum all factors and order by this sum. 
@@ -70,7 +71,7 @@ class Test_SearchGridManager(unittest.TestCase):
         manager.hits.append(hit)
         manager.sort()
         
-        print >> sys.stderr, repr(manager.hits)
+        print >> sys.stderr, time.asctime(),'-', repr(manager.hits)
         
         #
         # Process: for each factor, scale it (f - mean(f)) / sd(f). Then sum all factors and order by this sum. 

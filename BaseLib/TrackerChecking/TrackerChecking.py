@@ -1,3 +1,4 @@
+import time 
 # written by Yuan Yuan
 # see LICENSE.txt for license information
 
@@ -87,7 +88,7 @@ def singleTrackerStatus(torrent, announce):
     info_hash = torrent["infohash"]
     
     if DEBUG:
-        print >>sys.stderr,"TrackerChecking: Checking",announce,"for",`info_hash`
+        print >>sys.stderr,time.asctime(),'-', "TrackerChecking: Checking",announce,"for",`info_hash`
     
     url = getUrl(announce, info_hash)            # whether scrape support
     if (url == None):                            # tracker url error
@@ -97,7 +98,7 @@ def singleTrackerStatus(torrent, announce):
         (seeder, leecher) = getStatus(url, info_hash)
         
         if DEBUG:
-            print >>sys.stderr,"TrackerChecking: Result",(seeder,leecher)
+            print >>sys.stderr,time.asctime(),'-', "TrackerChecking: Result",(seeder,leecher)
     except:
         (seeder, leecher) = (-2, -2)
     return (seeder, leecher)

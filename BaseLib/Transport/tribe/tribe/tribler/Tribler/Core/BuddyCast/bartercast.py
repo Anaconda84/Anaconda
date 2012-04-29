@@ -1,3 +1,4 @@
+import time 
 # Written by Michel Meulpolder
 # see LICENSE.txt for license information
 import sys, os
@@ -31,7 +32,7 @@ class BarterCastCore:
     def __init__(self, data_handler, overlay_bridge, log = '', dnsindb = None):
     
         if DEBUG:
-            print >> sys.stderr, "=================Initializing bartercast core"
+            print >> sys.stderr, time.asctime(),'-', "=================Initializing bartercast core"
     
         self.data_handler = data_handler
         self.dnsindb = dnsindb
@@ -74,7 +75,7 @@ class BarterCastCore:
             return
 
         if DEBUG:
-            print >> sys.stderr, "===========bartercast: Sending BarterCast msg to ", self.bartercastdb.getName(target_permid)
+            print >> sys.stderr, time.asctime(),'-', "===========bartercast: Sending BarterCast msg to ", self.bartercastdb.getName(target_permid)
 
         # create a new bartercast message
         bartercast_data = self.createBarterCastMessage(target_permid)
@@ -86,7 +87,7 @@ class BarterCastCore:
             bartercast_msg = bencode(bartercast_data)
         except:
             print_exc()
-            print >> sys.stderr, "error bartercast_data:", bartercast_data
+            print >> sys.stderr, time.asctime(),'-', "error bartercast_data:", bartercast_data
             return
             
         # send the message    
@@ -138,15 +139,15 @@ class BarterCastCore:
         """ Received a bartercast message and handle it. Reply if needed """
         
         if DEBUG:
-            print >>sys.stderr,'bartercast: %s Received a BarterCast msg from %s'% (ctime(now()), self.bartercastdb.getName(sender_permid))
+            print >>sys.stderr,time.asctime(),'-', 'bartercast: %s Received a BarterCast msg from %s'% (ctime(now()), self.bartercastdb.getName(sender_permid))
             
         if not sender_permid or sender_permid == self.bartercastdb.my_permid:
-            print >> sys.stderr, "bartercast: error - got BarterCastMsg from a None peer", \
+            print >> sys.stderr, time.asctime(),'-', "bartercast: error - got BarterCastMsg from a None peer", \
                         sender_permid, recv_msg
             return False
         
         if MAX_BARTERCAST_LENGTH > 0 and len(recv_msg) > MAX_BARTERCAST_LENGTH:
-            print >> sys.stderr, "bartercast: warning - got large BarterCastMsg", len(t)
+            print >> sys.stderr, time.asctime(),'-', "bartercast: warning - got large BarterCastMsg", len(t)
             return False
 
         bartercast_data = {}
@@ -154,13 +155,13 @@ class BarterCastCore:
         try:
             bartercast_data = bdecode(recv_msg)
         except:
-            print >> sys.stderr, "bartercast: warning, invalid bencoded data"
+            print >> sys.stderr, time.asctime(),'-', "bartercast: warning, invalid bencoded data"
             return False
             
         try:    # check bartercast message
             self.validBarterCastMsg(bartercast_data)
         except RuntimeError, msg:
-            print >> sys.stderr, msg
+            print >> sys.stderr, time.asctime(),'-', msg
             return False
             
         if LOG:
@@ -178,7 +179,7 @@ class BarterCastCore:
             self.handleBarterCastMsg(sender_permid, data)
             et = time()
             diff = et - st
-            print >>sys.stderr,"bartercast: HANDLE took %.4f" % diff
+            print >>sys.stderr,time.asctime(),'-', "bartercast: HANDLE took %.4f" % diff
         else:
             self.handleBarterCastMsg(sender_permid, data, totals)
        
@@ -217,8 +218,8 @@ class BarterCastCore:
     def handleBarterCastMsg(self, sender_permid, data, totals = None):
         """ process bartercast data in database """
         if DEBUG:
-            print >> sys.stderr, "bartercast: Processing bartercast msg from: ", self.bartercastdb.getName(sender_permid)
-            print >> sys.stderr, "totals: ", totals
+            print >> sys.stderr, time.asctime(),'-', "bartercast: Processing bartercast msg from: ", self.bartercastdb.getName(sender_permid)
+            print >> sys.stderr, time.asctime(),'-', "totals: ", totals
         
         
         permids = data.keys()
@@ -244,7 +245,7 @@ class BarterCastCore:
             data_from = data[permid]['d']
             
             if DEBUG:
-                print >> sys.stderr, "bartercast: data: (%s, %s) up = %d down = %d" % (self.bartercastdb.getName(sender_permid), self.bartercastdb.getName(permid),\
+                print >> sys.stderr, time.asctime(),'-', "bartercast: data: (%s, %s) up = %d down = %d" % (self.bartercastdb.getName(sender_permid), self.bartercastdb.getName(permid),\
                                                                         data_to, data_from)
 
             # update database sender->permid and permid->sender
@@ -269,7 +270,7 @@ class BarterCastCore:
             self.createAndSendBarterCastMessage(target_permid, selversion)
             et = time()
             diff = et - st
-            print >>sys.stderr,"bartercast: CREATE took %.4f" % diff
+            print >>sys.stderr,time.asctime(),'-', "bartercast: CREATE took %.4f" % diff
         else:
             self.createAndSendBarterCastMessage(target_permid, selversion)
 
@@ -298,7 +299,7 @@ class BarterCastCore:
         block_list[peer_permid] = unblock_time
         
         if DEBUG:
-            print >>sys.stderr,'bartercast: %s Blocked peer %s'% (ctime(now()), self.bartercastdb.getName(peer_permid))
+            print >>sys.stderr,time.asctime(),'-', 'bartercast: %s Blocked peer %s'% (ctime(now()), self.bartercastdb.getName(peer_permid))
 
 
     ################################
@@ -318,7 +319,7 @@ class BarterCastCore:
         log = open(logfile, 'a')
         string = '%.1f %s %s' % (timestamp, in_or_out, permid_for_user(msg_permid))
         log.write(string + '\n')
-        print >> sys.stderr, string
+        print >> sys.stderr, time.asctime(),'-', string
         
         data = msg_data.get('data', [])
         
@@ -328,7 +329,7 @@ class BarterCastCore:
             
             string = '%.1f %s %s %d %d' % (timestamp, permid_from, permid_for_user(permid), u, d)
             log.write(string + '\n')
-            print >> sys.stderr, string
+            print >> sys.stderr, time.asctime(),'-', string
             
         totals = msg_data.get('totals', None)
 
@@ -337,7 +338,7 @@ class BarterCastCore:
             
             string = '%.1f TOT %s %d %d' % (timestamp, permid_from, u, d)
             log.write(string + '\n')
-            print >> sys.stderr, string
+            print >> sys.stderr, time.asctime(),'-', string
             
             
         log.close()

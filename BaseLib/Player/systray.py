@@ -1,3 +1,4 @@
+import time 
 # Written by Arno Bakker
 # see LICENSE.txt for license information
 
@@ -51,14 +52,14 @@ class PlayerTaskBarIcon(wx.TaskBarIcon):
         return menu
         
     def OnOptions(self,event=None):
-        #print >>sys.stderr,"PlayerTaskBarIcon: OnOptions"
+        #print >>sys.stderr,time.asctime(),'-', "PlayerTaskBarIcon: OnOptions"
         dlg = PlayerOptionsDialog(self.wxapp,self.icons)
         ret = dlg.ShowModal()
-        #print >>sys.stderr,"PlayerTaskBarIcon: Dialog returned",ret
+        #print >>sys.stderr,time.asctime(),'-', "PlayerTaskBarIcon: Dialog returned",ret
         dlg.Destroy()
 
     def OnExitClient(self,event=None):
-        #print >>sys.stderr,"PlayerTaskBarIcon: OnExitClient"
+        #print >>sys.stderr,time.asctime(),'-', "PlayerTaskBarIcon: OnExitClient"
         self.wxapp.ExitMainLoop()
     
     
@@ -137,7 +138,7 @@ class PlayerOptionsDialog(wx.Dialog):
     #    self.EndModal(wx.ID_CANCEL)
         
     def OnApply(self,event = None):
-        print >>sys.stderr,"PlayerOptionsDialog: OnApply",self.port
+        print >>sys.stderr,time.asctime(),'-', "PlayerOptionsDialog: OnApply",self.port
         
         if self.port is not None:
             session = self.wxapp.s
@@ -146,7 +147,7 @@ class PlayerOptionsDialog(wx.Dialog):
             scfg = SessionStartupConfig.load(cfgfilename)
             
             scfg.set_listen_port(self.port)
-            print >>sys.stderr,"PlayerOptionsDialog: OnApply: Saving SessionStartupConfig to",cfgfilename
+            print >>sys.stderr,time.asctime(),'-', "PlayerOptionsDialog: OnApply: Saving SessionStartupConfig to",cfgfilename
             scfg.save(cfgfilename)
         
         uploadrate = int(self.uploadratectrl.GetValue())

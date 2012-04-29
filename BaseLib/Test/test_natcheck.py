@@ -1,3 +1,4 @@
+import time 
 # Written by Arno Bakker, Boudewijn Schoon
 # see LICENSE.txt for license information
 
@@ -36,7 +37,7 @@ class TestNatCheck(TestCrawler):
         Send a CRAWLER_NATCHECK message to the Tribler instance. A
         reply containing a nat type should be returned.
         """
-        print >>sys.stderr, "-"*80, "\ntest: subtest_valid_nat_check"
+        print >>sys.stderr, time.asctime(),'-', "-"*80, "\ntest: subtest_valid_nat_check"
 
         # make sure that the OLConnection IS in the crawler_db
         crawler_db = CrawlerDBHandler.getInstance()
@@ -46,21 +47,21 @@ class TestNatCheck(TestCrawler):
         self.send_crawler_request(s, CRAWLER_NATCHECK, 42, 0, "")
         s.close()
 
-        if DEBUG: print >>sys.stderr, "test_natcheck: the nat-check code allows for a 10 minute delay in reporting the nat stats"
+        if DEBUG: print >>sys.stderr, time.asctime(),'-', "test_natcheck: the nat-check code allows for a 10 minute delay in reporting the nat stats"
         self.listen_socket.settimeout(11 * 60)
 
         # wait for reply
         try:
             conn, addr = self.listen_socket.accept()
         except socket.timeout:
-            if DEBUG: print >> sys.stderr,"test_natcheck: timeout, bad, peer didn't connect to send the crawler reply"
+            if DEBUG: print >> sys.stderr,time.asctime(),'-', "test_natcheck: timeout, bad, peer didn't connect to send the crawler reply"
             assert False, "test_natcheck: timeout, bad, peer didn't connect to send the crawler reply"
         s = OLConnection(self.my_keypair, "", 0, conn, mylistenport=self.listen_port)
 
         # read reply
         error, payload = self.receive_crawler_reply(s, CRAWLER_NATCHECK, 42)
         assert error == 0
-        if DEBUG: print >>sys.stderr, "test_natcheck:", bdecode(payload)
+        if DEBUG: print >>sys.stderr, time.asctime(),'-', "test_natcheck:", bdecode(payload)
 
         time.sleep(1)
 

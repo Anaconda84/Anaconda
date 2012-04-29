@@ -1,3 +1,4 @@
+import time 
 # Written by Andrea Reale
 # see LICENSE.txt for license information
 
@@ -143,7 +144,7 @@ class SubsMessageHandler(object):
                 
             except Exception,e:
                 if DEBUG:
-                    print >> sys.stderr, SUBS_LOG_PREFIX + "Unable to send: %s" % str(e)
+                    print >> sys.stderr, time.asctime(),'-', SUBS_LOG_PREFIX + "Unable to send: %s" % str(e)
                 raise SubtitleMsgHandlerException(e)
         else:
             raise SubtitleMsgHandlerException("Empty request, nothing to send")
@@ -189,18 +190,18 @@ class SubsMessageHandler(object):
         
         if t == GET_SUBS:   # the other peer requests a torrent
             if DEBUG:
-                print >> sys.stderr, SUBS_LOG_PREFIX + "Got GET_SUBS len: %s from %s" % \
+                print >> sys.stderr, time.asctime(),'-', SUBS_LOG_PREFIX + "Got GET_SUBS len: %s from %s" % \
                       (len(message), show_permid_short(permid))
             return self._handleGETSUBS(permid, message, selversion)
         elif t == SUBS:     # the other peer sends me a torrent
             if DEBUG:
-                print >> sys.stderr, SUBS_LOG_PREFIX + "Got SUBS len: %s from %s" %\
+                print >> sys.stderr, time.asctime(),'-', SUBS_LOG_PREFIX + "Got SUBS len: %s from %s" %\
                      (len(message), show_permid_short(permid))
 
             return self._handleSUBS(permid, message, selversion)
         else:
             if DEBUG:
-                print >> sys.stderr, SUBS_LOG_PREFIX + "Unknown Overlay Message %d" % ord(t)
+                print >> sys.stderr, time.asctime(),'-', SUBS_LOG_PREFIX + "Unknown Overlay Message %d" % ord(t)
             return False
     
     
@@ -208,21 +209,21 @@ class SubsMessageHandler(object):
         
         if selversion < OLPROTO_VER_FOURTEENTH:
             if DEBUG:
-                print >> sys.stderr, "The peer that sent the GET_SUBS request has an old" \
+                print >> sys.stderr, time.asctime(),'-', "The peer that sent the GET_SUBS request has an old" \
                      "protcol version: this is strange. Dropping the msg"
             return False
         decoded = self._decodeGETSUBSMessage(message)
         
         if decoded is None:
             if DEBUG:
-                print >> sys.stderr, "Error decoding a GET_SUBS message from %s" %\
+                print >> sys.stderr, time.asctime(),'-', "Error decoding a GET_SUBS message from %s" %\
                       utilities.show_permid_short(permid)
             return False
     
         if DEBUG:
             channel_id, infohash, languages = decoded
             bitmask = self._languagesUtility.langCodesToMask(languages)
-            print >> sys.stderr, "%s, %s, %s, %s, %d, %d" % ("RG", show_permid_short(permid), 
+            print >> sys.stderr, time.asctime(),'-', "%s, %s, %s, %s, %d, %d" % ("RG", show_permid_short(permid), 
                                                      show_permid_short(channel_id),
                                                      bin2str(infohash), bitmask, len(message))
         
@@ -239,7 +240,7 @@ class SubsMessageHandler(object):
     def _handleSUBS(self, permid, message, selversion):
         if selversion < OLPROTO_VER_FOURTEENTH:
             if DEBUG:
-                print >> sys.stderr, "The peer that sent the SUBS request has an old" \
+                print >> sys.stderr, time.asctime(),'-', "The peer that sent the SUBS request has an old" \
                      "protcol version: this is strange. Dropping the msg"
             return False
         
@@ -247,7 +248,7 @@ class SubsMessageHandler(object):
         
         if decoded is None:
             if DEBUG:
-                print >> sys.stderr, "Error decoding a SUBS message from %s" %\
+                print >> sys.stderr, time.asctime(),'-', "Error decoding a SUBS message from %s" %\
                       utilities.show_permid_short(permid)
             return False
         
@@ -256,7 +257,7 @@ class SubsMessageHandler(object):
         #if no subtitle was requested drop the whole message
         
         if DEBUG:
-            print >> sys.stderr, "%s, %s, %s, %s, %d, %d" % ("RS", show_permid_short(permid), 
+            print >> sys.stderr, time.asctime(),'-', "%s, %s, %s, %s, %d, %d" % ("RS", show_permid_short(permid), 
                                                      show_permid_short(channel_id),
                                                      bin2str(infohash), bitmask, len(message))
         
@@ -265,7 +266,7 @@ class SubsMessageHandler(object):
         requestedSubs = self._checkRequestedSubtitles(channel_id,infohash,bitmask) 
         if requestedSubs == 0:
             if DEBUG:
-                print >> sys.stderr, SUBS_LOG_PREFIX + "Received a SUBS message that was not"\
+                print >> sys.stderr, time.asctime(),'-', SUBS_LOG_PREFIX + "Received a SUBS message that was not"\
                       " requested. Dropping"
             return False
         
@@ -343,7 +344,7 @@ class SubsMessageHandler(object):
         
         if exception is not None:
             if DEBUG:
-                print >> sys.stderr, SUBS_LOG_PREFIX + \
+                print >> sys.stderr, time.asctime(),'-', SUBS_LOG_PREFIX + \
                       "GET_SUBS not sent. Unable to connect to " + \
                       utilities.show_permid_short(permid)
         else:
@@ -353,11 +354,11 @@ class SubsMessageHandler(object):
                 msg = "GET_SUBS not send, the other peers had an old protocol version: %d" %\
                     selversion
                 if DEBUG:
-                    print >> sys.stderr, msg
+                    print >> sys.stderr, time.asctime(),'-', msg
                 raise SubtitleMsgHandlerException(msg)
             
             if DEBUG:
-                print >> sys.stderr, SUBS_LOG_PREFIX + "sending GET_SUBS to " + \
+                print >> sys.stderr, time.asctime(),'-', SUBS_LOG_PREFIX + "sending GET_SUBS to " + \
                       utilities.show_permid_short(permid)
             try :
                 message = self._createGETSUBSMessage(channel_id, infohash,
@@ -367,7 +368,7 @@ class SubsMessageHandler(object):
                 if DEBUG:
                     # Format:
                     # SS|SG, destination, channel, infohash, bitmask, size
-                    print >> sys.stderr, "%s, %s, %s, %s, %d, %d" % ("SG",show_permid_short(permid), 
+                    print >> sys.stderr, time.asctime(),'-', "%s, %s, %s, %s, %d, %d" % ("SG",show_permid_short(permid), 
                                                              show_permid_short(channel_id),
                                                              bin2str(infohash),bitmask,len(message))
                 
@@ -391,11 +392,11 @@ class SubsMessageHandler(object):
         """
         if exc is not None:
             if DEBUG:
-                print >> sys.stderr, SUBS_LOG_PREFIX + "Unable to send GET_SUBS to: " + \
+                print >> sys.stderr, time.asctime(),'-', SUBS_LOG_PREFIX + "Unable to send GET_SUBS to: " + \
                       utilities.show_permid_short(permid) + ": " + exc
         else:
             if DEBUG:
-                print >> sys.stderr, SUBS_LOG_PREFIX + "GET_SUBS sent to %s" % \
+                print >> sys.stderr, time.asctime(),'-', SUBS_LOG_PREFIX + "GET_SUBS sent to %s" % \
                        (utilities.show_permid_short(permid))
             self._addToRequestedSubtitles(channel_id, infohash, bitmask, usrCallback)
             if msgSentCallback is not None:
@@ -438,25 +439,25 @@ class SubsMessageHandler(object):
             values = bdecode(message[1:])
         except:
             if DEBUG:
-                print >> sys.stderr, SUBS_LOG_PREFIX + "Error bdecoding message"
+                print >> sys.stderr, time.asctime(),'-', SUBS_LOG_PREFIX + "Error bdecoding message"
             return None
         
         if len(values) != 3:
             if DEBUG:
-                print >> sys.stderr, SUBS_LOG_PREFIX + "Invalid number of fields in GET_SUBS"
+                print >> sys.stderr, time.asctime(),'-', SUBS_LOG_PREFIX + "Invalid number of fields in GET_SUBS"
             return None
         channel_id, infohash, bitmask = values[0], values[1], values[2]
         if not validPermid(channel_id):
             if DEBUG:
-                print >> sys.stderr, SUBS_LOG_PREFIX + "Invalid channel_id in GET_SUBS"
+                print >> sys.stderr, time.asctime(),'-', SUBS_LOG_PREFIX + "Invalid channel_id in GET_SUBS"
             return None
         elif not validInfohash(infohash):
             if DEBUG:
-                print >> sys.stderr, SUBS_LOG_PREFIX + "Invalid infohash in GET_SUBS"
+                print >> sys.stderr, time.asctime(),'-', SUBS_LOG_PREFIX + "Invalid infohash in GET_SUBS"
             return None
         elif not isinstance(bitmask, str) or not len(bitmask)==4:
             if DEBUG:
-                print >> sys.stderr, SUBS_LOG_PREFIX + "Invalid bitmask in GET_SUBS"
+                print >> sys.stderr, time.asctime(),'-', SUBS_LOG_PREFIX + "Invalid bitmask in GET_SUBS"
             return None
         
         try:
@@ -464,7 +465,7 @@ class SubsMessageHandler(object):
             languages = self._languagesUtility.maskToLangCodes(bitmask)
         except:
             if DEBUG:
-                print >> sys.stderr, SUBS_LOG_PREFIX + "Invalid bitmask in GET_SUBS"
+                print >> sys.stderr, time.asctime(),'-', SUBS_LOG_PREFIX + "Invalid bitmask in GET_SUBS"
             return None
         
         return channel_id, infohash, languages
@@ -494,27 +495,27 @@ class SubsMessageHandler(object):
             values = bdecode(message[1:])
         except:
             if DEBUG:
-                print >> sys.stderr, SUBS_LOG_PREFIX + "Error bdecoding SUBS message"
+                print >> sys.stderr, time.asctime(),'-', SUBS_LOG_PREFIX + "Error bdecoding SUBS message"
             return None
         
         if len(values) != 4:
             if DEBUG:
-                print >> sys.stderr, SUBS_LOG_PREFIX + "Invalid number of fields in SUBS"
+                print >> sys.stderr, time.asctime(),'-', SUBS_LOG_PREFIX + "Invalid number of fields in SUBS"
             return None
         channel_id, infohash, bitmask, contents = values[0], values[1], \
             values[2], values[3]
         
         if not validPermid(channel_id):
             if DEBUG:
-                print >> sys.stderr, SUBS_LOG_PREFIX + "Invalid channel_id in SUBS"
+                print >> sys.stderr, time.asctime(),'-', SUBS_LOG_PREFIX + "Invalid channel_id in SUBS"
             return None
         elif not validInfohash(infohash):
             if DEBUG:
-                print >> sys.stderr, SUBS_LOG_PREFIX + "Invalid infohash in SUBS"
+                print >> sys.stderr, time.asctime(),'-', SUBS_LOG_PREFIX + "Invalid infohash in SUBS"
             return None
         elif not isinstance(bitmask, str) or not len(bitmask) == 4:
             if DEBUG:
-                print >> sys.stderr, SUBS_LOG_PREFIX + "Invalid bitmask in SUBS"
+                print >> sys.stderr, time.asctime(),'-', SUBS_LOG_PREFIX + "Invalid bitmask in SUBS"
             return None
         
         try:
@@ -522,23 +523,23 @@ class SubsMessageHandler(object):
             languages = self._languagesUtility.maskToLangCodes(bitmask)
         except:
             if DEBUG:
-                print >> sys.stderr, SUBS_LOG_PREFIX + "Invalid bitmask in SUBS"
+                print >> sys.stderr, time.asctime(),'-', SUBS_LOG_PREFIX + "Invalid bitmask in SUBS"
             return None
         
         if not isinstance(contents, list):
             if DEBUG:
-                print >> sys.stderr, SUBS_LOG_PREFIX + "Invalid contents in SUBS"
+                print >> sys.stderr, time.asctime(),'-', SUBS_LOG_PREFIX + "Invalid contents in SUBS"
             return None
         if len(languages) != len(contents):
             if DEBUG:
-                print >> sys.stderr, SUBS_LOG_PREFIX + "Bitmask and contents do not match in"\
+                print >> sys.stderr, time.asctime(),'-', SUBS_LOG_PREFIX + "Bitmask and contents do not match in"\
                       " SUBS"
             return None
         
         numOfContents = len(languages)
         if numOfContents == 0:
             if DEBUG:
-                print >> sys.stderr, SUBS_LOG_PREFIX + "Empty message. Discarding."
+                print >> sys.stderr, time.asctime(),'-', SUBS_LOG_PREFIX + "Empty message. Discarding."
             return None
         
         
@@ -580,14 +581,14 @@ class SubsMessageHandler(object):
         """
         
         if DEBUG:
-            print >> sys.stderr, SUBS_LOG_PREFIX + "Checking the upload queue..."
+            print >> sys.stderr, time.asctime(),'-', SUBS_LOG_PREFIX + "Checking the upload queue..."
         
         if not self._tokenBucket.upload_rate > 0:
             return 
         
         if not len(self._uploadQueue) > 0:
             if DEBUG:
-                print >> sys.stderr, SUBS_LOG_PREFIX + "Upload queue is empty."
+                print >> sys.stderr, time.asctime(),'-', SUBS_LOG_PREFIX + "Upload queue is empty."
             
         while len(self._uploadQueue) > 0 :
             responseData = self._uploadQueue[0]
@@ -595,7 +596,7 @@ class SubsMessageHandler(object):
             
             if encodedMsg is None:
                 if DEBUG:
-                    print >> sys.stderr, SUBS_LOG_PREFIX + "Nothing to send"
+                    print >> sys.stderr, time.asctime(),'-', SUBS_LOG_PREFIX + "Nothing to send"
                 del self._uploadQueue[0]
                 continue #check other messages in the queue
             
@@ -603,7 +604,7 @@ class SubsMessageHandler(object):
             
             if msgSize > self._tokenBucket.capacity: 
                 #message is too big, discarding
-                print >> sys.stderr, "Warning:" + SUBS_LOG_PREFIX + "SUBS message too big. Discarded!"
+                print >> sys.stderr, time.asctime(),'-', "Warning:" + SUBS_LOG_PREFIX + "SUBS message too big. Discarded!"
                 del self._uploadQueue[0]
                 continue #check other messages in the queue
             
@@ -615,7 +616,7 @@ class SubsMessageHandler(object):
                     # S|G, destination, channel, infohash, bitmask, size
                     keys = responseData['subtitles'].keys()
                     bitmask = self._languagesUtility.langCodesToMask(keys)
-                    print >> sys.stderr, "%s, %s, %s, %s, %d, %d" % ("SS",show_permid_short(responseData['permid']),
+                    print >> sys.stderr, time.asctime(),'-', "%s, %s, %s, %s, %d, %d" % ("SS",show_permid_short(responseData['permid']),
                                                              show_permid_short(responseData['channel_id']),
                                                              bin2str(responseData['infohash']),bitmask,int(msgSize*1024))
                     
@@ -654,7 +655,7 @@ class SubsMessageHandler(object):
             if fileContent is not None and len(fileContent) <= self._maxSubSize:
                 payload.append(fileContent)
             else:
-                print >> sys.stderr, "Warning: Subtitle in % for ch: %s, infohash:%s dropped. Bigger then %d" % \
+                print >> sys.stderr, time.asctime(),'-', "Warning: Subtitle in % for ch: %s, infohash:%s dropped. Bigger then %d" % \
                             (lang, responseData['channel_id'], responseData['infohash'], 
                              self._maxSubSize)
 
@@ -662,7 +663,7 @@ class SubsMessageHandler(object):
         
         if not len(payload) > 0:
             if DEBUG:
-                print >> sys.stderr, SUBS_LOG_PREFIX + "No payload to send in SUBS"
+                print >> sys.stderr, time.asctime(),'-', SUBS_LOG_PREFIX + "No payload to send in SUBS"
             return None
         
         bitmask = \
@@ -686,7 +687,7 @@ class SubsMessageHandler(object):
         Do sends the SUBS message through the overlay bridge.
         """
         if DEBUG:
-            print >> sys.stderr, SUBS_LOG_PREFIX + "Sending SUBS message to %s..." % \
+            print >> sys.stderr, time.asctime(),'-', SUBS_LOG_PREFIX + "Sending SUBS message to %s..." % \
                   show_permid_short(permid)
     
         # Optimization: we know we're currently connected
@@ -699,11 +700,11 @@ class SubsMessageHandler(object):
         Called by the OLThread when a SUBS message is succesfully sent
         '''
         if exc is not None:
-            print >> sys.stderr, "Warning: Sending of SUBS message to %s failed: %s" % \
+            print >> sys.stderr, time.asctime(),'-', "Warning: Sending of SUBS message to %s failed: %s" % \
                 (show_permid_short(permid), str(exc))
         else:
             if DEBUG:
-                print >> sys.stderr, "SUBS message succesfully sent to %s" % show_permid_short(permid)
+                print >> sys.stderr, time.asctime(),'-', "SUBS message succesfully sent to %s" % show_permid_short(permid)
         
         
     def _addToRequestedSubtitles(self, channel_id, infohash, bitmask, callback=None):
@@ -747,7 +748,7 @@ class SubsMessageHandler(object):
             somethingDeleted = rsEntry.cleanUpRequests(self._requestValidityTime)
             if somethingDeleted:
                 if DEBUG:
-                    print >> sys.stderr, "Deleting subtitle request for key %s: expired.", key
+                    print >> sys.stderr, time.asctime(),'-', "Deleting subtitle request for key %s: expired.", key
             
             #no more requests for the (channel,infohash, pair)
             if rsEntry.cumulativeBitmask == 0:
@@ -771,7 +772,7 @@ class SubsMessageHandler(object):
         key = self._getRequestedSubtitlesKey(channel_id, infohash)
         if key not in self.requestedSubtitles.keys():
             if DEBUG:
-                print >> sys.stderr, SUBS_LOG_PREFIX + "asked to remove a subtitle that" + \
+                print >> sys.stderr, time.asctime(),'-', SUBS_LOG_PREFIX + "asked to remove a subtitle that" + \
                         "was never requested from the requestedList"
             return None
         else:
@@ -791,7 +792,7 @@ class SubsMessageHandler(object):
         key = self._getRequestedSubtitlesKey(channel_id, infohash)
         if key not in self.requestedSubtitles.keys():
             if DEBUG:
-                print >> sys.stderr, SUBS_LOG_PREFIX + "asked to remove a subtitle that" + \
+                print >> sys.stderr, time.asctime(),'-', SUBS_LOG_PREFIX + "asked to remove a subtitle that" + \
                         "was never requested from the requested List"
             return 0
         else:

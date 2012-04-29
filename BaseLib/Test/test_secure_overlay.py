@@ -1,3 +1,4 @@
+import time 
 # Written by Arno Bakker
 # see LICENSE.txt for license information
 #
@@ -90,7 +91,7 @@ class Peer(Thread):
                                 reuse = True,
                                 ipv6_socket_style = config['ipv6_binds_v4'], 
                                 randomizer = config['random_port'])
-                print >> sys.stderr,"test: Got listen port", self.listen_port
+                print >> sys.stderr,time.asctime(),'-', "test: Got listen port", self.listen_port
                 break
             except socketerror, e:
                 self.report_failure(str(e))
@@ -112,7 +113,7 @@ class Peer(Thread):
         self.peer_db = PeerDBHandler.getInstance()
 
         self.secure_overlay.register(self,config['max_message_length'])
-        print >>sys.stderr,"Peer: Setting",self.secure_overlay.get_handler(),"as handler at SocketHandler"
+        print >>sys.stderr,time.asctime(),'-', "Peer: Setting",self.secure_overlay.get_handler(),"as handler at SocketHandler"
         self.rawserver.sockethandler.set_handler(self.secure_overlay.get_handler())
         self.secure_overlay.start_listening()
 
@@ -121,7 +122,7 @@ class Peer(Thread):
         self.rawserver.add_task(self.dummy_task,0)
 
     def run(self):
-        print >> sys.stderr,"test: MyServer: run called by",currentThread().getName()
+        print >> sys.stderr,time.asctime(),'-', "test: MyServer: run called by",currentThread().getName()
         self.multihandler.listen_forever()
 
     def report_failure(self,msg):
@@ -168,13 +169,13 @@ class TestSecureOverlay(unittest.TestCase):
         self.got2 = False
         self.first = True
 
-        print >>sys.stderr,"test: setUp: peer1 permid is",show_permid_short(self.peer1.my_permid)
-        print >>sys.stderr,"test: setUp: peer2 permid is",show_permid_short(self.peer2.my_permid)
+        print >>sys.stderr,time.asctime(),'-', "test: setUp: peer1 permid is",show_permid_short(self.peer1.my_permid)
+        print >>sys.stderr,time.asctime(),'-', "test: setUp: peer2 permid is",show_permid_short(self.peer2.my_permid)
 
         sleep(2) # let server threads start
 
     def tearDown(self):
-        print >> sys.stderr,"test: tearDown: waiting 10 secs"
+        print >> sys.stderr,time.asctime(),'-', "test: tearDown: waiting 10 secs"
         sleep(10)
         if self.wanted and not self.got:
             self.assert_(False,"callback was not called")
@@ -195,7 +196,7 @@ class TestSecureOverlay(unittest.TestCase):
     # connect_dns() to an address that noone responds at
     #
     def singtest_connect_dns_to_dead_peer(self):
-        print >> sys.stderr,"test: test_connect_dns_to_dead_peer"
+        print >> sys.stderr,time.asctime(),'-', "test: test_connect_dns_to_dead_peer"
         self.wanted = True
         self.peer1.secure_overlay.connect_dns(("127.0.0.1", 22220),self.connect_dns_to_dead_peer_callback)
         # Arno, 2009-04-23: was 2 secs, somehow the failed event comes in real slow now.
@@ -203,7 +204,7 @@ class TestSecureOverlay(unittest.TestCase):
         self.assert_(len(self.peer1.secure_overlay.iplport2oc) == 0)
 
     def connect_dns_to_dead_peer_callback(self,exc,dns,permid,selver):
-        print >> sys.stderr,"test: connect_dns_to_dead_peer_callback"
+        print >> sys.stderr,time.asctime(),'-', "test: connect_dns_to_dead_peer_callback"
         self.assert_(exc is not None)
         self.assert_(dns == ("127.0.0.1", 22220))
         self.assert_(permid is None)
@@ -214,7 +215,7 @@ class TestSecureOverlay(unittest.TestCase):
     # connect_dns() to an address that peer2 responds
     #
     def singtest_connect_dns_to_live_peer(self):
-        print >> sys.stderr,"test: test_connect_dns_to_live_peer"
+        print >> sys.stderr,time.asctime(),'-', "test: test_connect_dns_to_live_peer"
         self.wanted = True
         self.peer1.secure_overlay.connect_dns(("127.0.0.1", 5678),self.connect_dns_to_live_peer_callback)
         sleep(2) # let rawserver thread establish connection, which should succeed
@@ -222,7 +223,7 @@ class TestSecureOverlay(unittest.TestCase):
         self.assert_(self.peer1.secure_overlay.iplport2oc.has_key('127.0.0.1:5678'))
 
     def connect_dns_to_live_peer_callback(self,exc,dns,permid,selver):
-        print >> sys.stderr,"test: connect_dns_to_live_peer_callback"
+        print >> sys.stderr,time.asctime(),'-', "test: connect_dns_to_live_peer_callback"
         self.assert_(exc is None)
         self.assert_(dns == ("127.0.0.1", 5678))
         self.assert_(permid == self.peer2.my_permid)
@@ -233,7 +234,7 @@ class TestSecureOverlay(unittest.TestCase):
     # connect() to a fake permid
     #
     def singtest_connect_to_dead_peerA(self):
-        print >> sys.stderr,"test: test_connect_to_dead_peer"
+        print >> sys.stderr,time.asctime(),'-', "test: test_connect_to_dead_peer"
         self.wanted = True
         hispermid = 'blabla'
         self.peer1.secure_overlay.connect(hispermid,self.connect_to_dead_peerA_callback)
@@ -241,7 +242,7 @@ class TestSecureOverlay(unittest.TestCase):
         self.assert_(len(self.peer1.secure_overlay.iplport2oc) == 0)
 
     def connect_to_dead_peerA_callback(self,exc,dns,permid,selver):
-        print >> sys.stderr,"test: connect_to_dead_peer_callback"
+        print >> sys.stderr,time.asctime(),'-', "test: connect_to_dead_peer_callback"
         self.assert_(exc is not None)
         self.assert_(permid == 'blabla')
         self.got = True
@@ -251,7 +252,7 @@ class TestSecureOverlay(unittest.TestCase):
     # database that noone responds at
     #
     def singtest_connect_to_dead_peerB(self):
-        print >> sys.stderr,"test: test_connect_to_dead_peerB"
+        print >> sys.stderr,time.asctime(),'-', "test: test_connect_to_dead_peerB"
         self.wanted = True
 
         peer_db = PeerDBHandler.getInstance()
@@ -264,7 +265,7 @@ class TestSecureOverlay(unittest.TestCase):
         self.assert_(len(self.peer1.secure_overlay.iplport2oc) == 0)
 
     def connect_to_dead_peerB_callback(self,exc,dns,permid,selver):
-        print >> sys.stderr,"test: connect_to_dead_peerB_callback",exc
+        print >> sys.stderr,time.asctime(),'-', "test: connect_to_dead_peerB_callback",exc
         self.assert_(exc is not None)
         self.assert_(dns == ("127.0.0.1", 22220))
         self.assert_(permid == self.peer2.my_permid)
@@ -275,7 +276,7 @@ class TestSecureOverlay(unittest.TestCase):
     # connect() to peer2 which responds
     #
     def singtest_connect_to_live_peer(self):
-        print >> sys.stderr,"test: test_connect_to_live_peer"
+        print >> sys.stderr,time.asctime(),'-', "test: test_connect_to_live_peer"
         self.wanted = True
 
         peer_db = PeerDBHandler.getInstance()
@@ -288,7 +289,7 @@ class TestSecureOverlay(unittest.TestCase):
         self.assert_(self.peer1.secure_overlay.iplport2oc.has_key('127.0.0.1:5678'))
 
     def connect_to_live_peer_callback(self,exc,dns,permid,selver):
-        print >> sys.stderr,"test: connect_to_live_peer_callback",exc
+        print >> sys.stderr,time.asctime(),'-', "test: connect_to_live_peer_callback",exc
         self.assert_(exc is None)
         self.assert_(dns == ("127.0.0.1", 5678))
         self.assert_(permid == self.peer2.my_permid)
@@ -299,7 +300,7 @@ class TestSecureOverlay(unittest.TestCase):
     # connect() to peer2 which responds, and then connect again
     #
     def singtest_connect_twice_to_live_peer(self):
-        print >> sys.stderr,"test: test_connect_to_live_peer"
+        print >> sys.stderr,time.asctime(),'-', "test: test_connect_to_live_peer"
         self.wanted = True
         self.wanted2 = True
         
@@ -314,7 +315,7 @@ class TestSecureOverlay(unittest.TestCase):
         self.peer1.secure_overlay.connect(hispermid,self.connect_to_live_peer_again_callback)
 
     def connect_to_live_peer_again_callback(self,exc,dns,permid,selver):
-        print >> sys.stderr,"test: connect_to_live_peer_callback",exc
+        print >> sys.stderr,time.asctime(),'-', "test: connect_to_live_peer_callback",exc
         self.assert_(exc is None)
         self.assert_(dns == ("127.0.0.1", 5678))
         self.assert_(permid == self.peer2.my_permid)
@@ -325,7 +326,7 @@ class TestSecureOverlay(unittest.TestCase):
     # send() over a non-existing connection to peer2
     #
     def singtest_send_unopenedA(self):
-        print >> sys.stderr,"test: test_send_unopenedA"
+        print >> sys.stderr,time.asctime(),'-', "test: test_send_unopenedA"
         self.wanted = True
         hispermid = self.peer2.my_permid
         self.peer1.secure_overlay.send(hispermid,'msg=bla',self.send_unopenedA_send_callback)
@@ -333,7 +334,7 @@ class TestSecureOverlay(unittest.TestCase):
         self.assert_(len(self.peer1.secure_overlay.iplport2oc) == 0)
 
     def send_unopenedA_send_callback(self,exc,permid):
-        print >> sys.stderr,"test: send_unopenedA_send_callback",exc
+        print >> sys.stderr,time.asctime(),'-', "test: send_unopenedA_send_callback",exc
         self.assert_(exc is not None)
         self.assert_(permid == self.peer2.my_permid)
         self.got = True
@@ -343,7 +344,7 @@ class TestSecureOverlay(unittest.TestCase):
     # send() over a non-existing connection to peer2 whose address is in database
     #
     def singtest_send_unopenedB(self):
-        print >> sys.stderr,"test: test_send_unopenedB"
+        print >> sys.stderr,time.asctime(),'-', "test: test_send_unopenedB"
         self.wanted = True
         peer_db = PeerDBHandler.getInstance()
         hispermid = self.peer2.my_permid
@@ -353,7 +354,7 @@ class TestSecureOverlay(unittest.TestCase):
         self.assert_(len(self.peer1.secure_overlay.iplport2oc) == 0)
 
     def send_unopenedB_send_callback(self,exc,permid):
-        print >> sys.stderr,"test: send_unopenedB_send_callback",exc
+        print >> sys.stderr,time.asctime(),'-', "test: send_unopenedB_send_callback",exc
         self.assert_(exc is not None)
         self.assert_(permid == self.peer2.my_permid)
         self.got = True
@@ -363,7 +364,7 @@ class TestSecureOverlay(unittest.TestCase):
     # send() over a connection to peer2 that peer1 closed
     #
     def singtest_send_local_close(self):
-        print >> sys.stderr,"test: test_send_local_close"
+        print >> sys.stderr,time.asctime(),'-', "test: test_send_local_close"
         self.wanted = True
 
         self.peer1.secure_overlay.connect_dns(("127.0.0.1", 5678),self.connect_dns_to_live_peer_callback)
@@ -378,7 +379,7 @@ class TestSecureOverlay(unittest.TestCase):
         self.assert_(len(self.peer1.secure_overlay.iplport2oc) == 0)
 
     def send_local_close_send_callback(self,exc,permid):
-        print >> sys.stderr,"test: send_local_close_send_callback",exc
+        print >> sys.stderr,time.asctime(),'-', "test: send_local_close_send_callback",exc
         self.assert_(exc is not None)
         self.assert_(permid == self.peer2.my_permid)
         self.got = True
@@ -387,7 +388,7 @@ class TestSecureOverlay(unittest.TestCase):
     # send() over a connection to peer2 that peer2 closed
     #
     def singtest_send_remote_close(self):
-        print >> sys.stderr,"test: test_send_remote_close"
+        print >> sys.stderr,time.asctime(),'-', "test: test_send_remote_close"
 
         self.wanted = True
         self.wanted2 = True
@@ -404,7 +405,7 @@ class TestSecureOverlay(unittest.TestCase):
         self.assert_(len(self.peer1.secure_overlay.iplport2oc) == 0)
 
     def send_remote_close_conns_callback(self,exc,permid,selversion,locally_initiated,hisdns=None):
-        print  >> sys.stderr,"test: send_remote_close_conns_callback",exc,show_permid_short(permid)
+        print  >> sys.stderr,time.asctime(),'-', "test: send_remote_close_conns_callback",exc,show_permid_short(permid)
         if self.first:
             self.assert_(exc is None)
             self.assert_(permid == self.peer1.my_permid)
@@ -422,7 +423,7 @@ class TestSecureOverlay(unittest.TestCase):
             self.assert_(not locally_initiated)
 
     def send_remote_close_send_callback(self,exc,permid):
-        print >> sys.stderr,"test: send_remote_close_send_callback",exc
+        print >> sys.stderr,time.asctime(),'-', "test: send_remote_close_send_callback",exc
         self.assert_(exc is not None)
         self.assert_(permid == self.peer2.my_permid)
         self.got = True
@@ -432,7 +433,7 @@ class TestSecureOverlay(unittest.TestCase):
     # send() over an open connection to peer2
     #
     def singtest_send_opened(self):
-        print >> sys.stderr,"test: test_send_opened"
+        print >> sys.stderr,time.asctime(),'-', "test: test_send_opened"
         self.wanted = True
         self.wanted2 = True
         peer_db = PeerDBHandler.getInstance()
@@ -442,7 +443,7 @@ class TestSecureOverlay(unittest.TestCase):
         self.peer1.secure_overlay.connect(hispermid,lambda e,d,p,s: self.send_opened_connect_callback(e,d,p,s,msg))
 
     def send_opened_connect_callback(self,exc,dns,permid,selver,msg):
-        print >> sys.stderr,"test: send_opened_connect_callback"
+        print >> sys.stderr,time.asctime(),'-', "test: send_opened_connect_callback"
         self.assert_(exc is None)
         self.assert_(dns == ("127.0.0.1", 5678))
         self.assert_(permid == self.peer2.my_permid)
@@ -450,7 +451,7 @@ class TestSecureOverlay(unittest.TestCase):
         self.got = True
 
     def send_opened_send_callback(self,exc,permid):
-        print >> sys.stderr,"test: send_opened_send_callback"
+        print >> sys.stderr,time.asctime(),'-', "test: send_opened_send_callback"
         self.assert_(exc is None)
         self.assert_(permid == self.peer2.my_permid)
         self.got2 = True
@@ -460,7 +461,7 @@ class TestSecureOverlay(unittest.TestCase):
     # close() a non-existing to peer2
     #
     def singtest_close_unopened(self):
-        print >> sys.stderr,"test: test_close_unopened"
+        print >> sys.stderr,time.asctime(),'-', "test: test_close_unopened"
         hispermid = self.peer2.my_permid
         self.peer1.secure_overlay.close(hispermid)
         sleep(2) # let rawserver thread close connection, which should succeed
@@ -471,7 +472,7 @@ class TestSecureOverlay(unittest.TestCase):
     # close() an open connection to peer2
     #
     def singtest_close_opened(self):
-        print >> sys.stderr,"test: test_close_opened"
+        print >> sys.stderr,time.asctime(),'-', "test: test_close_opened"
         self.peer1.secure_overlay.connect_dns(("127.0.0.1", 5678),self.connect_dns_to_live_peer_callback)
         sleep(2) # let rawserver thread establish connection, which should succeed
         self.assert_(len(self.peer1.secure_overlay.iplport2oc) == 1)
@@ -487,7 +488,7 @@ class TestSecureOverlay(unittest.TestCase):
     # Let peer2 register an receive callback and let peer1 send a message
     #
     def singtest_receive(self):
-        print >> sys.stderr,"test: test_receive"
+        print >> sys.stderr,time.asctime(),'-', "test: test_receive"
         self.wanted = True
         self.wanted2 = True
         # register handler for messages
@@ -500,21 +501,21 @@ class TestSecureOverlay(unittest.TestCase):
         self.peer1.secure_overlay.connect(hispermid,lambda e,d,p,s: self.receive_connect_callback(e,d,p,s,msg))
 
     def receive_connect_callback(self,exc,dns,permid,selver,msg):
-        print >> sys.stderr,"test: receive_connect_callback"
+        print >> sys.stderr,time.asctime(),'-', "test: receive_connect_callback"
         self.assert_(exc is None)
         self.assert_(dns == ("127.0.0.1", 5678))
         self.assert_(permid == self.peer2.my_permid)
         self.peer1.secure_overlay.send(permid,msg,self.receive_send_callback)
-        print >> sys.stderr,"test: test_receive exiting"
+        print >> sys.stderr,time.asctime(),'-', "test: test_receive exiting"
 
     def receive_send_callback(self,exc,permid):
-        print >> sys.stderr,"test: receive_send_callback"
+        print >> sys.stderr,time.asctime(),'-', "test: receive_send_callback"
         self.assert_(exc is None)
         self.assert_(permid == self.peer2.my_permid)
         self.got2 = True
 
     def receive_msg_callback(self,permid,selversion,message):
-        print  >> sys.stderr,"test: testcase succesfully received message"
+        print  >> sys.stderr,time.asctime(),'-', "test: testcase succesfully received message"
         self.got = True
         self.assert_(message[0] == GET_METADATA)
         self.assert_(permid == self.peer1.my_permid)
@@ -526,7 +527,7 @@ class TestSecureOverlay(unittest.TestCase):
     # which implies setting up a connection
     #
     def singtest_got_conn_incoming(self):
-        print >> sys.stderr,"test: test_got_conn_incoming"
+        print >> sys.stderr,time.asctime(),'-', "test: test_got_conn_incoming"
         self.wanted = True
         self.wanted2 = True
         # register handler for messages
@@ -543,15 +544,15 @@ class TestSecureOverlay(unittest.TestCase):
 
 
     def got_conn_incoming_connect_callback(self,exc,dns,permid,selver,msg):
-        print >> sys.stderr,"test: got_conn_incoming_connect_callback",exc
+        print >> sys.stderr,time.asctime(),'-', "test: got_conn_incoming_connect_callback",exc
         self.assert_(exc is None)
         self.assert_(dns == ("127.0.0.1", 5678))
         self.assert_(permid == self.peer2.my_permid)
         self.peer1.secure_overlay.send(permid,msg,self.receive_send_callback)
-        print >> sys.stderr,"test: test_got_conn_incoming exiting"
+        print >> sys.stderr,time.asctime(),'-', "test: test_got_conn_incoming exiting"
 
     def got_conn_incoming_conns_callback(self,exc,permid,selversion,locally_initiated,hisdns=None):
-        print  >> sys.stderr,"test: got_conn_incoming_conns_callback",exc,show_permid_short(permid)
+        print  >> sys.stderr,time.asctime(),'-', "test: got_conn_incoming_conns_callback",exc,show_permid_short(permid)
         self.assert_(exc is None)
         self.assert_(permid == self.peer1.my_permid)
         self.assert_(selversion == OLPROTO_VER_CURRENT)
@@ -564,7 +565,7 @@ class TestSecureOverlay(unittest.TestCase):
     # which implies setting up a connection
     #
     def singtest_got_conn_outgoing(self):
-        print >> sys.stderr,"test: test_got_conn_outgoing"
+        print >> sys.stderr,time.asctime(),'-', "test: test_got_conn_outgoing"
         self.wanted = True
         self.wanted2 = True
         # register handler for connections
@@ -578,14 +579,14 @@ class TestSecureOverlay(unittest.TestCase):
 
 
     def got_conn_outgoing_connect_callback(self,exc,dns,permid,selver,msg):
-        print >> sys.stderr,"test: got_conn_outgoing_connect_callback",exc
+        print >> sys.stderr,time.asctime(),'-', "test: got_conn_outgoing_connect_callback",exc
         self.assert_(exc is None)
         self.assert_(dns == ("127.0.0.1", 5678))
         self.assert_(permid == self.peer2.my_permid)
         self.got2 = True
 
     def got_conn_outgoing_conns_callback(self,exc,permid,selversion,locally_initiated,hisdns=None):
-        print  >> sys.stderr,"test: got_conn_outgoing_conns_callback",exc,show_permid_short(permid)
+        print  >> sys.stderr,time.asctime(),'-', "test: got_conn_outgoing_conns_callback",exc,show_permid_short(permid)
         self.assert_(exc is None)
         self.assert_(permid == self.peer2.my_permid)
         self.assert_(selversion == OLPROTO_VER_CURRENT)
@@ -599,7 +600,7 @@ class TestSecureOverlay(unittest.TestCase):
     # after succesful setup.
     #
     def singtest_got_conn_local_close(self):
-        print >> sys.stderr,"test: test_got_conn_local_close"
+        print >> sys.stderr,time.asctime(),'-', "test: test_got_conn_local_close"
 
         self.wanted = True
         self.wanted2 = True
@@ -619,7 +620,7 @@ class TestSecureOverlay(unittest.TestCase):
 
 
     def got_conn_local_close_conns_callback(self,exc,permid,selversion,locally_initiated,hisdns=None):
-        print  >> sys.stderr,"test: got_conn_local_close_conns_callback",exc,show_permid_short(permid)
+        print  >> sys.stderr,time.asctime(),'-', "test: got_conn_local_close_conns_callback",exc,show_permid_short(permid)
         if self.first:
             self.assert_(exc is None)
             self.assert_(permid == self.peer1.my_permid)
@@ -639,7 +640,7 @@ class TestSecureOverlay(unittest.TestCase):
     # after succesful setup.
     #
     def singtest_got_conn_remote_close(self):
-        print >> sys.stderr,"test: test_got_conn_remote_close"
+        print >> sys.stderr,time.asctime(),'-', "test: test_got_conn_remote_close"
 
         self.wanted = True
         self.wanted2 = True
@@ -655,7 +656,7 @@ class TestSecureOverlay(unittest.TestCase):
         self.assert_(len(self.peer1.secure_overlay.iplport2oc) == 0)
 
     def got_conn_remote_close_conns_callback(self,exc,permid,selversion,locally_initiated,hisdns=None):
-        print  >> sys.stderr,"test: got_conn_remote_close_conns_callback",exc,show_permid_short(permid)
+        print  >> sys.stderr,time.asctime(),'-', "test: got_conn_remote_close_conns_callback",exc,show_permid_short(permid)
         if self.first:
             self.assert_(exc is None)
             self.assert_(permid == self.peer1.my_permid)
@@ -676,7 +677,7 @@ class TestSecureOverlay(unittest.TestCase):
     def rawserver_fatalerrorfunc(self,e):
         """ Called by network thread """
         if DEBUG:
-            print >>sys.stderr,"test_secure_overlay: RawServer fatal error func called",e
+            print >>sys.stderr,time.asctime(),'-', "test_secure_overlay: RawServer fatal error func called",e
         print_exc()
         self.assert_(False)
 

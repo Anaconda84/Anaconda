@@ -1,3 +1,4 @@
+import time 
 # wRIsten by Jan David Mol, Arno Bakker
 # see LICENSE.txt for license information
 
@@ -164,7 +165,7 @@ class PiecePickerStreaming(PiecePicker):
 
     def got_have(self, piece, connection=None):
         # if DEBUG:
-        #     print >>sys.stderr,"PiecePickerStreaming: got_have:",piece
+        #     print >>sys.stderr,time.asctime(),'-', "PiecePickerStreaming: got_have:",piece
         self.maxhave = max(self.maxhave,piece)
         PiecePicker.got_have( self, piece, connection )
         if self.transporter:
@@ -196,7 +197,7 @@ class PiecePickerStreaming(PiecePicker):
 
     def complete(self, piece):
         # if DEBUG:
-        #     print >>sys.stderr,"PiecePickerStreaming: complete:",piece
+        #     print >>sys.stderr,time.asctime(),'-', "PiecePickerStreaming: complete:",piece
         PiecePicker.complete( self, piece )
         if self.transporter:
             self.transporter.complete( piece )
@@ -224,7 +225,7 @@ class PiecePickerStreaming(PiecePicker):
         # since data can be seeded in a 'live' fashion
         if not vs.live_streaming:
             if DEBUG:
-                print >>sys.stderr, "PiecePickerStreaming: pos is sustainable: not streaming live"
+                print >>sys.stderr, time.asctime(),'-', "PiecePickerStreaming: pos is sustainable: not streaming live"
             return True
 
         # We assume the maximum piece number that is available at at least half of the neighbours
@@ -241,7 +242,7 @@ class PiecePickerStreaming(PiecePicker):
             # not sustainable, but nothing we can do. Return True to avoid pausing
             # and getting out of sync.
             if DEBUG:
-                print >>sys.stderr, "PiecePickerStreaming: pos is sustainable: no neighbours with pieces"
+                print >>sys.stderr, time.asctime(),'-', "PiecePickerStreaming: pos is sustainable: no neighbours with pieces"
             return True
 
         half = max( 1, numconn/2 )
@@ -252,13 +253,13 @@ class PiecePickerStreaming(PiecePicker):
                 skip -= 1
             elif self.numhaves[x] >= half:
                 if DEBUG:
-                    print >>sys.stderr, "PiecePickerStreaming: pos is sustainable: piece %s @ %s>%s peers (fudge=%s)" % (x,self.numhaves[x],half,fudge)
+                    print >>sys.stderr, time.asctime(),'-', "PiecePickerStreaming: pos is sustainable: piece %s @ %s>%s peers (fudge=%s)" % (x,self.numhaves[x],half,fudge)
                 return True
             else:
                 pass
 
         if DEBUG:
-            print >>sys.stderr, "PiecePickerStreaming: pos is NOT sustainable playpos=%s fudge=%s numconn=%s half=%s numpeers=%s %s" % (vs.playback_pos,fudge,numconn,half,len(self.peer_connections),[x.get_ip() for x in self.peer_connections])
+            print >>sys.stderr, time.asctime(),'-', "PiecePickerStreaming: pos is NOT sustainable playpos=%s fudge=%s numconn=%s half=%s numpeers=%s %s" % (vs.playback_pos,fudge,numconn,half,len(self.peer_connections),[x.get_ip() for x in self.peer_connections])
 
         # too few neighbours own the future pieces. it's wise to pause and let neighbours catch up
         # with us
@@ -271,13 +272,13 @@ class PiecePickerStreaming(PiecePicker):
 
     def next(self, haves, wantfunc, sdownload, complete_first = False, helper_con = False, slowpieces=[], willrequest=True,connection=None):
         def newwantfunc( piece ):
-            #print >>sys.stderr,"S",self.streaming_piece_filter( piece ),"!sP",not (piece in slowpieces),"w",wantfunc( piece )
+            #print >>sys.stderr,time.asctime(),'-', "S",self.streaming_piece_filter( piece ),"!sP",not (piece in slowpieces),"w",wantfunc( piece )
             return not (piece in slowpieces) and wantfunc( piece )
 
         # fallback: original piece picker
         p = PiecePicker.next(self, haves, newwantfunc, sdownload, complete_first, helper_con, slowpieces=slowpieces, willrequest=willrequest,connection=connection)
         if DEBUGPP and self.videostatus.prebuffering:
-            print >>sys.stderr,"PiecePickerStreaming: original PP.next returns",p
+            print >>sys.stderr,time.asctime(),'-', "PiecePickerStreaming: original PP.next returns",p
         if p is None and not self.videostatus.live_streaming:
             # When the file we selected from a multi-file torrent is complete,
             # we won't request anymore pieces, so the normal way of detecting 
@@ -289,7 +290,7 @@ class PiecePickerStreaming(PiecePicker):
     def _next(self, haves, wantfunc, complete_first, helper_con, willrequest=True, connection=None):
         """ First, complete any partials if needed. Otherwise, select a new piece. """
 
-        #print >>sys.stderr,"PiecePickerStreaming: complete_first is",complete_first,"started",self.started
+        #print >>sys.stderr,time.asctime(),'-', "PiecePickerStreaming: complete_first is",complete_first,"started",self.started
 
         # cutoff = True:  random mode
         #          False: rarest-first mode
@@ -323,7 +324,7 @@ class PiecePickerStreaming(PiecePicker):
 
         p = self.next_new(haves, wantfunc, complete_first, helper_con,willrequest=willrequest,connection=connection)
         # if DEBUG:
-        #     print >>sys.stderr,"PiecePickerStreaming: next_new returns",p
+        #     print >>sys.stderr,time.asctime(),'-', "PiecePickerStreaming: next_new returns",p
         return p
 
     def check_outstanding_requests(self, downloads):
@@ -369,7 +370,7 @@ class PiecePickerStreaming(PiecePicker):
                 if in_high_range(piece_id):
                     if download_rate == 0:
                         # we have not received anything in the last min_delay seconds
-                        if DEBUG: print >>sys.stderr, "PiecePickerStreaming: download not started yet for piece", piece_id, "chunk", begin, "on", download.ip
+                        if DEBUG: print >>sys.stderr, time.asctime(),'-', "PiecePickerStreaming: download not started yet for piece", piece_id, "chunk", begin, "on", download.ip
                         cancel_requests.append((piece_id, begin, length))
                         download.bad_performance_counter += 1
 
@@ -382,7 +383,7 @@ class PiecePickerStreaming(PiecePicker):
 
                         # we have to cancel when the deadline can not be met
                         if time_until_deadline < time_until_download - offset_delay:
-                            if DEBUG: print >>sys.stderr, "PiecePickerStreaming: download speed too slow for piece", piece_id, "chunk", begin, "on", download.ip, "Deadline in", time_until_deadline, "while estimated download in", time_until_download
+                            if DEBUG: print >>sys.stderr, time.asctime(),'-', "PiecePickerStreaming: download speed too slow for piece", piece_id, "chunk", begin, "on", download.ip, "Deadline in", time_until_deadline, "while estimated download in", time_until_download
                             cancel_requests.append((piece_id, begin, length))
                 
         # Cancel all requests that are too late
@@ -417,7 +418,7 @@ class PiecePickerStreaming(PiecePicker):
             # first, make sure we know where to start downloading
             if vs.live_startpos is None:
                 self.transporter.calc_live_startpos( self.transporter.max_prebuf_packets, False )
-                print >>sys.stderr,"vod: pp determined startpos of",vs.live_startpos
+                print >>sys.stderr,time.asctime(),'-', "vod: pp determined startpos of",vs.live_startpos
 
             # select any interesting piece, rarest first
             if connection:
@@ -455,11 +456,11 @@ class PiecePickerStreaming(PiecePicker):
             else:
                 r = xr
             for i in r:
-                #print >>sys.stderr,"H",
+                #print >>sys.stderr,time.asctime(),'-', "H",
                 if not haves[i] or self.has[i]:
                     continue
 
-                #print >>sys.stderr,"W",
+                #print >>sys.stderr,time.asctime(),'-', "W",
                 if not wantfunc(i):
                     continue
 
@@ -469,7 +470,7 @@ class PiecePickerStreaming(PiecePicker):
             return None
 
         def pick_rarest_small_range(f,t):
-            #print >>sys.stderr,"choice small",f,t
+            #print >>sys.stderr,time.asctime(),'-', "choice small",f,t
             d = vs.dist_range(f,t)
             
             for level in xrange(len(self.interests)):
@@ -485,20 +486,20 @@ class PiecePickerStreaming(PiecePicker):
                     # at the lowest level, hacked distance metric to determine
                     # whether to use slow or fast method.
                     
-                    #print >>sys.stderr,"choice QUICK"
+                    #print >>sys.stderr,time.asctime(),'-', "choice QUICK"
                     return pick_rarest_loop_over_small_range(f,t)
-                    #print >>sys.stderr,"choice Q",diffstr,"l",level,"s",len(piecelist) 
+                    #print >>sys.stderr,time.asctime(),'-', "choice Q",diffstr,"l",level,"s",len(piecelist) 
                 else:
                     # Higher priorities / short lists
                     for i in piecelist:
                         if not vs.in_range( f, t, i ):
                             continue
     
-                        #print >>sys.stderr,"H",
+                        #print >>sys.stderr,time.asctime(),'-', "H",
                         if not haves[i] or self.has[i]:
                             continue
     
-                        #print >>sys.stderr,"W",
+                        #print >>sys.stderr,time.asctime(),'-', "W",
                         if not wantfunc(i):
                             continue
     
@@ -513,11 +514,11 @@ class PiecePickerStreaming(PiecePicker):
                     if not vs.in_range( f, t, i ):
                         continue
 
-                    #print >>sys.stderr,"H",
+                    #print >>sys.stderr,time.asctime(),'-', "H",
                     if not haves[i] or self.has[i]:
                         continue
 
-                    #print >>sys.stderr,"W",
+                    #print >>sys.stderr,time.asctime(),'-', "W",
                     if not wantfunc(i):
                         continue
 
@@ -539,7 +540,7 @@ class PiecePickerStreaming(PiecePicker):
         # highprob_cutoff = vs.normalize(first + max(h, self.HIGH_PROB_MIN_PIECES))
         # midprob_cutoff = vs.normalize(first + max(self.MU * h, self.HIGH_PROB_MIN_PIECES))
 
-        # print >>sys.stderr, "Prio %s:%s:%s" % (first, highprob_cutoff, midprob_cutoff), highprob_cutoff - first, midprob_cutoff - highprob_cutoff
+        # print >>sys.stderr, time.asctime(),'-', "Prio %s:%s:%s" % (first, highprob_cutoff, midprob_cutoff), highprob_cutoff - first, midprob_cutoff - highprob_cutoff
 
         # first,last = vs.download_range()
         # if vs.wraparound:
@@ -592,7 +593,7 @@ class PiecePickerStreaming(PiecePicker):
                 #
                 # Attempt 1: loop over range (which is 25% of window (see 
                 # VideoStatus), ignoring priorities, no shuffle.
-                #print >>sys.stderr,"vod: choice low RANGE",midprob_cutoff,last
+                #print >>sys.stderr,time.asctime(),'-', "vod: choice low RANGE",midprob_cutoff,last
                 #choice = pick_rarest_loop_over_small_range(midprob_cutoff,last,shuffle=False)
                 pass
             else:
@@ -603,7 +604,7 @@ class PiecePickerStreaming(PiecePicker):
             self.stats[type] += 1
 
         if DEBUG:
-            print >>sys.stderr,"vod: picked piece %s [type=%s] [%d,%d,%d,%d]" % (`choice`,type,first,highprob_cutoff,midprob_cutoff,last)
+            print >>sys.stderr,time.asctime(),'-', "vod: picked piece %s [type=%s] [%d,%d,%d,%d]" % (`choice`,type,first,highprob_cutoff,midprob_cutoff,last)
 
         # 12/05/09, boudewijn: (1) The bad_performance_counter is
         # incremented whenever a piece download failed and decremented
@@ -629,7 +630,7 @@ class PiecePickerStreaming(PiecePicker):
                     # no other connection has it... then ignore the
                     # bad_performance_counter advice and attempt to
                     # download it from this connection anyway
-                    if DEBUG: print >>sys.stderr, "vod: the bad_performance_counter says this is a bad peer... but we have nothing better... requesting piece", high_priority_choice, "regardless."
+                    if DEBUG: print >>sys.stderr, time.asctime(),'-', "vod: the bad_performance_counter says this is a bad peer... but we have nothing better... requesting piece", high_priority_choice, "regardless."
                     choice = high_priority_choice
 
         return choice
@@ -640,10 +641,10 @@ class PiecePickerStreaming(PiecePicker):
     def get_valid_range_iterator(self):
         if self.videostatus.live_streaming and self.videostatus.get_live_startpos() is None:
             # Not hooked in, so cannot provide a sensible download range
-            #print >>sys.stderr,"PiecePickerStreaming: Not hooked in, valid range set to total"
+            #print >>sys.stderr,time.asctime(),'-', "PiecePickerStreaming: Not hooked in, valid range set to total"
             return PiecePicker.get_valid_range_iterator(self)
             
-        #print >>sys.stderr,"PiecePickerStreaming: Live hooked in, or VOD, valid range set to subset"
+        #print >>sys.stderr,time.asctime(),'-', "PiecePickerStreaming: Live hooked in, or VOD, valid range set to subset"
         first,last = self.videostatus.download_range()
         return self.videostatus.generate_range((first,last))
             

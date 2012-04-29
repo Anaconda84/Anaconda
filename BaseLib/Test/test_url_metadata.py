@@ -1,3 +1,4 @@
+import time 
 # Written by Arno Bakker
 # see LICENSE.txt for license information
 #
@@ -31,9 +32,9 @@ class TestURLMetadata(TestAsServer):
     def setUp(self):
         """ override TestAsServer """
         TestAsServer.setUp(self)
-        print >>sys.stderr,"test: Giving MyLaunchMany time to startup"
+        print >>sys.stderr,time.asctime(),'-', "test: Giving MyLaunchMany time to startup"
         time.sleep(5)
-        print >>sys.stderr,"test: MyLaunchMany should have started up"
+        print >>sys.stderr,time.asctime(),'-', "test: MyLaunchMany should have started up"
 
     def setUpPreSession(self):
         """ override TestAsServer """
@@ -64,7 +65,7 @@ class TestURLMetadata(TestAsServer):
         
     def tearDown(self):
         """ override TestAsServer """
-        print >> sys.stderr,"test: *** TEARDOWN"
+        print >> sys.stderr,time.asctime(),'-', "test: *** TEARDOWN"
         TestAsServer.tearDown(self)
 
     #
@@ -83,12 +84,12 @@ class TestURLMetadata(TestAsServer):
                 s.b.s.settimeout(10.0)
                 resp = s.recv()
                 self.assert_(len(resp) > 0)
-                print >>sys.stderr,"test: Got reply",getMessageName(resp[0])
+                print >>sys.stderr,time.asctime(),'-', "test: Got reply",getMessageName(resp[0])
                 self.assert_(resp[0] == METADATA)
                 self.check_metadata(resp[1:],tdef)
 
             except socket.timeout:
-                print >> sys.stderr,"test: Timeout, bad, peer didn't reply with METADATA message"
+                print >> sys.stderr,time.asctime(),'-', "test: Timeout, bad, peer didn't reply with METADATA message"
                 self.assert_(False)
 
         s.close()

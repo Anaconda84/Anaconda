@@ -1,3 +1,4 @@
+import time 
 # Written by Boxun Zhang
 # see LICENSE.txt for license information
 
@@ -29,7 +30,7 @@ class GlobalSeedingManager:
 
     def prepare_storage(self):
         if not os.path.exists(self.storage_dir):
-            if DEBUG: print >>sys.stderr, "SeedingManager: created storage_dir", self.storage_dir
+            if DEBUG: print >>sys.stderr, time.asctime(),'-', "SeedingManager: created storage_dir", self.storage_dir
             os.mkdir(self.storage_dir)
 
     def write_all_storage(self):
@@ -39,7 +40,7 @@ class GlobalSeedingManager:
     def read_storage(self, infohash):
         filename = os.path.join(self.storage_dir, binascii.hexlify(infohash) + ".pickle")
         if os.path.exists(filename):
-            if DEBUG: print >>sys.stderr, "SeedingManager: read_storage", filename
+            if DEBUG: print >>sys.stderr, time.asctime(),'-', "SeedingManager: read_storage", filename
             storage = cPickle.load(open(filename, "rb"))
             # Any version upgrading must be done here
 
@@ -55,7 +56,7 @@ class GlobalSeedingManager:
 
     def write_storage(self, infohash, storage):
         filename = os.path.join(self.storage_dir, binascii.hexlify(infohash) + ".pickle")
-        if DEBUG: print >>sys.stderr, "SeedingManager: write_storage", filename
+        if DEBUG: print >>sys.stderr, time.asctime(),'-', "SeedingManager: write_storage", filename
         cPickle.dump(storage, open(filename, "wb"))
     
     def apply_seeding_policy(self, dslist):
@@ -79,50 +80,50 @@ class GlobalSeedingManager:
                     t4t_option = self.Read('t4t_option', "int")
                     if t4t_option == 0:
                         # No Bittorrent leeching, seeding until sharing ratio = 1.0
-                        if DEBUG: print >>sys.stderr, "GlobalSeedingManager: TitForTatRatioBasedSeeding"
+                        if DEBUG: print >>sys.stderr, time.asctime(),'-', "GlobalSeedingManager: TitForTatRatioBasedSeeding"
                         seeding_manager.set_t4t_policy(TitForTatRatioBasedSeeding())
 
                     elif t4t_option == 1:
                         # Unlimited seeding
-                        if DEBUG: print >>sys.stderr, "GlobalSeedingManager: UnlimitedSeeding (for t4t)"
+                        if DEBUG: print >>sys.stderr, time.asctime(),'-', "GlobalSeedingManager: UnlimitedSeeding (for t4t)"
                         seeding_manager.set_t4t_policy(UnlimitedSeeding())
 
                     elif t4t_option == 2:
-                        if DEBUG: print >>sys.stderr, "GlobalSeedingManager: TitForTatTimeBasedSeeding"
+                        if DEBUG: print >>sys.stderr, time.asctime(),'-', "GlobalSeedingManager: TitForTatTimeBasedSeeding"
                             # Time based seeding
                         seeding_manager.set_t4t_policy(TitForTatTimeBasedSeeding(self.Read))
 
                     else:
                         # t4t_option == 3, no seeding 
-                        if DEBUG: print >>sys.stderr, "GlobalSeedingManager: NoSeeding (for t4t)"
+                        if DEBUG: print >>sys.stderr, time.asctime(),'-', "GlobalSeedingManager: NoSeeding (for t4t)"
                         seeding_manager.set_t4t_policy(NoSeeding())
 
                     g2g_option = self.Read('g2g_option', "int")
                     if g2g_option == 0:
                         # Seeding to peers with large sharing ratio
-                        if DEBUG: print >>sys.stderr, "GlobalSeedingManager: GiveToGetRatioBasedSeeding"
+                        if DEBUG: print >>sys.stderr, time.asctime(),'-', "GlobalSeedingManager: GiveToGetRatioBasedSeeding"
                         seeding_manager.set_g2g_policy(GiveToGetRatioBasedSeeding(self.Read))
 
                     elif g2g_option == 1:
                         # Boost your reputation
-                        if DEBUG: print >>sys.stderr, "GlobalSeedingManager: UnlimitedSeeding (for g2g)"
+                        if DEBUG: print >>sys.stderr, time.asctime(),'-', "GlobalSeedingManager: UnlimitedSeeding (for g2g)"
                         seeding_manager.set_g2g_policy(UnlimitedSeeding())
 
                     elif g2g_option == 2:
                         # Seeding for sometime
-                        if DEBUG: print >>sys.stderr, "GlobalSeedingManager: GiveToGetTimeBasedSeeding"
+                        if DEBUG: print >>sys.stderr, time.asctime(),'-', "GlobalSeedingManager: GiveToGetTimeBasedSeeding"
                         seeding_manager.set_g2g_policy(GiveToGetTimeBasedSeeding(self.Read))
 
                     else:
                         # g2g_option == 3, no seeding
-                        if DEBUG: print >>sys.stderr, "GlobalSeedingManager: NoSeeding (for g2g)"
+                        if DEBUG: print >>sys.stderr, time.asctime(),'-', "GlobalSeedingManager: NoSeeding (for g2g)"
                         seeding_manager.set_g2g_policy(NoSeeding())
                 
                     # Apply seeding manager
                     download_state.get_download().set_seeding_policy(seeding_manager)
                     self.seeding_managers[infohash] = seeding_manager
         
-        # if DEBUG: print >>sys.stderr,"GlobalSeedingManager: current seedings: ", len(self.seeding_managers), "out of", len(dslist), "downloads"
+        # if DEBUG: print >>sys.stderr,time.asctime(),'-', "GlobalSeedingManager: current seedings: ", len(self.seeding_managers), "out of", len(dslist), "downloads"
 
 class SeedingManager:
     def __init__(self, download_state, storage):
@@ -154,13 +155,13 @@ class SeedingManager:
             self.g2g_eligible = self.g2g_policy.apply(conn, self.download_state, self.storage)
             if DEBUG:
                 if self.g2g_eligible:
-                    print >>sys.stderr,"AllowSeeding to g2g peer: ",self.download_state.get_download().get_dest_files()
+                    print >>sys.stderr,time.asctime(),'-', "AllowSeeding to g2g peer: ",self.download_state.get_download().get_dest_files()
                 else:
-                    print >>sys.stderr,"DenySeeding to g2g peer: ",self.download_state.get_download().get_dest_files()
+                    print >>sys.stderr,time.asctime(),'-', "DenySeeding to g2g peer: ",self.download_state.get_download().get_dest_files()
 
             # stop download when neither t4t_eligible nor g2g_eligible
             if not (self.t4t_eligible or self.g2g_eligible):
-                if DEBUG: print >>sys.stderr,"Stop seedings: ",self.download_state.get_download().get_dest_files()
+                if DEBUG: print >>sys.stderr,time.asctime(),'-', "Stop seedings: ",self.download_state.get_download().get_dest_files()
                 self.download_state.get_download().stop()
             
             return self.g2g_eligible
@@ -170,12 +171,12 @@ class SeedingManager:
             
             if DEBUG:
                 if self.t4t_eligible:
-                    print >>sys.stderr,"AllowSeeding to t4t peer: ",self.download_state.get_download().get_dest_files()
+                    print >>sys.stderr,time.asctime(),'-', "AllowSeeding to t4t peer: ",self.download_state.get_download().get_dest_files()
                 else:
-                    print >>sys.stderr,"DenySeeding to t4t peer: ",self.download_state.get_download().get_dest_files()
+                    print >>sys.stderr,time.asctime(),'-', "DenySeeding to t4t peer: ",self.download_state.get_download().get_dest_files()
             # stop download when neither t4t_eligible nor g2g_eligible
             if not (self.t4t_eligible or self.g2g_eligible):
-                if DEBUG: print >>sys.stderr,"Stop seedings: ",self.download_state.get_download().get_dest_files()
+                if DEBUG: print >>sys.stderr,time.asctime(),'-', "Stop seedings: ",self.download_state.get_download().get_dest_files()
                 self.download_state.get_download().stop()
             
             return self.t4t_eligible
@@ -218,7 +219,7 @@ class TitForTatTimeBasedSeeding(SeedingPolicy):
     def apply(self, _, __, storage):
         current = storage["time_seeding"] + time.time() - self.begin
         limit = long(self.Read('t4t_hours', "int"))*3600 + long(self.Read('t4t_mins', "int"))*60
-        if DEBUG: print >>sys.stderr, "TitForTatTimeBasedSeeding: apply:", current, "/", limit
+        if DEBUG: print >>sys.stderr, time.asctime(),'-', "TitForTatTimeBasedSeeding: apply:", current, "/", limit
         return current <= limit
 
 class GiveToGetTimeBasedSeeding(SeedingPolicy):
@@ -230,7 +231,7 @@ class GiveToGetTimeBasedSeeding(SeedingPolicy):
     def apply(self, _, __, storage):
         current = storage["time_seeding"] + time.time() - self.begin
         limit = long(self.Read('g2g_hours', "int"))*3600 + long(self.Read('g2g_mins', "int"))*60
-        if DEBUG: print >>sys.stderr, "GiveToGetTimeBasedSeeding: apply:", current, "/", limit
+        if DEBUG: print >>sys.stderr, time.asctime(),'-', "GiveToGetTimeBasedSeeding: apply:", current, "/", limit
         return current <= limit
     
 class TitForTatRatioBasedSeeding(SeedingPolicy):
@@ -248,7 +249,7 @@ class TitForTatRatioBasedSeeding(SeedingPolicy):
         else:
             ratio = 1.0*ul/dl
 
-        if DEBUG: print >>sys.stderr, "TitForTatRatioBasedSeeding: apply:", dl, ul, ratio
+        if DEBUG: print >>sys.stderr, time.asctime(),'-', "TitForTatRatioBasedSeeding: apply:", dl, ul, ratio
 
         return ratio < 1.0
 
@@ -268,6 +269,6 @@ class GiveToGetRatioBasedSeeding(SeedingPolicy):
         else:
             ratio = 1.0*ul/dl
     
-        if DEBUG: print >>sys.stderr, "GiveToGetRatioBasedSeedingapply:", dl, ul, ratio, self.Read('g2g_ratio', "int")/100.0
+        if DEBUG: print >>sys.stderr, time.asctime(),'-', "GiveToGetRatioBasedSeedingapply:", dl, ul, ratio, self.Read('g2g_ratio', "int")/100.0
         return ratio < self.Read('g2g_ratio', "int")/100.0
 

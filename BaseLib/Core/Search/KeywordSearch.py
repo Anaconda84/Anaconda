@@ -1,3 +1,4 @@
+import time 
 # written by Jelle Roozenburg
 # see LICENSE.txt for license information
 
@@ -19,15 +20,15 @@ class KeywordSearch:
     """
     def search(self, haystack, needles, haystackismatching=False):
         if DEBUG:
-            print >>sys.stderr,'kws: unprocessed keywords: %s' % needles
+            print >>sys.stderr,time.asctime(),'-', 'kws: unprocessed keywords: %s' % needles
         needles = self.unRegExpifySearchwords(needles)
         if DEBUG:
-            print >>sys.stderr,'kws: Searching for %s in %d items' % (repr(needles), len(haystack))
+            print >>sys.stderr,time.asctime(),'-', 'kws: Searching for %s in %d items' % (repr(needles), len(haystack))
             
         if not haystackismatching:
             searchspace = self.simpleSearch(haystack, needles)
             if DEBUG:
-                print >>sys.stderr,'kws: Found %s items using simple search' % len(searchspace)
+                print >>sys.stderr,time.asctime(),'-', 'kws: Found %s items using simple search' % len(searchspace)
         else:
             searchspace = haystack
         results = []
@@ -50,7 +51,7 @@ class KeywordSearch:
         
         results.sort(reverse=True)
         if DEBUG:
-            print >>sys.stderr,'kws: Found %d items eventually' % len(results)
+            print >>sys.stderr,time.asctime(),'-', 'kws: Found %d items eventually' % len(results)
             #for r in results:
             #    print r
         return [r[1] for r in results]

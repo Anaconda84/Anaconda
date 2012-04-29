@@ -1,3 +1,4 @@
+import time 
 # Written by Arno Bakker, George Milescu 
 # see LICENSE.txt for license information
 
@@ -60,7 +61,7 @@ class SingleDownload:
             event_reporter = get_status_holder("LivingLab")
             event_reporter.create_and_add_event("peerid", [self.b64_infohash, b64encode(self.peerid)])
             
-            #print >>sys.stderr,"SingleDownload: __init__: My peer ID is",`peerid`
+            #print >>sys.stderr,time.asctime(),'-', "SingleDownload: __init__: My peer ID is",`peerid`
     
             self.dow = BT1Download(self.hashcheckprogressfunc,
                             self.finishedfunc,
@@ -80,7 +81,7 @@ class SingleDownload:
         
             file = self.dow.saveAs(self.save_as)
             #if DEBUG:
-            #    print >>sys.stderr,"SingleDownload: dow.saveAs returned",file
+            #    print >>sys.stderr,time.asctime(),'-', "SingleDownload: dow.saveAs returned",file
             
             # Set local filename in vodfileindex
             if vodfileindex is not None:
@@ -112,7 +113,7 @@ class SingleDownload:
                 self.dow.set_videoinfo(vodfileindex,self.videostatus)
 
             #if DEBUG:
-            #    print >>sys.stderr,"SingleDownload: setting vodfileindex",vodfileindex
+            #    print >>sys.stderr,time.asctime(),'-', "SingleDownload: setting vodfileindex",vodfileindex
             
             # RePEX: Start in RePEX mode
             if kvconfig['initialdlstatus'] == DLSTATUS_REPEXING:
@@ -141,7 +142,7 @@ class SingleDownload:
     def save_as(self,name,length,saveas,isdir):
         """ Return the local filename to which to save the file 'name' in the torrent """
         if DEBUG:
-            print >>sys.stderr,"SingleDownload: save_as(",`name`,length,`saveas`,isdir,")"
+            print >>sys.stderr,time.asctime(),'-', "SingleDownload: save_as(",`name`,length,`saveas`,isdir,")"
         try:
             if not os.access(saveas,os.F_OK):
                 os.mkdir(saveas)
@@ -155,7 +156,7 @@ class SingleDownload:
     def perform_hashcheck(self,complete_callback):
         """ Called by any thread """
         if DEBUG:
-            print >>sys.stderr,"SingleDownload: perform_hashcheck()" # ,self.videoinfo
+            print >>sys.stderr,time.asctime(),'-', "SingleDownload: perform_hashcheck()" # ,self.videoinfo
         try:
             """ Schedules actually hashcheck on network thread """
             self._getstatsfunc = SPECIAL_VALUE # signal we're hashchecking
@@ -172,7 +173,7 @@ class SingleDownload:
             Called by network thread
         """
         if DEBUG:
-            print >>sys.stderr,"SingleDownload: hashcheck_done()"
+            print >>sys.stderr,time.asctime(),'-', "SingleDownload: hashcheck_done()"
         try:
             self.dow.startEngine(vodeventfunc = self.lmvodeventcallback)
             self._getstatsfunc = self.dow.startStats() # not possible earlier
@@ -210,7 +211,7 @@ class SingleDownload:
     def set_max_speed(self,direct,speed,callback):
         if self.dow is not None:
             if DEBUG:
-                print >>sys.stderr,"SingleDownload: set_max_speed",`self.dow.response['info']['name']`,direct,speed
+                print >>sys.stderr,time.asctime(),'-', "SingleDownload: set_max_speed",`self.dow.response['info']['name']`,direct,speed
             if direct == UPLOAD:
                 self.dow.setUploadRate(speed,networkcalling=True)
             else:
@@ -221,7 +222,7 @@ class SingleDownload:
     def set_max_conns_to_initiate(self,nconns,callback):
         if self.dow is not None:
             if DEBUG:
-                print >>sys.stderr,"SingleDownload: set_max_conns_to_initiate",`self.dow.response['info']['name']`
+                print >>sys.stderr,time.asctime(),'-', "SingleDownload: set_max_conns_to_initiate",`self.dow.response['info']['name']`
             self.dow.setInitiate(nconns,networkcalling=True)
         if callback is not None:
             callback(nconns)
@@ -230,7 +231,7 @@ class SingleDownload:
     def set_max_conns(self,nconns,callback):
         if self.dow is not None:
             if DEBUG:
-                print >>sys.stderr,"SingleDownload: set_max_conns",`self.dow.response['info']['name']`
+                print >>sys.stderr,time.asctime(),'-', "SingleDownload: set_max_conns",`self.dow.response['info']['name']`
             self.dow.setMaxConns(nconns,networkcalling=True)
         if callback is not None:
             callback(nconns)
@@ -279,7 +280,7 @@ class SingleDownload:
     
     def shutdown(self):
         if DEBUG:
-            print >>sys.stderr,"SingleDownload: shutdown"
+            print >>sys.stderr,time.asctime(),'-', "SingleDownload: shutdown"
         resumedata = None
         if self.dow is not None:
             # RePEX: unhook and abort RePEXer
@@ -292,7 +293,7 @@ class SingleDownload:
             resumedata = self.dow.shutdown()
             self.dow = None
             #if DEBUG:
-            #    print >>sys.stderr,"SingleDownload: stopped dow"
+            #    print >>sys.stderr,time.asctime(),'-', "SingleDownload: stopped dow"
                 
         if self._getstatsfunc is None or self._getstatsfunc == SPECIAL_VALUE:
             # Hashchecking or waiting for while being shutdown, signal LaunchMany
@@ -390,19 +391,19 @@ class SingleDownload:
     #
     def hashcheckprogressfunc(self,activity = '', fractionDone = 0.0):
         """ Allegedly only used by StorageWrapper during hashchecking """
-        #print >>sys.stderr,"SingleDownload::statusfunc called",activity,fractionDone
+        #print >>sys.stderr,time.asctime(),'-', "SingleDownload::statusfunc called",activity,fractionDone
         self.hashcheckfrac = fractionDone
 
     def finishedfunc(self):
         """ Download is complete """
         if DEBUG:
-            print >>sys.stderr,"SingleDownload::finishedfunc called: Download is complete *******************************"
+            print >>sys.stderr,time.asctime(),'-', "SingleDownload::finishedfunc called: Download is complete *******************************"
         pass
 
     def fatalerrorfunc(self,data):
-        print >>sys.stderr,"SingleDownload::fatalerrorfunc called",data
+        print >>sys.stderr,time.asctime(),'-', "SingleDownload::fatalerrorfunc called",data
         if type(data) == StringType:
-            print >>sys.stderr,"LEGACY CORE FATAL ERROR",data
+            print >>sys.stderr,time.asctime(),'-', "LEGACY CORE FATAL ERROR",data
             print_stack()
             self.set_error_func(TriblerLegacyException(data))
         else:
@@ -411,7 +412,7 @@ class SingleDownload:
         self.shutdown()
 
     def nonfatalerrorfunc(self,e):
-        print >>sys.stderr,"SingleDownload::nonfatalerrorfunc called",e
+        print >>sys.stderr,time.asctime(),'-', "SingleDownload::nonfatalerrorfunc called",e
         # Could log this somewhere, or phase it out (only used in Rerequester)
 
     def logerrorfunc(self,msg):

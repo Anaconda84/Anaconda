@@ -1,3 +1,4 @@
+import time 
 # Written by Arno Bakker
 # see LICENSE.txt for license information
 from threading import currentThread
@@ -104,13 +105,13 @@ class VideoPlayer:
     def play_file(self,dest): 
         """ Play video file from disk """
         if DEBUG:
-            print >>sys.stderr,"videoplay: Playing file from disk",dest
+            print >>sys.stderr,time.asctime(),'-', "videoplay: Playing file from disk",dest
 
         (prefix,ext) = os.path.splitext(dest)
         [mimetype,cmd] = self.get_video_player(ext,dest)
         
         if DEBUG:
-            print >>sys.stderr,"videoplay: play_file: cmd is",cmd
+            print >>sys.stderr,time.asctime(),'-', "videoplay: play_file: cmd is",cmd
  
         self.launch_video_player(cmd)
 
@@ -120,7 +121,7 @@ class VideoPlayer:
         characters.
         """ 
         if DEBUG:
-            print >>sys.stderr,"videoplay: Playing file with Unicode filename via HTTP"
+            print >>sys.stderr,time.asctime(),'-', "videoplay: Playing file with Unicode filename via HTTP"
 
         (prefix,ext) = os.path.splitext(dest)
         videourl = self.create_url(self.videohttpserv,'/'+os.path.basename(prefix+ext))
@@ -139,7 +140,7 @@ class VideoPlayer:
     def play_url(self,url):
         """ Play video file from network or disk """
         if DEBUG:
-            print >>sys.stderr,"videoplay: Playing file from url",url
+            print >>sys.stderr,time.asctime(),'-', "videoplay: Playing file from url",url
         
         self.determine_playbackmode()
         
@@ -153,11 +154,11 @@ class VideoPlayer:
                 x = [t[0],t[1],t[2],t[3],t[4]]
                 n = urllib.quote(x[2])
                 if DEBUG:
-                    print >>sys.stderr,"videoplay: play_url: OLD PATH WAS",x[2],"NEW PATH",n
+                    print >>sys.stderr,time.asctime(),'-', "videoplay: play_url: OLD PATH WAS",x[2],"NEW PATH",n
                 x[2] = n
                 n = urllib.quote(x[3])
                 if DEBUG:
-                    print >>sys.stderr,"videoplay: play_url: OLD QUERY WAS",x[3],"NEW PATH",n
+                    print >>sys.stderr,time.asctime(),'-', "videoplay: play_url: OLD QUERY WAS",x[3],"NEW PATH",n
                 x[3] = n
                 url = urlparse.urlunsplit(x)
             elif url[0] != '"' and url[0] != "'":
@@ -169,14 +170,14 @@ class VideoPlayer:
         [mimetype,cmd] = self.get_video_player(ext,url)
         
         if DEBUG:
-            print >>sys.stderr,"videoplay: play_url: cmd is",cmd
+            print >>sys.stderr,time.asctime(),'-', "videoplay: play_url: cmd is",cmd
         
         self.launch_video_player(cmd)
 
 
     def play_stream(self,streaminfo):
         if DEBUG:
-            print >>sys.stderr,"videoplay: play_stream"
+            print >>sys.stderr,time.asctime(),'-', "videoplay: play_stream"
 
         self.determine_playbackmode()
 
@@ -245,7 +246,7 @@ class VideoPlayer:
         videofiles = d.get_dest_files(exts=videoextdefaults)
         
         if len(videofiles) == 0:
-            print >>sys.stderr,"videoplay: play: No video files found! Let user select"
+            print >>sys.stderr,time.asctime(),'-', "videoplay: play: No video files found! Let user select"
             # Let user choose any file
             videofiles = d.get_dest_files(exts=None)
             
@@ -258,9 +259,9 @@ class VideoPlayer:
                 for infilename,diskfilename in videofiles:
                     infilenames.append(infilename)
                 selectedinfilename = self.ask_user_to_select_video(infilenames)
-                print >> sys.stderr , "selectedinfilename == None" , selectedinfilename , len(selectedinfilename)
+                print >> sys.stderr , time.asctime(),'-', "selectedinfilename == None" , selectedinfilename , len(selectedinfilename)
                 if selectedinfilename is None:
-                    print >>sys.stderr,"videoplay: play: User selected no video"
+                    print >>sys.stderr,time.asctime(),'-', "videoplay: play: User selected no video"
                     return
                 for infilename,diskfilename in videofiles:
                     if infilename == selectedinfilename:
@@ -269,7 +270,7 @@ class VideoPlayer:
                 selectedinfilename = videofiles[0][0]
                 selectedoutfilename = videofiles[0][1]
         else:
-            #print >> sys.stderr , "videoplay: play: selectedinfilename not None" , selectedinfilename , len(selectedinfilename)
+            #print >> sys.stderr , time.asctime(),'-', "videoplay: play: selectedinfilename not None" , selectedinfilename , len(selectedinfilename)
             for infilename,diskfilename in videofiles:
                 if infilename == selectedinfilename:
                     selectedoutfilename = diskfilename
@@ -283,7 +284,7 @@ class VideoPlayer:
         if selectedoutfilename is None:
             return self.play_vod(ds, selectedinfilename)
 
-        print >> sys.stderr , "videoplay: play: PROGRESS" , ds.get_progress()
+        print >> sys.stderr , time.asctime(),'-', "videoplay: play: PROGRESS" , ds.get_progress()
         complete = ds.get_progress() == 1.0 or ds.get_status() == DLSTATUS_SEEDING
 
         bitrate = tdef.get_bitrate(selectedinfilename)
@@ -300,7 +301,7 @@ class VideoPlayer:
         flag = self.playbackmode == PLAYBACKMODE_INTERNAL and not self.is_ascii_filename(selectedoutfilename)
         
         if complete:
-            print >> sys.stderr, 'videoplay: play: complete'
+            print >> sys.stderr, time.asctime(),'-', 'videoplay: play: complete'
             if flag:
                 self.play_file_via_httpserv(selectedoutfilename)
             else:
@@ -310,7 +311,7 @@ class VideoPlayer:
             # Fake it, to get DL status reporting for right Download
             self.set_vod_download(d)
         else:
-            print >> sys.stderr, 'videoplay: play: not complete'
+            print >> sys.stderr, time.asctime(),'-', 'videoplay: play: not complete'
             self.play_vod(ds,selectedinfilename)
 
 
@@ -328,7 +329,7 @@ class VideoPlayer:
         # 1. (Re)Start torrent in VOD mode
         switchfile = (oldselectedfile is not None and oldselectedfile != infilename) 
 
-        print >> sys.stderr, ds.is_vod() , switchfile , tdef.get_live()
+        print >> sys.stderr, time.asctime(),'-', ds.is_vod() , switchfile , tdef.get_live()
         if not ds.is_vod() or switchfile or tdef.get_live():
 
             
@@ -345,7 +346,7 @@ class VideoPlayer:
                 return
 
             if DEBUG:
-                print >>sys.stderr,"videoplay: play_vod: Enabling VOD on torrent",`d.get_def().get_name()`
+                print >>sys.stderr,time.asctime(),'-', "videoplay: play_vod: Enabling VOD on torrent",`d.get_def().get_name()`
 
             self.manage_other_downloads(othertorrentspolicy,targetd = d)
 
@@ -354,7 +355,7 @@ class VideoPlayer:
             d.set_video_events(self.get_supported_vod_events())
             if d.get_def().is_multifile_torrent():
                 d.set_selected_files([infilename])
-            print >>sys.stderr,"videoplay: play_vod: Restarting existing Download",`ds.get_download().get_def().get_infohash()`
+            print >>sys.stderr,time.asctime(),'-', "videoplay: play_vod: Restarting existing Download",`ds.get_download().get_def().get_infohash()`
             self.set_vod_download(d)
             d.restart()
 
@@ -369,21 +370,21 @@ class VideoPlayer:
             # resume when there is no VOD download
             if self.vod_download is None:
                 self.resume_by_system += 1
-                if DEBUG: print >> sys.stderr, "VideoPlayer: restart_other_downloads: Resume because vod_download is None", "(%d)" % self.resume_by_system
+                if DEBUG: print >> sys.stderr, time.asctime(),'-', "VideoPlayer: restart_other_downloads: Resume because vod_download is None", "(%d)" % self.resume_by_system
 
             # resume when the VOD download is not part of download_state_list
             elif not self.vod_download in [download_state.get_download() for download_state in download_state_list]:
                 self.resume_by_system += 1
                 if DEBUG:
-                    print >> sys.stderr, "VideoPlayer: restart_other_downloads: Resume because", `self.vod_download.get_def().get_name()`, "not in list", "(%d)" % self.resume_by_system
-                    print >> sys.stderr, "VideoPlayer: list:", `[download_state.get_download().get_def().get_name() for download_state in download_state_list]`
+                    print >> sys.stderr, time.asctime(),'-', "VideoPlayer: restart_other_downloads: Resume because", `self.vod_download.get_def().get_name()`, "not in list", "(%d)" % self.resume_by_system
+                    print >> sys.stderr, time.asctime(),'-', "VideoPlayer: list:", `[download_state.get_download().get_def().get_name() for download_state in download_state_list]`
 
             # resume when the VOD download has finished downloading
             elif not get_vod_download_status(DLSTATUS_ALLOCATING_DISKSPACE) in (DLSTATUS_ALLOCATING_DISKSPACE, DLSTATUS_WAITING4HASHCHECK, DLSTATUS_HASHCHECKING, DLSTATUS_DOWNLOADING):
                 self.resume_by_system += 1
                 if DEBUG:
-                    print >> sys.stderr, "VideoPlayer: restart_other_downloads: Resume because vod_download_status is inactive", "(%d)" % self.resume_by_system
-                    print >> sys.stderr, "VideoPlayer: status:", dlstatus_strings[get_vod_download_status(DLSTATUS_ALLOCATING_DISKSPACE)]
+                    print >> sys.stderr, time.asctime(),'-', "VideoPlayer: restart_other_downloads: Resume because vod_download_status is inactive", "(%d)" % self.resume_by_system
+                    print >> sys.stderr, time.asctime(),'-', "VideoPlayer: status:", dlstatus_strings[get_vod_download_status(DLSTATUS_ALLOCATING_DISKSPACE)]
 
             # otherwise we do not resume
             else:
@@ -411,13 +412,13 @@ class VideoPlayer:
                     # resume a download unless the user explisitly
                     # stopped the download
                     if not user_state == "stop":
-                        if DEBUG: print >> sys.stderr, "VideoPlayer: restart_other_downloads: Restarting", `download.get_def().get_name()`
+                        if DEBUG: print >> sys.stderr, time.asctime(),'-', "VideoPlayer: restart_other_downloads: Restarting", `download.get_def().get_name()`
                         download.set_mode(DLMODE_NORMAL)
                         download.restart()
 
     def manage_other_downloads(self,othertorrentspolicy, targetd = None):
         self.resume_by_system = 1
-        if DEBUG: print >> sys.stderr, "VideoPlayer: manage_other_downloads"
+        if DEBUG: print >> sys.stderr, time.asctime(),'-', "VideoPlayer: manage_other_downloads"
 
         policy_stop = othertorrentspolicy == OTHERTORRENTS_STOP or \
                       othertorrentspolicy == OTHERTORRENTS_STOP_RESTART
@@ -427,19 +428,19 @@ class VideoPlayer:
                 # Filter out live torrents, they are always
                 # removed. They stay in myPreferenceDB so can be
                 # restarted.
-                if DEBUG: print >>sys.stderr,"VideoPlayer: manage_other_downloads: Remove live", `download.get_def().get_name()`
+                if DEBUG: print >>sys.stderr,time.asctime(),'-', "VideoPlayer: manage_other_downloads: Remove live", `download.get_def().get_name()`
                 self.utility.session.remove_download(download)
 
             elif download == targetd:
-                if DEBUG: print >>sys.stderr,"VideoPlayer: manage_other_downloads: Leave", `download.get_def().get_name()`
+                if DEBUG: print >>sys.stderr,time.asctime(),'-', "VideoPlayer: manage_other_downloads: Leave", `download.get_def().get_name()`
                 download.stop()
                 
             elif policy_stop:
-                if DEBUG: print >>sys.stderr,"VideoPlayer: manage_other_downloads: Stop", `download.get_def().get_name()`
+                if DEBUG: print >>sys.stderr,time.asctime(),'-', "VideoPlayer: manage_other_downloads: Stop", `download.get_def().get_name()`
                 download.stop()
 
             else:
-                if DEBUG: print >>sys.stderr,"VideoPlayer: manage_other_downloads: Ignore", `download.get_def().get_name()`
+                if DEBUG: print >>sys.stderr,time.asctime(),'-', "VideoPlayer: manage_other_downloads: Ignore", `download.get_def().get_name()`
 
     def manage_others_when_playing_from_file(self,targetd):
         """ When playing from file, make sure all other Downloads are no
@@ -449,10 +450,10 @@ class VideoPlayer:
         for d in activetorrents:
             if d.get_mode() == DLMODE_VOD:
                 if d.get_def().get_live():
-                    #print >>sys.stderr,"videoplay: manage_when_file_play: Removing live",`d.get_def().get_name()`
+                    #print >>sys.stderr,time.asctime(),'-', "videoplay: manage_when_file_play: Removing live",`d.get_def().get_name()`
                     self.utility.session.remove_download(d)
                 else:
-                    #print >>sys.stderr,"videoplay: manage_when_file_play: Restarting in NORMAL mode",`d.get_def().get_name()`
+                    #print >>sys.stderr,time.asctime(),'-', "videoplay: manage_when_file_play: Restarting in NORMAL mode",`d.get_def().get_name()`
                     d.stop()
                     d.set_mode(DLMODE_NORMAL)
                     d.restart()
@@ -484,7 +485,7 @@ class VideoPlayer:
             # Restart download
             dscfg.set_video_event_callback(self.sesscb_vod_event_callback)
             dscfg.set_video_events(self.get_supported_vod_events())
-            print >>sys.stderr,"videoplay: Starting new VOD/live Download",`tdef.get_name()`
+            print >>sys.stderr,time.asctime(),'-', "videoplay: Starting new VOD/live Download",`tdef.get_name()`
 
             download = self.utility.session.start_download(tdef,dscfg)
    
@@ -503,13 +504,13 @@ class VideoPlayer:
          
         Called by Session thread """
         
-        print >>sys.stderr,"videoplay: sesscb_vod_event_callback called",currentThread().getName(),"###########################################################"
+        print >>sys.stderr,time.asctime(),'-', "videoplay: sesscb_vod_event_callback called",currentThread().getName(),"###########################################################"
         wx.CallAfter(self.gui_vod_event_callback,d,event,params)
 
     def gui_vod_event_callback(self,d,event,params):
         """ Also called by SwarmPlayer """
 
-        print >>sys.stderr,"videoplay: gui_vod_event:",event
+        print >>sys.stderr,time.asctime(),'-', "videoplay: gui_vod_event:",event
         if event == VODEVENT_START:
             filename = params["filename"]
             mimetype = params["mimetype"]
@@ -634,14 +635,14 @@ class VideoPlayer:
 
         video_player_path = self.utility.config.Read('videoplayerpath')
         if DEBUG:
-            print >>sys.stderr,"videoplay: Default player is",video_player_path
+            print >>sys.stderr,time.asctime(),'-', "videoplay: Default player is",video_player_path
 
         if mimetype is None:
             if sys.platform == 'win32':
                 # TODO: Use Python's mailcap facility on Linux to find player
                 [mimetype,playcmd] = win32_retrieve_video_play_command(ext,videourl)
                 if DEBUG:
-                    print >>sys.stderr,"videoplay: Win32 reg said playcmd is",playcmd
+                    print >>sys.stderr,time.asctime(),'-', "videoplay: Win32 reg said playcmd is",playcmd
                     
             if mimetype is None:
                 if ext == '.avi':
@@ -657,7 +658,7 @@ class VideoPlayer:
 
         if self.playbackmode == PLAYBACKMODE_INTERNAL:
             if DEBUG:
-                print >>sys.stderr,"videoplay: using internal player"
+                print >>sys.stderr,time.asctime(),'-', "videoplay: using internal player"
             return [mimetype,videourl]
         elif self.playbackmode == PLAYBACKMODE_EXTERNAL_MIME and sys.platform == 'win32':
             if playcmd is not None:
@@ -665,9 +666,9 @@ class VideoPlayer:
                 return [mimetype,cmd]
 
         if DEBUG:
-            print >>sys.stderr,"videoplay: Defaulting to default player",video_player_path
+            print >>sys.stderr,time.asctime(),'-', "videoplay: Defaulting to default player",video_player_path
         qprogpath = quote_program_path(video_player_path)
-        #print >>sys.stderr,"videoplay: Defaulting to quoted prog",qprogpath
+        #print >>sys.stderr,time.asctime(),'-', "videoplay: Defaulting to quoted prog",qprogpath
         if qprogpath is None:
             return [None,None]
         qvideourl = self.escape_path(videourl)
@@ -679,14 +680,14 @@ class VideoPlayer:
         else:
             cmd = playcmd
         if DEBUG:
-            print >>sys.stderr,"videoplay: using external user-defined player by executing ",cmd
+            print >>sys.stderr,time.asctime(),'-', "videoplay: using external user-defined player by executing ",cmd
         return [mimetype,cmd]
 
 
 
     def exec_video_player(self,cmd):
         if DEBUG:
-            print >>sys.stderr,"videoplay: Command is @"+cmd+"@"
+            print >>sys.stderr,time.asctime(),'-', "videoplay: Command is @"+cmd+"@"
         # I get a weird problem on Linux. When doing a
         # os.popen2("vlc /tmp/file.wmv") I get the following error:
         #[00000259] main interface error: no suitable interface module
@@ -798,7 +799,7 @@ class VideoPlayer:
         wx.CallAfter(self.videohttpserver_error_guicallback,e,url)
         
     def videohttpserver_error_guicallback(self,e,url):
-        print >>sys.stderr,"videoplay: Video HTTP server reported error",str(e)
+        print >>sys.stderr,time.asctime(),'-', "videoplay: Video HTTP server reported error",str(e)
         # if e[0] == ECONNRESET and self.closeextplayercallback is not None:
         if self.closeextplayercallback is not None:
             self.closeextplayercallback()
@@ -826,7 +827,7 @@ class VideoChooser(wx.Dialog):
             self.filelist.append(u)
 
         if DEBUG:
-            print >>sys.stderr,"VideoChooser: filelist",self.filelist
+            print >>sys.stderr,time.asctime(),'-', "VideoChooser: filelist",self.filelist
         
         style = wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER
         if title is None:
@@ -948,7 +949,7 @@ class VODWarningDialog(wx.Dialog):
         else:
             idx = OTHERTORRENTS_STOP_RESTART
         if DEBUG:
-            print >>sys.stderr,"videoplay: Other-torrents-policy is",idx
+            print >>sys.stderr,time.asctime(),'-', "videoplay: Other-torrents-policy is",idx
         return idx
     
     def is_mov_file(self,videoinfo):
@@ -963,7 +964,7 @@ class VODWarningDialog(wx.Dialog):
 
 def parse_playtime_to_secs(hhmmss):
     if DEBUG:
-        print >>sys.stderr,"videoplay: Playtime is",hhmmss
+        print >>sys.stderr,time.asctime(),'-', "videoplay: Playtime is",hhmmss
     r = re.compile("([0-9]+):*")
     occ = r.findall(hhmmss)
     t = None

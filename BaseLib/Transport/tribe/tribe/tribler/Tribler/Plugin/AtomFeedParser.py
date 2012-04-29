@@ -1,3 +1,4 @@
+import time 
 # Written by Arno Bakker
 # see LICENSE.txt for license information
 import sys
@@ -41,13 +42,13 @@ class FeedParser:
         
     def parse(self):
         self.title2entrymap = {}
-        print >>sys.stderr,"feedp: Parsing",self.feedurl
+        print >>sys.stderr,time.asctime(),'-', "feedp: Parsing",self.feedurl
         stream = urlOpenTimeout(self.feedurl,10)
         self.tree = etree.parse(stream)
         entries = self.tree.findall('{http://www.w3.org/2005/Atom}entry')
         for entry in entries:
             titleelement = entry.find('{http://www.w3.org/2005/Atom}title')
-            #print >> sys.stderr,"feedp: Got title",titleelement.text
+            #print >> sys.stderr,time.asctime(),'-', "feedp: Got title",titleelement.text
             self.title2entrymap[titleelement.text] = entry
                 
     def search(self,searchstr):
@@ -116,11 +117,11 @@ if __name__ == '__main__':
         hits = feedp.search(searchstr)
         allhits.extend(hits)
     
-    #print >>sys.stderr,"Got hits",`hits`
+    #print >>sys.stderr,time.asctime(),'-', "Got hits",`hits`
     
     for hitentry in allhits:
         titleelement = hitentry.find('{http://www.w3.org/2005/Atom}title')
-        print >>sys.stderr,"Got hit",titleelement.text
+        print >>sys.stderr,time.asctime(),'-', "Got hit",titleelement.text
         
     atomxml = feedhits2atomxml(allhits,searchstr,"http://localhost/bla")
-    print >>sys.stderr,"Result feed",atomxml
+    print >>sys.stderr,time.asctime(),'-', "Result feed",atomxml

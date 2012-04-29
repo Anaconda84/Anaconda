@@ -1,3 +1,4 @@
+import time 
 
 import sys
 import socket
@@ -18,9 +19,9 @@ class PluginEmulator:
         
         while True:
             data = s.recv(1024)
-            print >>sys.stderr,"pe: Got BG command",data
+            print >>sys.stderr,time.asctime(),'-', "pe: Got BG command",data
             if len(data) == 0:
-                print >>sys.stderr,"pe: BG closes IC"
+                print >>sys.stderr,time.asctime(),'-', "pe: BG closes IC"
                 return
             elif data.startswith("PLAY"):
                 break
@@ -33,10 +34,10 @@ class PluginEmulator:
         s2 = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         s2.connect(('127.0.0.1',6878))
         cmd = "GET "+path+" HTTP/1.1\r\nHost: localhost:6878\r\n\r\n"
-        print >>sys.stderr,"SENDING CMD",cmd
+        print >>sys.stderr,time.asctime(),'-', "SENDING CMD",cmd
         s2.send(cmd)
         data = s2.recv(256)
-        print >>sys.stderr,"pe: Got HTTP command",data
+        print >>sys.stderr,time.asctime(),'-', "pe: Got HTTP command",data
             
             
 #pe = PluginEmulator(62062,"START","http://www.cs.vu.nl/~arno/vod/route2.tstream")

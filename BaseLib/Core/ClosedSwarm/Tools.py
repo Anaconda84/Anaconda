@@ -1,3 +1,4 @@
+import time 
 # Written by Njaal Borch
 # see LICENSE.txt for license information
 #
@@ -16,7 +17,7 @@ def wx_get_poa(root_window=None):
     """
     import wx
     import sys
-    print >>sys.stderr, "Using GUI poa browser"
+    print >>sys.stderr, time.asctime(),'-', "Using GUI poa browser"
     fd = wx.FileDialog(root_window, "Select Proof of Access", wildcard="*.poa", style=wx.OPEN)
     if fd.ShowModal() == wx.ID_OK:
         return read_poa_from_file(fd.GetPath())
@@ -35,7 +36,7 @@ def wx_get_http_poa(url, swarm_id, perm_id, root_window=None):
         """
         import wx
         import sys
-        print >>sys.stderr, "Using GUI poa browser"
+        print >>sys.stderr, time.asctime(),'-', "Using GUI poa browser"
         
         pw = wx.Dialog(root_window, -1, "Authenticate")
 

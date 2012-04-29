@@ -1,3 +1,4 @@
+import time 
 """
 Crawling the VideoPlayback statistics database
 """
@@ -56,7 +57,7 @@ class VideoPlaybackCrawler:
         @param request_callback Call this function one or more times to send the requests: request_callback(message_id, payload)
         """
         if selversion >= OLPROTO_VER_TENTH:
-            if DEBUG: print >>sys.stderr, "videoplaybackcrawler: query_initiator", show_permid_short(permid), "version", selversion
+            if DEBUG: print >>sys.stderr, time.asctime(),'-', "videoplaybackcrawler: query_initiator", show_permid_short(permid), "version", selversion
             # Overlay version 10 provided a simplification in the VOD
             # stats collecting. We now have only one database table:
             # playback_event that has only 3 columns: key, timestamp,
@@ -64,7 +65,7 @@ class VideoPlaybackCrawler:
             request_callback(CRAWLER_VIDEOPLAYBACK_EVENT_QUERY, "SELECT key, timestamp, event FROM playback_event; DELETE FROM playback_event;", callback=self._after_event_request_callback)
             
         elif selversion >= OLPROTO_VER_EIGHTH:
-            if DEBUG: print >>sys.stderr, "videoplaybackcrawler: query_initiator", show_permid_short(permid), "version", selversion
+            if DEBUG: print >>sys.stderr, time.asctime(),'-', "videoplaybackcrawler: query_initiator", show_permid_short(permid), "version", selversion
             # boudewijn: order the result DESC! From the resulting
             # list we will not remove the first entries from the
             # database because this (being the last item added) may
@@ -72,7 +73,7 @@ class VideoPlaybackCrawler:
             request_callback(CRAWLER_VIDEOPLAYBACK_INFO_QUERY, "SELECT key, timestamp, piece_size, num_pieces, bitrate, nat FROM playback_info ORDER BY timestamp DESC LIMIT 50", callback=self._after_info_request_callback)
 
         else:
-            if DEBUG: print >>sys.stderr, "videoplaybackcrawler: query_info_initiator", show_permid_short(permid), "unsupported overlay version"
+            if DEBUG: print >>sys.stderr, time.asctime(),'-', "videoplaybackcrawler: query_info_initiator", show_permid_short(permid), "unsupported overlay version"
 
     def _after_info_request_callback(self, exc, permid):
         """
@@ -81,7 +82,7 @@ class VideoPlaybackCrawler:
         call in the query_initiator method.
         """
         if not exc:
-            if DEBUG: print >>sys.stderr, "videoplaybackcrawler: request send to", show_permid_short(permid)
+            if DEBUG: print >>sys.stderr, time.asctime(),'-', "videoplaybackcrawler: request send to", show_permid_short(permid)
             self._file.write("; ".join((strftime("%Y/%m/%d %H:%M:%S"), "INFO REQUEST", show_permid(permid), "\n")))
             self._file.flush()
 
@@ -98,14 +99,14 @@ class VideoPlaybackCrawler:
         """
         if error:
             if DEBUG:
-                print >> sys.stderr, "videoplaybackcrawler: handle_crawler_reply", error, message
+                print >> sys.stderr, time.asctime(),'-', "videoplaybackcrawler: handle_crawler_reply", error, message
 
             self._file.write("; ".join((strftime("%Y/%m/%d %H:%M:%S"), "   INFO REPLY", show_permid(permid), str(error), message, "\n")))
             self._file.flush()
 
         else:
             if DEBUG:
-                print >> sys.stderr, "videoplaybackcrawler: handle_crawler_reply", show_permid_short(permid), cPickle.loads(message)
+                print >> sys.stderr, time.asctime(),'-', "videoplaybackcrawler: handle_crawler_reply", show_permid_short(permid), cPickle.loads(message)
 
             info = cPickle.loads(message)
             self._file.write("; ".join((strftime("%Y/%m/%d %H:%M:%S"), "   INFO REPLY", show_permid(permid), str(error), str(info), "\n")))
@@ -140,7 +141,7 @@ DELETE FROM playback_info WHERE key = '%s';
         call in the handle_crawler_reply method.
         """
         if not exc:
-            if DEBUG: print >>sys.stderr, "videoplaybackcrawler: request send to", show_permid_short(permid)
+            if DEBUG: print >>sys.stderr, time.asctime(),'-', "videoplaybackcrawler: request send to", show_permid_short(permid)
             self._file.write("; ".join((strftime("%Y/%m/%d %H:%M:%S"), " INFO REQUEST", show_permid(permid), "\n")))
             self._file.flush()
 
@@ -158,7 +159,7 @@ DELETE FROM playback_info WHERE key = '%s';
         """
         if error:
             if DEBUG:
-                print >> sys.stderr, "videoplaybackcrawler: handle_crawler_reply", error, message
+                print >> sys.stderr, time.asctime(),'-', "videoplaybackcrawler: handle_crawler_reply", error, message
 
             self._file.write("; ".join((strftime("%Y/%m/%d %H:%M:%S"), "  EVENT REPLY", show_permid(permid), str(error), str(channel_data), message, "\n")))
             self._file.flush()
@@ -166,7 +167,7 @@ DELETE FROM playback_info WHERE key = '%s';
         elif selversion >= OLPROTO_VER_TENTH:
             # Overlay version 10 sends the reply pickled and zipped
             if DEBUG:
-                print >> sys.stderr, "videoplaybackcrawler: handle_crawler_reply", show_permid_short(permid), len(message), "bytes zipped"
+                print >> sys.stderr, time.asctime(),'-', "videoplaybackcrawler: handle_crawler_reply", show_permid_short(permid), len(message), "bytes zipped"
 
             info = cPickle.loads(zlib.decompress(message))
             self._file.write("; ".join((strftime("%Y/%m/%d %H:%M:%S"), "  EVENT REPLY", show_permid(permid), str(error), str(channel_data), str(info), "\n")))
@@ -174,7 +175,7 @@ DELETE FROM playback_info WHERE key = '%s';
             
         elif selversion >= OLPROTO_VER_EIGHTH:
             if DEBUG:
-                print >> sys.stderr, "videoplaybackcrawler: handle_crawler_reply", show_permid_short(permid), cPickle.loads(message)
+                print >> sys.stderr, time.asctime(),'-', "videoplaybackcrawler: handle_crawler_reply", show_permid_short(permid), cPickle.loads(message)
 
             info = cPickle.loads(message)
             self._file.write("; ".join((strftime("%Y/%m/%d %H:%M:%S"), "  EVENT REPLY", show_permid(permid), str(error), str(channel_data), str(info), "\n")))
@@ -191,7 +192,7 @@ DELETE FROM playback_info WHERE key = '%s';
         @param reply_callback Call this function once to send the reply: reply_callback(payload [, error=123])
         """
         if DEBUG:
-            print >> sys.stderr, "videoplaybackcrawler: handle_event_crawler_request", show_permid_short(permid), message
+            print >> sys.stderr, time.asctime(),'-', "videoplaybackcrawler: handle_event_crawler_request", show_permid_short(permid), message
 
         # execute the sql
         try:

@@ -1,3 +1,4 @@
+import time 
 # Written by Boudewijn Schoon
 # see LICENSE.txt for license information
 
@@ -56,12 +57,12 @@ class Connection:
         # outstanding requests for pieces
         self._metadata_requests = []
 
-        if DEBUG: print >> sys.stderr, self._address, "MiniBitTorrent: New connection"
+        if DEBUG: print >> sys.stderr, time.asctime(),'-', self._address, "MiniBitTorrent: New connection"
         self._socket = raw_server.start_connection(address, self)
         self.write_handshake()
 
     def write_handshake(self):
-        # if DEBUG: print >> sys.stderr, "MiniBitTorrent.write_handshake()"
+        # if DEBUG: print >> sys.stderr, time.asctime(),'-', "MiniBitTorrent.write_handshake()"
         self._socket.write("".join((chr(len(protocol_name)), protocol_name,
                                     "\x00\x00\x00\x00\x00\x30\x00\x00",
                                     self._swarm.get_info_hash(),
@@ -71,7 +72,7 @@ class Connection:
         assert isinstance(payload, dict), "PAYLOAD has invalid type: %s" % type(payload)
         assert isinstance(metadata_message_id, str), "METADATA_MESSAGE_ID has invalid type: %s" % type(metadata_message_id)
         assert len(metadata_message_id) == 1, "METADATA_MESSAGE_ID has invalid length: %d" % len(metadata_message_id)
-        if DEBUG: print >> sys.stderr, self._address, "MiniBitTorrent.write_extend_message()"
+        if DEBUG: print >> sys.stderr, time.asctime(),'-', self._address, "MiniBitTorrent.write_extend_message()"
         payload = bencode(payload)
         self._socket.write("".join((tobinary(2 + len(payload)), # msg len
                                     EXTEND,                     # msg id
@@ -91,16 +92,16 @@ class Connection:
     def read_reserved(self, s):
         if ord(s[5]) & 16:
             # extend module is enabled
-            if DEBUG: print >> sys.stderr, self._address, "MiniBitTorrent.read_reserved() extend module is supported"
+            if DEBUG: print >> sys.stderr, time.asctime(),'-', self._address, "MiniBitTorrent.read_reserved() extend module is supported"
             self.write_extend_message(UT_EXTEND_HANDSHAKE, {"m":{"ut_pex":ord(UT_PEX_ID), "ut_metadata":ord(UT_METADATA_ID), "metadata_size":self._swarm.get_metadata_size()}})
             return 20, self.read_download_id
         else:
-            if DEBUG: print >> sys.stderr, self._address, "MiniBitTorrent.read_reserved() extend module not supported"
+            if DEBUG: print >> sys.stderr, time.asctime(),'-', self._address, "MiniBitTorrent.read_reserved() extend module not supported"
             return None
 
     def read_download_id(self, s):
         if s != self._swarm.get_info_hash():
-            if DEBUG: print >> sys.stderr, self._address, "MiniBitTorrent.read_download_id() invalid info hash"
+            if DEBUG: print >> sys.stderr, time.asctime(),'-', self._address, "MiniBitTorrent.read_download_id() invalid info hash"
             return None
         return 20, self.read_peer_id
 
@@ -112,7 +113,7 @@ class Connection:
         l = toint(s)
         # if l > self.Encoder.max_len:
         #     return None
-        # if DEBUG: print >> sys.stderr, "waiting for", l, "bytes"
+        # if DEBUG: print >> sys.stderr, time.asctime(),'-', "waiting for", l, "bytes"
         return l, self.read_message
 
     def read_message(self, s):
@@ -137,7 +138,7 @@ class Connection:
         if not self._closed:
             piece = self._swarm.reserve_metadata_piece()
             if isinstance(piece, int):
-                if DEBUG: print >> sys.stderr, self._address, "MiniBitTorrent.got_extend_message() Requesting metadata piece", piece
+                if DEBUG: print >> sys.stderr, time.asctime(),'-', self._address, "MiniBitTorrent.got_extend_message() Requesting metadata piece", piece
                 self._metadata_requests.append(piece)
                 self.write_extend_message(self._her_ut_metadata_id, {"msg_type":0, "piece":piece})
 
@@ -147,10 +148,10 @@ class Connection:
     def got_extend_message(self, data):
         try:
             message = bdecode(data[2:], sloppy=True)
-            if DEBUG: print >> sys.stderr, self._address, "MiniBitTorrent.got_extend_message()", len(message), "bytes as payload"
-            # if DEBUG: print >> sys.stderr, message
+            if DEBUG: print >> sys.stderr, time.asctime(),'-', self._address, "MiniBitTorrent.got_extend_message()", len(message), "bytes as payload"
+            # if DEBUG: print >> sys.stderr, time.asctime(),'-', message
         except:
-            if DEBUG: print >> sys.stderr, self._address, "MiniBitTorrent.got_extend_message() Received invalid UT_METADATA message"
+            if DEBUG: print >> sys.stderr, time.asctime(),'-', self._address, "MiniBitTorrent.got_extend_message() Received invalid UT_METADATA message"
             return False
 
         if data[1] == UT_EXTEND_HANDSHAKE: # extend handshake
@@ -174,7 +175,7 @@ class Connection:
                 for offset in xrange(0, len(added), 6):
                     address = ("%s.%s.%s.%s" % (ord(added[offset]), ord(added[offset+1]), ord(added[offset+2]), ord(added[offset+3])), ord(added[offset+4]) << 8 | ord(added[offset+5]))
                     addresses.append(address)
-                if DEBUG: print >> sys.stderr, self._address, "MiniBitTorrent.got_extend_message()", len(addresses), "peers from PEX"
+                if DEBUG: print >> sys.stderr, time.asctime(),'-', self._address, "MiniBitTorrent.got_extend_message()", len(addresses), "peers from PEX"
                 self._swarm.add_potential_peers(addresses)
 
                 # when this peer does not support ut_metadata we can
@@ -190,21 +191,21 @@ class Connection:
                     # metadata, we can not provide any pieces
                     # whatsoever.
                     # So... send reject
-                    if DEBUG: print >> sys.stderr, self._address, "MiniBitTorrent.got_extend_message() Rejecting request for piece", message["piece"]
+                    if DEBUG: print >> sys.stderr, time.asctime(),'-', self._address, "MiniBitTorrent.got_extend_message() Rejecting request for piece", message["piece"]
                     self.write_extend_message(self._her_ut_metadata_id, {"msg_type":2, "piece":message["piece"]})
 
                 elif message["msg_type"] == 1 and \
                          "piece" in message and (isinstance(message["piece"], int) or isinstance(message["piece"], long)) and message["piece"] in self._metadata_requests and \
                          "total_size" in message and (isinstance(message["total_size"], int) or isinstance(message["total_size"], long)) and message["total_size"] <= METADATA_PIECE_SIZE:
                     # Received a metadata piece
-                    if DEBUG: print >> sys.stderr, self._address, "MiniBitTorrent.got_extend_message() Received metadata piece", message["piece"]
+                    if DEBUG: print >> sys.stderr, time.asctime(),'-', self._address, "MiniBitTorrent.got_extend_message() Received metadata piece", message["piece"]
                     self._metadata_requests.remove(message["piece"])
                     self._swarm.add_metadata_piece(message["piece"], data[-message["total_size"]:])
                     self._request_some_metadata_piece()
 
                 elif message["msg_type"] == 2 and "piece" in message and isinstance(message["piece"], int) and message["piece"] in self._metadata_requests:
                     # Received a reject
-                    if DEBUG: print >> sys.stderr, self._address, "MiniBitTorrent.got_extend_message() Our request for", message["piece"], "was rejected"
+                    if DEBUG: print >> sys.stderr, time.asctime(),'-', self._address, "MiniBitTorrent.got_extend_message() Our request for", message["piece"], "was rejected"
                     self._metadata_requests.remove(message["piece"])
                     self._swarm.unreserve_metadata_piece(message["piece"])
 
@@ -214,15 +215,15 @@ class Connection:
                     self._swarm._raw_server.add_task(self._request_some_metadata_piece, 5)
 
                 else:
-                    if DEBUG: print >> sys.stderr, self._address, "MiniBitTorrent.got_extend_message() Received unknown message"
+                    if DEBUG: print >> sys.stderr, time.asctime(),'-', self._address, "MiniBitTorrent.got_extend_message() Received unknown message"
                     return False
 
             else:
-                if DEBUG: print >> sys.stderr, self._address, "MiniBitTorrent.got_extend_message() Received invalid extend message (no msg_type)"
+                if DEBUG: print >> sys.stderr, time.asctime(),'-', self._address, "MiniBitTorrent.got_extend_message() Received invalid extend message (no msg_type)"
                 return False
 
         else:
-            if DEBUG: print >> sys.stderr, self._address, "MiniBitTorrent.got_extend_message() Received unknown extend message"
+            if DEBUG: print >> sys.stderr, time.asctime(),'-', self._address, "MiniBitTorrent.got_extend_message() Received unknown extend message"
             return False
                     
         return True
@@ -230,7 +231,7 @@ class Connection:
     def data_came_in(self, socket, data):
         while not self._closed:
             left = self._next_len - self._in_buffer.tell()
-            # if DEBUG: print >> sys.stderr, self._in_buffer.tell() + len(data), "/", self._next_len
+            # if DEBUG: print >> sys.stderr, time.asctime(),'-', self._in_buffer.tell() + len(data), "/", self._next_len
             if left > len(data):
                 self._in_buffer.write(data)
                 return
@@ -246,7 +247,7 @@ class Connection:
             self._next_len, self._next_func = next_
 
     def connection_lost(self, socket):
-        if DEBUG: print >> sys.stderr, self._address, "MiniBitTorrent.connection_lost()"
+        if DEBUG: print >> sys.stderr, time.asctime(),'-', self._address, "MiniBitTorrent.connection_lost()"
         self._closed = True
         self._swarm.connection_lost(self)
 
@@ -258,11 +259,11 @@ class Connection:
         Close when no activity since DEADLINE
         """
         if self._last_activity < deadline:
-            if DEBUG: print >> sys.stderr, self._address, "MiniBitTorrent.check_for_timeout() Timeout!"
+            if DEBUG: print >> sys.stderr, time.asctime(),'-', self._address, "MiniBitTorrent.check_for_timeout() Timeout!"
             self.close()
 
     def close(self):
-        if DEBUG: print >> sys.stderr, self._address, "MiniBitTorrent.close()"
+        if DEBUG: print >> sys.stderr, time.asctime(),'-', self._address, "MiniBitTorrent.close()"
         self._closed = True
         if self._socket.connected:
             self._socket.close()
@@ -356,12 +357,12 @@ class MiniSwarm:
         # what do we believe the metadata size is
         if len(self._metadata_size_opinions) == 1:
             metadata_size = self._metadata_size_opinions.keys()[0]
-            if DEBUG: print >> sys.stderr, "MiniBitTorrent.add_metadata_size_opinion() Metadata size is:", metadata_size, "(%d unanimous vote)" % sum(self._metadata_size_opinions.values())
+            if DEBUG: print >> sys.stderr, time.asctime(),'-', "MiniBitTorrent.add_metadata_size_opinion() Metadata size is:", metadata_size, "(%d unanimous vote)" % sum(self._metadata_size_opinions.values())
 
         else:
             options = [(weight, metadata_size) for metadata_size, weight in self._metadata_size_opinions.iteritems()]
             options.sort(reverse=True)
-            if DEBUG: print >> sys.stderr, "MiniBitTorrent.add_metadata_size_opinion() Choosing metadata size from multiple options:", options
+            if DEBUG: print >> sys.stderr, time.asctime(),'-', "MiniBitTorrent.add_metadata_size_opinion() Choosing metadata size from multiple options:", options
             metadata_size = options[0][1]
 
         if self._metadata_size != metadata_size:
@@ -374,14 +375,14 @@ class MiniSwarm:
             # we were led to believe that there are more blocks than
             # there actually are, remove some
             if len(self._metadata_blocks) > pieces:
-                if DEBUG: print >> sys.stderr, "MiniBitTorrent.add_metadata_size_opinion() removing some blocks..."
+                if DEBUG: print >> sys.stderr, time.asctime(),'-', "MiniBitTorrent.add_metadata_size_opinion() removing some blocks..."
                 self._metadata_blocks = [block_tuple for block_tuple in self._metadata_blocks if block_tuple[1] < pieces]
 
             # we were led to believe that there are fewer blocks than
             # there actually are, add some
             elif len(self._metadata_blocks) < pieces:
                 blocks = [[0, piece, None] for piece in xrange(len(self._metadata_blocks), pieces)]
-                if DEBUG: print >> sys.stderr, "MiniBitTorrent.add_metadata_size_opinion() adding", len(blocks), "blocks..."
+                if DEBUG: print >> sys.stderr, time.asctime(),'-', "MiniBitTorrent.add_metadata_size_opinion() adding", len(blocks), "blocks..."
                 self._metadata_blocks.extend(blocks)
 
     def reserve_metadata_piece(self):
@@ -423,7 +424,7 @@ class MiniSwarm:
             # def p(s):
             #     if s is None: return 0
             #     return len(s)
-            # if DEBUG: print >> sys.stderr, "Progress:", [p(t[2]) for t in self._metadata_blocks]
+            # if DEBUG: print >> sys.stderr, time.asctime(),'-', "Progress:", [p(t[2]) for t in self._metadata_blocks]
 
             # see if we are done
             for requested, piece, data in self._metadata_blocks:
@@ -435,7 +436,7 @@ class MiniSwarm:
                 info_hash = sha(metadata).digest()
 
                 if info_hash == self._info_hash:
-                    if DEBUG: print >> sys.stderr, "MiniBitTorrent.add_metadata_piece() Done!"
+                    if DEBUG: print >> sys.stderr, time.asctime(),'-', "MiniBitTorrent.add_metadata_piece() Done!"
 
                     # get nice list with recent BitTorrent peers, sorted
                     # by most recently connected
@@ -466,7 +467,7 @@ class MiniSwarm:
 
         now = time()
 
-        # print >> sys.stderr, len(self._connections), "/", len(self._potential_peers)
+        # print >> sys.stderr, time.asctime(),'-', len(self._connections), "/", len(self._potential_peers)
 
         for timestamp, address in addresses:
             if len(self._connections) >= MAX_CONNECTIONS:
@@ -480,7 +481,7 @@ class MiniSwarm:
                 connection = Connection(self, self._raw_server, address)
 
             except:
-                if DEBUG: print >> sys.stderr, "MiniBitTorrent.add_potential_peers() ERROR"
+                if DEBUG: print >> sys.stderr, time.asctime(),'-', "MiniBitTorrent.add_potential_peers() ERROR"
                 print_exc()
 
             else:
@@ -554,7 +555,7 @@ class MiniTracker(Thread):
                         port = (ord(peer_data[x+4]) << 8) | ord(peer_data[x+5])
                         peers.append((ip, port))
 
-                    if DEBUG: print >> sys.stderr, "MiniTracker.run() received", len(peers), "peer addresses from tracker"
+                    if DEBUG: print >> sys.stderr, time.asctime(),'-', "MiniTracker.run() received", len(peers), "peer addresses from tracker"
                     self._swarm.add_potential_peers(peers)
                                                                                                             
                                                     

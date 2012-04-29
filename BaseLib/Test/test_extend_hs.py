@@ -1,3 +1,4 @@
+import time 
 # Written by Arno Bakker
 # see LICENSE.txt for license information
 #
@@ -40,9 +41,9 @@ class TestExtendHandshake(TestAsServer):
     def setUp(self):
         """ override TestAsServer """
         TestAsServer.setUp(self)
-        print >>sys.stderr,"test: Giving MyLaunchMany time to startup"
+        print >>sys.stderr,time.asctime(),'-', "test: Giving MyLaunchMany time to startup"
         time.sleep(5)
-        print >>sys.stderr,"test: MyLaunchMany should have started up"
+        print >>sys.stderr,time.asctime(),'-', "test: MyLaunchMany should have started up"
     
     def setUpPostSession(self):
         """ override TestAsServer """
@@ -135,12 +136,12 @@ class TestExtendHandshake(TestAsServer):
             s.s.settimeout(10.0)
             resp = s.recv()
             self.assert_(len(resp) > 0)
-            print >>sys.stderr,"test: Got reply",getMessageName(resp[0])
+            print >>sys.stderr,time.asctime(),'-', "test: Got reply",getMessageName(resp[0])
             self.assert_(resp[0] == EXTEND)
             self.check_tribler_extend_hs(resp[1:])
             #s.close()
         except socket.timeout:
-            print >> sys.stderr,"test: Timeout, bad, peer didn't reply with EXTEND message"
+            print >> sys.stderr,time.asctime(),'-', "test: Timeout, bad, peer didn't reply with EXTEND message"
             self.assert_(False)
         
 
@@ -218,7 +219,7 @@ class TestExtendHandshake(TestAsServer):
     def _test_bad(self,gen_drequest_func):
         options = '\x00\x00\x00\x00\x00\x10\x00\x00'
         s = BTConnection('localhost',self.hisport,user_option_pattern=options,user_infohash=self.infohash)
-        print >> sys.stderr,"\ntest: ",gen_drequest_func
+        print >> sys.stderr,time.asctime(),'-', "\ntest: ",gen_drequest_func
         msg = gen_drequest_func()
         s.send(msg)
         time.sleep(5)
@@ -230,14 +231,14 @@ class TestExtendHandshake(TestAsServer):
             while True:
                 resp = s.recv()
                 if len(resp) > 0:
-                    print >>sys.stderr,"test: Got",getMessageName(resp[0]),"from peer"
+                    print >>sys.stderr,time.asctime(),'-', "test: Got",getMessageName(resp[0]),"from peer"
                     self.assert_(resp[0] == EXTEND or resp[0]==UNCHOKE)
                 else:
                     self.assert_(len(resp)==0)
                     s.close()
                     break
         except socket.timeout:
-            print >> sys.stderr,"test: Timeout, bad, peer didn't close connection"
+            print >> sys.stderr,time.asctime(),'-', "test: Timeout, bad, peer didn't close connection"
             self.assert_(False)
 
     #
@@ -306,7 +307,7 @@ class TestExtendHandshake(TestAsServer):
 
 def test_suite():
     
-    print >>sys.stderr,"test: test_suite #######################################3"
+    print >>sys.stderr,time.asctime(),'-', "test: test_suite #######################################3"
     
     suite = unittest.TestSuite()
     suite.addTest(unittest.makeSuite(TestExtendHandshake))

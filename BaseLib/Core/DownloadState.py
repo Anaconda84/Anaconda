@@ -1,3 +1,4 @@
+import time 
 # Written by Arno Bakker 
 # see LICENSE.txt for license information
 """ Contains a snapshot of the state of the Download at a specific point in time. """
@@ -83,7 +84,7 @@ class DownloadState(Serializable):
                 self.status = DLSTATUS_SEEDING
             else:
                 self.status = DLSTATUS_DOWNLOADING
-            #print >>sys.stderr,"STATS IS",stats
+            #print >>sys.stderr,time.asctime(),'-', "STATS IS",stats
             
             # Safe to store the stats dict. The stats dict is created per
             # invocation of the BT1Download returned statsfunc and contains no
@@ -102,7 +103,7 @@ class DownloadState(Serializable):
                     diff = tl-t
                     totalpieces += diff
                     
-                #print >>sys.stderr,"DownloadState: get_pieces_complete",totalpieces
+                #print >>sys.stderr,time.asctime(),'-', "DownloadState: get_pieces_complete",totalpieces
                 
                 haveslice = [False] * totalpieces
                 haveall = True

@@ -1,3 +1,4 @@
+import time 
 # Written by Raynor Vliegendhart
 # see LICENSE.txt for license information
 import sys
@@ -229,7 +230,7 @@ class RePEXer(RePEXerInterface):
         
         # Added robustness, check whether received SwarmCache is not None
         if self.starting_peertable is None:
-            print >>sys.stderr, 'RePEXer: __init__: swarmcache was None, defaulting to {}'
+            print >>sys.stderr, time.asctime(),'-', 'RePEXer: __init__: swarmcache was None, defaulting to {}'
             self.starting_peertable = {}
             
     
@@ -238,13 +239,13 @@ class RePEXer(RePEXerInterface):
     #
     def repex_ready(self, infohash, connecter, encoder, rerequester):
         if infohash != self.infohash:
-            print >>sys.stderr, "RePEXer: repex_ready: wrong infohash:", b2a_hex(infohash)
+            print >>sys.stderr, time.asctime(),'-', "RePEXer: repex_ready: wrong infohash:", b2a_hex(infohash)
             return
         if self.done:
-            print >>sys.stderr, "RePEXer: repex_ready: already done"
+            print >>sys.stderr, time.asctime(),'-', "RePEXer: repex_ready: already done"
             return
         if DEBUG:
-            print >>sys.stderr, "RePEXer: repex_ready:", b2a_hex(infohash)
+            print >>sys.stderr, time.asctime(),'-', "RePEXer: repex_ready:", b2a_hex(infohash)
         self.ready = True
         self.ready_ts = ts_now()
         self.connecter = connecter
@@ -267,14 +268,14 @@ class RePEXer(RePEXerInterface):
         if self.done:
             return
         if infohash != self.infohash:
-            print >>sys.stderr, "RePEXer: repex_aborted: wrong infohash:", b2a_hex(infohash)
+            print >>sys.stderr, time.asctime(),'-', "RePEXer: repex_aborted: wrong infohash:", b2a_hex(infohash)
             return
         if DEBUG:
             if dlstatus is None:
                 status_string = str(None)
             else:
                 status_string = dlstatus_strings[dlstatus]
-            print >>sys.stderr, "RePEXer: repex_aborted:", b2a_hex(infohash),status_string
+            print >>sys.stderr, time.asctime(),'-', "RePEXer: repex_aborted:", b2a_hex(infohash),status_string
         self.done = True
         self.aborted = True
         for observer in self._observers:
@@ -292,7 +293,7 @@ class RePEXer(RePEXerInterface):
         else:
             numpeers = -1
         if DEBUG:
-            print >>sys.stderr, "RePEXer: rerequester_peers: received %s peers" % numpeers
+            print >>sys.stderr, time.asctime(),'-', "RePEXer: rerequester_peers: received %s peers" % numpeers
         if numpeers > 0:
             self.to_pex.extend([dns for dns,id in peers])
             self.datacost['bootstrap_peers'] += numpeers
@@ -304,7 +305,7 @@ class RePEXer(RePEXerInterface):
         if infohash != self.infohash:
             return
         if DEBUG:
-            print >>sys.stderr, "RePEXer: connection_timeout: %s:%s" % dns
+            print >>sys.stderr, time.asctime(),'-', "RePEXer: connection_timeout: %s:%s" % dns
  
     def connection_closed(self, connection):
         self.active_sockets -= 1
@@ -318,7 +319,7 @@ class RePEXer(RePEXerInterface):
         if infohash != self.infohash:
             return
         if DEBUG:
-            print >>sys.stderr, "RePEXer: connection_closed: %s:%s" % dns
+            print >>sys.stderr, time.asctime(),'-', "RePEXer: connection_closed: %s:%s" % dns
         
         singlesocket = connection.connection
         
@@ -362,7 +363,7 @@ class RePEXer(RePEXerInterface):
         if infohash != self.infohash:
             return
         if DEBUG:
-            print >>sys.stderr, "RePEXer: connection_made: %s:%s ext_support = %s" % (dns + (ext_support,))
+            print >>sys.stderr, time.asctime(),'-', "RePEXer: connection_made: %s:%s ext_support = %s" % (dns + (ext_support,))
         self.datacost['connections_made'] += 1
         self.bt_connectable.add(dns)
         if ext_support:
@@ -371,7 +372,7 @@ class RePEXer(RePEXerInterface):
             def auto_close(connection = connection.connection, dns=dns):
                 if not connection.closed:
                     if DEBUG:
-                        print >>sys.stderr, "RePEXer: auto_close: %s:%s" % dns
+                        print >>sys.stderr, time.asctime(),'-', "RePEXer: auto_close: %s:%s" % dns
                     try:
                         # only in rare circumstances
                         # (like playing around in the REPL which is running in a diff. thread)
@@ -379,7 +380,7 @@ class RePEXer(RePEXerInterface):
                         connection.close()
                     except AssertionError, e:
                         if DEBUG:
-                            print >>sys.stderr, "RePEXer: auto_close:", `e`
+                            print >>sys.stderr, time.asctime(),'-', "RePEXer: auto_close:", `e`
                         self.connection_closed(connection)
             self.connecter.sched(auto_close, REPEX_LISTEN_TIME)
         else:
@@ -391,7 +392,7 @@ class RePEXer(RePEXerInterface):
         if infohash != self.infohash:
             return
         if DEBUG:
-            print >>sys.stderr, "RePEXer: got_extend_handshake: %s:%s version = %s ut_pex_support = %s" % (dns + (`version`,ut_pex_support ))
+            print >>sys.stderr, time.asctime(),'-', "RePEXer: got_extend_handshake: %s:%s version = %s ut_pex_support = %s" % (dns + (`version`,ut_pex_support ))
         if ut_pex_support:
             self.bt_pex.add(dns)
         else:
@@ -409,7 +410,7 @@ class RePEXer(RePEXerInterface):
         if infohash != self.infohash:
             return
         if DEBUG:
-            print >>sys.stderr, "RePEXer: got_ut_pex: %s:%s pex_size = %s" % (dns + (len(added),))
+            print >>sys.stderr, time.asctime(),'-', "RePEXer: got_ut_pex: %s:%s pex_size = %s" % (dns + (len(added),))
         
         # Remove bad IPs like 0.x.x.x (often received from Transmission peers)
         for i in range(len(added)-1,-1,-1):
@@ -455,12 +456,12 @@ class RePEXer(RePEXerInterface):
         if dns in self.attempted:
             return
         if DEBUG:
-            print >>sys.stderr, "RePEXer: connecting: %s:%s" % dns
+            print >>sys.stderr, time.asctime(),'-', "RePEXer: connecting: %s:%s" % dns
         self.active_sockets += 1
         self.datacost['connection_attempts'] += 1
         self.attempted.add(dns)
         if not self.encoder.start_connection(dns, id, forcenew = True):
-            print >>sys.stderr, "RePEXer: connecting failed: %s:%s" % dns
+            print >>sys.stderr, time.asctime(),'-', "RePEXer: connecting failed: %s:%s" % dns
             self.active_sockets -= 1
             self.datacost['connection_attempts'] -= 1
             if dns in self.starting_peertable:
@@ -478,7 +479,7 @@ class RePEXer(RePEXerInterface):
     
     def connect_queue(self):
         if DEBUG:
-            print >>sys.stderr, "RePEXer: connect_queue: active_sockets: %s" % self.active_sockets
+            print >>sys.stderr, time.asctime(),'-', "RePEXer: connect_queue: active_sockets: %s" % self.active_sockets
         
         # We get here from repex_ready, connection_closed or from rerequester_peers.
         # First we check whether we can connect, whether we're done, or whether we are closing.
@@ -513,11 +514,11 @@ class RePEXer(RePEXerInterface):
                 self.send_done()
         
         if DEBUG:
-            print >>sys.stderr, "RePEXer: connect_queue: active_sockets: %s" % self.active_sockets
+            print >>sys.stderr, time.asctime(),'-', "RePEXer: connect_queue: active_sockets: %s" % self.active_sockets
             
     def bootstrap(self):
         if DEBUG:
-            print >>sys.stderr, "RePEXer: bootstrap"
+            print >>sys.stderr, time.asctime(),'-', "RePEXer: bootstrap"
         self.bootstrap_counter += 1
         if REPEX_DISABLE_BOOTSTRAP or self.rerequest is None:
             self.rerequester_peers(None)
@@ -588,7 +589,7 @@ class RePEXer(RePEXerInterface):
         self.final_peertable = swarmcache
         for observer in self._observers:
             if DEBUG:
-                print >>sys.stderr, "RePEXer: send_done: calling repex_done on", `observer`
+                print >>sys.stderr, time.asctime(),'-', "RePEXer: send_done: calling repex_done on", `observer`
             try:
                 observer.repex_done(self,
                                     swarmcache,
@@ -709,7 +710,7 @@ class RePEXScheduler(RePEXerStatusCallback):
     def start(self):
         """ Starts the RePEX scheduler. """
         if DEBUG:
-            print >>sys.stderr, "RePEXScheduler: start"
+            print >>sys.stderr, time.asctime(),'-', "RePEXScheduler: start"
         self.lock.acquire()
         try:
             if self.active:
@@ -723,7 +724,7 @@ class RePEXScheduler(RePEXerStatusCallback):
     def stop(self):
         """ Stops the RePEX scheduler. """
         if DEBUG:
-            print >>sys.stderr, "RePEXScheduler: stop"
+            print >>sys.stderr, time.asctime(),'-', "RePEXScheduler: stop"
         self.lock.acquire()
         try:
             if not self.active:
@@ -741,7 +742,7 @@ class RePEXScheduler(RePEXerStatusCallback):
         @param dslist List of DownloadStates"""
         # TODO: only repex last X Downloads instead of all.
         if DEBUG:
-            print >>sys.stderr, "RePEXScheduler: network_scan: %s DownloadStates" % len(dslist)
+            print >>sys.stderr, time.asctime(),'-', "RePEXScheduler: network_scan: %s DownloadStates" % len(dslist)
         self.lock.acquire()
         exception = None
         try:
@@ -758,7 +759,7 @@ class RePEXScheduler(RePEXerStatusCallback):
                     infohash = download.tdef.get_infohash()
                     debug_msg = None
                     if DEBUG:
-                        print >>sys.stderr, "RePEXScheduler: network_scan: checking", `download.tdef.get_name_as_unicode()`
+                        print >>sys.stderr, time.asctime(),'-', "RePEXScheduler: network_scan: checking", `download.tdef.get_name_as_unicode()`
                     if ds.get_status() == DLSTATUS_STOPPED and ds.get_progress()==1.0:
                         # TODO: only repex finished downloads or also prematurely stopped ones?
                         age = now - (swarmcache_ts(ds.get_swarmcache()) or 0)
@@ -778,15 +779,15 @@ class RePEXScheduler(RePEXerStatusCallback):
                     else:
                         debug_msg = "...not repexable: %s %s%%" % (dlstatus_strings[ds.get_status()], ds.get_progress()*100)
                     if DEBUG:
-                        print >>sys.stderr, "RePEXScheduler: network_scan:", debug_msg
+                        print >>sys.stderr, time.asctime(),'-', "RePEXScheduler: network_scan:", debug_msg
                 
                 if found_download is None:
                     if DEBUG:
-                        print >>sys.stderr, "RePEXScheduler: network_scan: nothing found yet"
+                        print >>sys.stderr, time.asctime(),'-', "RePEXScheduler: network_scan: nothing found yet"
                     return REPEX_SCAN_INTERVAL, False
                 else:
                     if DEBUG:
-                        print >>sys.stderr, "RePEXScheduler: network_scan: found %s, starting RePEX phase." % `found_download.tdef.get_name_as_unicode()`
+                        print >>sys.stderr, time.asctime(),'-', "RePEXScheduler: network_scan: found %s, starting RePEX phase." % `found_download.tdef.get_name_as_unicode()`
                     self.current_repex = found_infohash
                     self.downloads[found_infohash] = found_download
                     found_download.set_mode(DLMODE_NORMAL)
@@ -802,10 +803,10 @@ class RePEXScheduler(RePEXerStatusCallback):
         """Called by network thread.
         @param dslist List of DownloadStates"""
         if DEBUG:
-            print >>sys.stderr, "RePEXScheduler: network_stop_repex:"
+            print >>sys.stderr, time.asctime(),'-', "RePEXScheduler: network_stop_repex:"
         for d in [ds.get_download() for ds in dslist if ds.get_status() == DLSTATUS_REPEXING]:
             if DEBUG:
-                print >>sys.stderr, "\t...",`d.tdef.get_name_as_unicode()`
+                print >>sys.stderr, time.asctime(),'-', "\t...",`d.tdef.get_name_as_unicode()`
             d.stop()
         return -1, False
         
@@ -818,14 +819,14 @@ class RePEXScheduler(RePEXerStatusCallback):
                 status_string = str(None)
             else:
                 status_string = dlstatus_strings[dlstatus]
-            print >>sys.stderr, "RePEXScheduler: repex_aborted:", b2a_hex(repexer.infohash), status_string
+            print >>sys.stderr, time.asctime(),'-', "RePEXScheduler: repex_aborted:", b2a_hex(repexer.infohash), status_string
         self.current_repex = None
         self.last_attempts[repexer.infohash] = ts_now() 
         self.session.set_download_states_callback(self.network_scan)
 
     def repex_done(self, repexer, swarmcache, shufflecount, shufflepeers, bootstrapcount, datacost):
         if DEBUG:
-            print >>sys.stderr, 'RePEXScheduler: repex_done: %s\n\ttable size/shuffle/bootstrap %s/%s/%s' % (
+            print >>sys.stderr, time.asctime(),'-', 'RePEXScheduler: repex_done: %s\n\ttable size/shuffle/bootstrap %s/%s/%s' % (
                                 b2a_hex(repexer.infohash), len(swarmcache), shufflecount, bootstrapcount)
         self.current_repex = None
         self.last_attempts[repexer.infohash] = ts_now()
@@ -867,7 +868,7 @@ class RePEXLogger(RePEXerStatusCallback):
     def start(self):
         """ Starts the RePEX logger. """
         if DEBUG:
-            print >>sys.stderr, "RePEXLogger: start"
+            print >>sys.stderr, time.asctime(),'-', "RePEXLogger: start"
         self.lock.acquire()
         try:
             if self.active:
@@ -880,7 +881,7 @@ class RePEXLogger(RePEXerStatusCallback):
     def stop(self):
         """ Stops the RePEX logger. """
         if DEBUG:
-            print >>sys.stderr, "RePEXLogger: stop"
+            print >>sys.stderr, time.asctime(),'-', "RePEXLogger: stop"
         self.lock.acquire()
         try:
             if not self.active:
@@ -899,11 +900,11 @@ class RePEXLogger(RePEXerStatusCallback):
         else:
             status_string = dlstatus_strings[dlstatus]
         if DEBUG:
-            print >>sys.stderr, "RePEXLogger: repex_aborted:", b2a_hex(repexer.infohash), status_string
+            print >>sys.stderr, time.asctime(),'-', "RePEXLogger: repex_aborted:", b2a_hex(repexer.infohash), status_string
     
     def repex_done(self, repexer, swarmcache, shufflecount, shufflepeers, bootstrapcount, datacost):
         if DEBUG:
-            print >>sys.stderr, 'RePEXLogger: repex_done: %s' % repexer
+            print >>sys.stderr, time.asctime(),'-', 'RePEXLogger: repex_done: %s' % repexer
         self.repexlog.storeSwarmCache(repexer.infohash, swarmcache,
                                       (shufflecount,shufflepeers,bootstrapcount,datacost),
                                       timestamp=repexer.ready_ts, commit=True)
@@ -978,7 +979,7 @@ class RePEXLogDB:
         @param commit Flag to commit automatically.
         """
         if DEBUG:
-            print >>sys.stderr, 'RePEXLogDB: storeSwarmCache: DEBUG:\n\t%s\n\t%s\n\t%s' % (
+            print >>sys.stderr, time.asctime(),'-', 'RePEXLogDB: storeSwarmCache: DEBUG:\n\t%s\n\t%s\n\t%s' % (
                             #b2a_hex(infohash), swarmcache, stats) # verbose
                             b2a_hex(infohash), '', '') # less cluttered
         self.lock.acquire()
@@ -1089,14 +1090,14 @@ class RePEXerTester(RePEXerStatusCallback):
             status_string = str(None)
         else:
             status_string = dlstatus_strings[dlstatus]
-        print >>sys.stderr, "RePEXerTester: repex_aborted:", `repexer`,status_string
+        print >>sys.stderr, time.asctime(),'-', "RePEXerTester: repex_aborted:", `repexer`,status_string
         download = self.downloads[repexer.infohash]
         self.repexers.setdefault(download,[]).append(repexer)
         self.swarmcaches.setdefault(download,[]).append(None)
     
     def repex_done(self, repexer, swarmcache, shufflecount, shufflepeers, bootstrapcount, datacost):
         download = self.downloads[repexer.infohash]
-        print >>sys.stderr, 'RePEXerTester: repex_done: %s' % repexer
+        print >>sys.stderr, time.asctime(),'-', 'RePEXerTester: repex_done: %s' % repexer
         self.repexers.setdefault(download,[]).append(repexer)
         self.swarmcaches.setdefault(download,[]).append(swarmcache)
         

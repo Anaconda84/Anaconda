@@ -1,3 +1,4 @@
+import time 
 # Written by John Hoffman
 # see LICENSE.txt for license information
 
@@ -121,7 +122,7 @@ try:
     class curlopen:
             def __init__(self,url):
                 
-                    print >>sys.stderr,"CURL",url
+                    print >>sys.stderr,time.asctime(),'-', "CURL",url
                 
                     self.contents = ''
                     self.c = pycurl.Curl()

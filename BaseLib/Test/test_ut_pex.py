@@ -1,3 +1,4 @@
+import time 
 # Written by Arno Bakker
 # see LICENSE.txt for license information
 #
@@ -32,9 +33,9 @@ class TestUTorrentPeerExchange(TestAsServer):
     def setUp(self):
         """ override TestAsServer """
         TestAsServer.setUp(self)
-        print >>sys.stderr,"test: Giving MyLaunchMany time to startup"
+        print >>sys.stderr,time.asctime(),'-', "test: Giving MyLaunchMany time to startup"
         time.sleep(3)
-        print >>sys.stderr,"test: MyLaunchMany should have started up"
+        print >>sys.stderr,time.asctime(),'-', "test: MyLaunchMany should have started up"
     
     def setUpPostSession(self):
         """ override TestAsServer """
@@ -144,7 +145,7 @@ class TestUTorrentPeerExchange(TestAsServer):
             self.assert_(resp[0] == EXTEND)
             self.check_tribler_extend_hs(resp[1:])
         except socket.timeout:
-            print >> sys.stderr,"test: Timeout, bad, peer didn't reply with EXTEND HS message"
+            print >> sys.stderr,time.asctime(),'-', "test: Timeout, bad, peer didn't reply with EXTEND HS message"
             self.assert_(False)
 
         # Tribler should send an ut_pex message after a while
@@ -160,7 +161,7 @@ class TestUTorrentPeerExchange(TestAsServer):
                     s.close()
                     break
         except socket.timeout:
-            print >> sys.stderr,"test: Timeout, bad, peer didn't reply with EXTEND ut_pex message"
+            print >> sys.stderr,time.asctime(),'-', "test: Timeout, bad, peer didn't reply with EXTEND ut_pex message"
             self.assert_(False)
 
         
@@ -214,14 +215,14 @@ class TestUTorrentPeerExchange(TestAsServer):
         self.assert_(data[0] == chr(pex_id))
         d = bdecode(data[1:])
         
-        print >>sys.stderr,"test: d is",`d`,"pex_id",pex_id
+        print >>sys.stderr,time.asctime(),'-', "test: d is",`d`,"pex_id",pex_id
         
         self.assert_(type(d) == DictType)
         self.assert_('added' in d.keys())
         cp = d['added']
         apeers = self.check_compact_peers(cp)
         
-        print >>sys.stderr,"test: apeers is",apeers
+        print >>sys.stderr,time.asctime(),'-', "test: apeers is",apeers
 
         self.assert_('added.f' in d.keys())
         addedf = d['added.f']
@@ -296,7 +297,7 @@ class TestUTorrentPeerExchange(TestAsServer):
     def _test_bad(self,gen_drequest_func):
         options = '\x00\x00\x00\x00\x00\x10\x00\x00'
         s = BTConnection('localhost',self.hisport,user_option_pattern=options,user_infohash=self.infohash)
-        print >> sys.stderr,"\ntest: ",gen_drequest_func
+        print >> sys.stderr,time.asctime(),'-', "\ntest: ",gen_drequest_func
         
         hsmsg = self.create_good_nontribler_extend_hs()
         s.send(hsmsg)
@@ -312,14 +313,14 @@ class TestUTorrentPeerExchange(TestAsServer):
             while True:
                 resp = s.recv()
                 if len(resp) > 0:
-                    print >>sys.stderr,"test: Got",getMessageName(resp[0]),"from peer"
+                    print >>sys.stderr,time.asctime(),'-', "test: Got",getMessageName(resp[0]),"from peer"
                     self.assert_(resp[0] == EXTEND or resp[0]==UNCHOKE)
                 else:
                     self.assert_(len(resp)==0)
                     s.close()
                     break
         except socket.timeout:
-            print >> sys.stderr,"test: Timeout, bad, peer didn't close connection"
+            print >> sys.stderr,time.asctime(),'-', "test: Timeout, bad, peer didn't close connection"
             self.assert_(False)
 
     #

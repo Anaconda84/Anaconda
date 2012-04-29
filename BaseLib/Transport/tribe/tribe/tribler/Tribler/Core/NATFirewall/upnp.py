@@ -1,3 +1,4 @@
+import time 
 # Written by Arno Bakker
 # see LICENSE.txt for license information
 #
@@ -36,7 +37,7 @@ class UPnPPlatformIndependent:
         """
         #if self.lastdiscovertime != 0 and self.lastdiscovertime + DISCOVER_WAIT < time.time():
         #    if DEBUG:
-        #        print >> sys.stderr,"upnp: discover: Already did a discovery recently"
+        #        print >> sys.stderr,time.asctime(),'-', "upnp: discover: Already did a discovery recently"
         #    return
 
         maxwait = 4
@@ -53,16 +54,16 @@ class UPnPPlatformIndependent:
             self.s.sendto(req,('239.255.255.250',1900))
             while True: # exited by socket.timeout exception only
                 if DEBUG:
-                    print >> sys.stderr,"upnp: discover: Wait 4 reply"
+                    print >> sys.stderr,time.asctime(),'-', "upnp: discover: Wait 4 reply"
                 (rep,sender) = self.s.recvfrom(1024)
 
                 if DEBUG:
-                    print >> sys.stderr,"upnp: discover: Got reply from",sender
-                    #print >> sys.stderr,"upnp: discover: Saying:",rep
+                    print >> sys.stderr,time.asctime(),'-', "upnp: discover: Got reply from",sender
+                    #print >> sys.stderr,time.asctime(),'-', "upnp: discover: Saying:",rep
                 repio = StringIO(rep)
                 while True:
                     line = repio.readline()
-                    #print >> sys.stderr,"LINE",line
+                    #print >> sys.stderr,time.asctime(),'-', "LINE",line
                     if line == '':
                         break
                     if line[-2:] == '\r\n':
@@ -72,7 +73,7 @@ class UPnPPlatformIndependent:
                         continue
                     key = line[:idx]
                     key = key.lower()
-                    #print >> sys.stderr,"key",key
+                    #print >> sys.stderr,time.asctime(),'-', "key",key
                     if key.startswith('location'):
                         # Careful: MS Internet Connection Sharing returns "Location:http://bla", so no space
                         location = line[idx+1:].strip() 
@@ -142,7 +143,7 @@ class UPnPPlatformIndependent:
                     # test: provoke error
                     #endpoint = o[0]+'://'+o[1]+'/bla'+self.services[location]['controlurl']
                     if DEBUG:
-                        print >> sys.stderr,"upnp: "+methodname+": Talking to endpoint ",endpoint
+                        print >> sys.stderr,time.asctime(),'-', "upnp: "+methodname+": Talking to endpoint ",endpoint
                     (headers,body) = self.create_soap_request(methodname,port,iproto=iproto,internalip=internalip)
                     #print body
                     try:
@@ -155,7 +156,7 @@ class UPnPPlatformIndependent:
                             print_exc()
                     srch = SOAPResponseContentHandler(methodname)
                     if DEBUG:
-                        print >> sys.stderr,"upnp: "+methodname+": response is",resp
+                        print >> sys.stderr,time.asctime(),'-', "upnp: "+methodname+": response is",resp
                     try:
                         srch.parse(resp)
                     except sax.SAXParseException,e:
@@ -169,10 +170,10 @@ class UPnPPlatformIndependent:
 
     def get_description(self,url):
         if DEBUG:
-            print >> sys.stderr,"upnp: discover: Reading description from",url
+            print >> sys.stderr,time.asctime(),'-', "upnp: discover: Reading description from",url
         f = urllib.urlopen(url)
         data = f.read()
-        #print >> sys.stderr,"upnp: description: Got",data
+        #print >> sys.stderr,time.asctime(),'-', "upnp: description: Got",data
         return data
 
     def parse_services(self,desc):
@@ -240,10 +241,10 @@ class DescriptionContentHandler(ContentHandler):
 
     def endDocument(self):
         if DEBUG:
-            print >> sys.stderr,"upnp: discover: Services found",self.services
+            print >> sys.stderr,time.asctime(),'-', "upnp: discover: Services found",self.services
 
     def endElement(self, name):
-        #print >> sys.stderr,"endElement",name
+        #print >> sys.stderr,time.asctime(),'-', "endElement",name
         n = name.lower()
         if n == 'servicetype':
             self.services['servicetype'] = self.content
@@ -251,7 +252,7 @@ class DescriptionContentHandler(ContentHandler):
             self.services['controlurl'] = self.content
             
     def characters(self, content):
-        # print >> sys.stderr,"content",content
+        # print >> sys.stderr,time.asctime(),'-', "content",content
         self.content = content
 
 
@@ -290,11 +291,11 @@ class SOAPResponseContentHandler(ContentHandler):
             self.errordesc = self.content
             
     def characters(self, content):
-        #print >>sys.stderr,"upnp: GOT CHARACTERS",content
+        #print >>sys.stderr,time.asctime(),'-', "upnp: GOT CHARACTERS",content
         self.content = content
 
 if __name__ == '__main__':
     u = UPnPPlatformIndependent()
     u.discover()
-    print >> sys.stderr,"IGD say my external IP address is",u.get_ext_ip()
+    print >> sys.stderr,time.asctime(),'-', "IGD say my external IP address is",u.get_ext_ip()
     #u.add_port_map('130.37.193.64',6881)

@@ -1,3 +1,4 @@
+import time 
 # Written by John Hoffman
 # see LICENSE.txt for license information
 
@@ -45,7 +46,7 @@ class SingleRawServer:
 
     def _shutdown(self):
         if DEBUG:
-            print >>sys.stderr,"SingleRawServer: _shutdown"
+            print >>sys.stderr,time.asctime(),'-', "SingleRawServer: _shutdown"
         if not self.finished:
             self.finished = True
             self.running = False
@@ -55,7 +56,7 @@ class SingleRawServer:
 
     def _external_connection_made(self, c, options, msg_remainder):
         if DEBUG:
-            print >> sys.stderr,"SingleRawServer: _external_conn_made, running?",self.running
+            print >> sys.stderr,time.asctime(),'-', "SingleRawServer: _external_conn_made, running?",self.running
         if self.running:
             c.set_handler(self.handler)
             self.handler.externally_handshaked_connection_made(
@@ -123,7 +124,7 @@ class NewSocketHandler:     # hand a new socket off where it belongs
             self.protocol = 'HTTP'
             self.firstbyte = s
             if DEBUG:
-                print >>sys.stderr,"NewSocketHandler: Got HTTP connection"
+                print >>sys.stderr,time.asctime(),'-', "NewSocketHandler: Got HTTP connection"
             return True
         else:
             l = ord(s)
@@ -139,14 +140,14 @@ class NewSocketHandler:     # hand a new socket off where it belongs
 
     def read_download_id(self, s):
         if DEBUG:
-            print >>sys.stderr,"NewSocketHandler: Swarm id is",`s`,self.connection.socket.getpeername()
+            print >>sys.stderr,time.asctime(),'-', "NewSocketHandler: Swarm id is",`s`,self.connection.socket.getpeername()
         if self.multihandler.singlerawservers.has_key(s):
             if self.multihandler.singlerawservers[s].protocol == self.protocol:
                 if DEBUG:
-                    print >>sys.stderr,"NewSocketHandler: Found rawserver for swarm id"
+                    print >>sys.stderr,time.asctime(),'-', "NewSocketHandler: Found rawserver for swarm id"
                 return True
         if DEBUG:
-            print >>sys.stderr,"NewSocketHandler: No rawserver found for swarm id",`s`
+            print >>sys.stderr,time.asctime(),'-', "NewSocketHandler: No rawserver found for swarm id",`s`
         return None
 
     def read_dead(self, s):
@@ -174,19 +175,19 @@ class NewSocketHandler:     # hand a new socket off where it belongs
                 raise
             if x is None:
                 if DEBUG:
-                    print >> sys.stderr,"NewSocketHandler:",self.next_func,"returned None"
+                    print >> sys.stderr,time.asctime(),'-', "NewSocketHandler:",self.next_func,"returned None"
                 self.close()
                 return
             if x == True:       # ready to process
                 if self.protocol == 'HTTP':
                     if DEBUG:
-                        print >> sys.stderr,"NewSocketHandler: Reporting HTTP connection"
+                        print >> sys.stderr,time.asctime(),'-', "NewSocketHandler: Reporting HTTP connection"
                     self.multihandler.httphandler.external_connection_made(self.connection)
                     self.multihandler.httphandler.data_came_in(self.connection,self.firstbyte)
                     self.multihandler.httphandler.data_came_in(self.connection,s)
                 else:
                     if DEBUG:
-                        print >> sys.stderr,"NewSocketHandler: Reporting connection via",self.multihandler.singlerawservers[m]._external_connection_made
+                        print >> sys.stderr,time.asctime(),'-', "NewSocketHandler: Reporting connection via",self.multihandler.singlerawservers[m]._external_connection_made
                     self.multihandler.singlerawservers[m]._external_connection_made(self.connection, self.options, s)
                 self.complete = True
                 return
@@ -214,13 +215,13 @@ class MultiHandler:
 
     def shutdown_torrent(self, info_hash):
         if DEBUG:
-            print >>sys.stderr,"MultiHandler: shutdown_torrent",`info_hash`
+            print >>sys.stderr,time.asctime(),'-', "MultiHandler: shutdown_torrent",`info_hash`
         self.singlerawservers[info_hash]._shutdown()
         del self.singlerawservers[info_hash]
 
     def listen_forever(self):
         if DEBUG:
-            print >>sys.stderr,"MultiHandler: listen_forever()"
+            print >>sys.stderr,time.asctime(),'-', "MultiHandler: listen_forever()"
         self.rawserver.listen_forever(self)
         for srs in self.singlerawservers.values():
             srs.finished = True

@@ -1,3 +1,4 @@
+import time 
 # Written by Gertjan Halkes
 # see LICENSE.txt for license information
 
@@ -57,7 +58,7 @@ class TimeoutFinder:
                     break
         else:
             if DEBUG:
-                print >>sys.stderr, ("Received ping with %d delay" % (timeout[0]))
+                print >>sys.stderr, time.asctime(),'-', ("Received ping with %d delay" % (timeout[0]))
             self.timeout_found = timeout[0]
             #FIXME: log reception of packet
 
@@ -91,7 +92,7 @@ if __name__ == "__main__":
             with_ = "without"
 
         if DEBUG:
-            print >>sys.stderr, ("Timeout %s initial ping: %d" % (with_, timeout))
+            print >>sys.stderr, time.asctime(),'-', ("Timeout %s initial ping: %d" % (with_, timeout))
 
     DEBUG = False
 

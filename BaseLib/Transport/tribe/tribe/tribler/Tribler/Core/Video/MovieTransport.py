@@ -1,3 +1,4 @@
+import time 
 # Written by Jan David Mol, Arno Bakker
 # see LICENSE.txt for license information
 
@@ -49,13 +50,13 @@ class MovieTransportStreamWrapper:
             return ''
         data = self.mt.read(numbytes)
         if data is None:
-            print >>sys.stderr,"MovieTransportStreamWrapper: mt read returns None"
+            print >>sys.stderr,time.asctime(),'-', "MovieTransportStreamWrapper: mt read returns None"
             data = ''
         return data
 
     def seek(self,pos,whence=os.SEEK_SET):
         # TODO: shift play_pos in PiecePicking + interpret whence
-        print >>sys.stderr,"MovieTransportStreamWrapper: seek() CALLED",pos,"whence",whence
+        print >>sys.stderr,time.asctime(),'-', "MovieTransportStreamWrapper: seek() CALLED",pos,"whence",whence
         self.mt.seek(pos,whence=whence)
     
     def close(self):

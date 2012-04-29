@@ -1,3 +1,4 @@
+import time 
 # Written by Pawel Garbacki, Arno Bakker, George Milescu
 # see LICENSE.txt for license information
 #
@@ -50,13 +51,13 @@ class HelperMessageHandler:
 
         t = message[0]
         if DEBUG:
-            print >> sys.stderr, "helper: received the message", getMessageName(t), "from", show_permid_short(permid)
+            print >> sys.stderr, time.asctime(),'-', "helper: received the message", getMessageName(t), "from", show_permid_short(permid)
 
         #if ProxyService is not turned on, return
         session_config = self.session.get_current_startup_config_copy()
         if session_config.get_proxyservice_status() == PROXYSERVICE_OFF:
             if DEBUG:
-                print >> sys.stderr, "helper: ProxyService not active, ignoring message"
+                print >> sys.stderr, time.asctime(),'-', "helper: ProxyService not active, ignoring message"
 
             return
         
@@ -83,16 +84,16 @@ class HelperMessageHandler:
             challenge = bdecode(message[21:])
         except:
             if DEBUG:
-                print >> sys.stderr, "helper: got_ask_for_help: bad data in ask_for_help"
+                print >> sys.stderr, time.asctime(),'-', "helper: got_ask_for_help: bad data in ask_for_help"
             return False
 
         if len(infohash) != 20:
             if DEBUG:
-                print >> sys.stderr, "helper: got_ask_for_help: bad infohash in ask_for_help"
+                print >> sys.stderr, time.asctime(),'-', "helper: got_ask_for_help: bad infohash in ask_for_help"
             return False
         
         if DEBUG:
-            print >> sys.stderr, "helper: got_ask_for_help: received a help request from",show_permid_short(permid)
+            print >> sys.stderr, time.asctime(),'-', "helper: got_ask_for_help: received a help request from",show_permid_short(permid)
 
         
         # Save the challenge
@@ -102,7 +103,7 @@ class HelperMessageHandler:
         helper_obj = self.session.lm.get_coopdl_role_object(infohash, COOPDL_ROLE_HELPER)
         if helper_obj is None:
             if DEBUG:
-                print >> sys.stderr, "helper: got_ask_for_help: There is no current download for this infohash. A new download must be started."
+                print >> sys.stderr, time.asctime(),'-', "helper: got_ask_for_help: There is no current download for this infohash. A new download must be started."
             
             self.start_helper_download(permid, infohash, selversion)
             # start_helper_download will make, indirectly, a call to the network_got_ask_for_help method of the helper,
@@ -134,14 +135,14 @@ class HelperMessageHandler:
         helper_obj = self.session.lm.get_coopdl_role_object(infohash, COOPDL_ROLE_HELPER)
         if helper_obj is None:
             if DEBUG:
-                print >> sys.stderr, "helper: network_got_ask_for_help: There is no current download for this infohash. Try again later..."
+                print >> sys.stderr, time.asctime(),'-', "helper: network_got_ask_for_help: There is no current download for this infohash. Try again later..."
             return
             
         # At this point, a previous download existed
         # A node can not be a helper and a coordinator at the same time
         if not helper_obj.is_coordinator(permid):
             if DEBUG:
-                print >> sys.stderr, "helper: network_got_ask_for_help: The node asking for help is not the current coordinator"
+                print >> sys.stderr, time.asctime(),'-', "helper: network_got_ask_for_help: The node asking for help is not the current coordinator"
             return
 
         challenge = self.received_challenges[permid]
@@ -194,8 +195,8 @@ class HelperMessageHandler:
         tfile.close()
 
         if DEBUG:
-            print >> sys.stderr, "helper: new_download: Got metadata required for helping",show_permid_short(permid)
-            print >> sys.stderr, "helper: new_download: torrent: ",torrentfilename
+            print >> sys.stderr, time.asctime(),'-', "helper: new_download: Got metadata required for helping",show_permid_short(permid)
+            print >> sys.stderr, time.asctime(),'-', "helper: new_download: torrent: ",torrentfilename
 
         tdef = TorrentDef.load(torrentfilename)
         if self.dlconfig is None:
@@ -208,7 +209,7 @@ class HelperMessageHandler:
 
         # Start new download
         if DEBUG:
-            print >> sys.stderr, "helper: new_download: Starting a new download"
+            print >> sys.stderr, time.asctime(),'-', "helper: new_download: Starting a new download"
         d=self.session.start_download(tdef,dscfg)
         d.set_state_callback(self.state_callback, getpeerlist=False)
         
@@ -223,8 +224,8 @@ class HelperMessageHandler:
     # Print torrent statistics
     def state_callback(self, ds):
         d = ds.get_download()
-    #    print >>sys.stderr,`d.get_def().get_name()`,dlstatus_strings[ds.get_status()],ds.get_progress(),"%",ds.get_error(),"up",ds.get_current_speed(UPLOAD),"down",ds.get_current_speed(DOWNLOAD)
-        print >>sys.stderr, '%s %s %5.2f%% %s up %8.2fKB/s down %8.2fKB/s' % \
+    #    print >>sys.stderr,time.asctime(),'-', `d.get_def().get_name()`,dlstatus_strings[ds.get_status()],ds.get_progress(),"%",ds.get_error(),"up",ds.get_current_speed(UPLOAD),"down",ds.get_current_speed(DOWNLOAD)
+        print >>sys.stderr, time.asctime(),'-', '%s %s %5.2f%% %s up %8.2fKB/s down %8.2fKB/s' % \
                 (d.get_def().get_name(), \
                 dlstatus_strings[ds.get_status()], \
                 ds.get_progress() * 100, \
@@ -245,7 +246,7 @@ class HelperMessageHandler:
         @param selversion:
         """
         if DEBUG:
-            print >> sys.stderr, "helper: get_torrent_metadata: Asking coordinator for the .torrent"
+            print >> sys.stderr, time.asctime(),'-', "helper: get_torrent_metadata: Asking coordinator for the .torrent"
         self.metadata_queue_lock.acquire()
         try:
             if not self.metadata_queue.has_key(infohash):
@@ -263,13 +264,13 @@ class HelperMessageHandler:
         # TODO: Where is this handler registered ?
         # TODO: Is this handler actually called by the network thread ?
         if DEBUG:
-            print >> sys.stderr, "helper: metadatahandler_received_torrent: the .torrent is in."
+            print >> sys.stderr, time.asctime(),'-', "helper: metadatahandler_received_torrent: the .torrent is in."
         
         self.metadata_queue_lock.acquire()
         try:
             if not self.metadata_queue.has_key(infohash) or not self.metadata_queue[infohash]:
                 if DEBUG:
-                    print >> sys.stderr, "helper: metadatahandler_received_torrent: a .torrent was received that we are not waiting for."
+                    print >> sys.stderr, time.asctime(),'-', "helper: metadatahandler_received_torrent: a .torrent was received that we are not waiting for."
                 return
             
             infohash_queue = self.metadata_queue[infohash]
@@ -290,7 +291,7 @@ class HelperMessageHandler:
         if torrent is None:
             # The .torrent file is not in the local cache
             if DEBUG:
-                print >> sys.stderr, "helper: find_torrent: The .torrent file is not in the local cache"
+                print >> sys.stderr, time.asctime(),'-', "helper: find_torrent: The .torrent file is not in the local cache"
             return None
         elif 'torrent_dir' in torrent:
             fn = torrent['torrent_dir']
@@ -302,12 +303,12 @@ class HelperMessageHandler:
             else:
                 # The .torrent file path does not exist or the path is not for a file
                 if DEBUG:
-                    print >> sys.stderr, "helper: find_torrent: The .torrent file path does not exist or the path is not for a file" 
+                    print >> sys.stderr, time.asctime(),'-', "helper: find_torrent: The .torrent file path does not exist or the path is not for a file" 
                 return None
         else:
             # The torrent dictionary does not contain a torrent_dir field 
             if DEBUG:
-                print >> sys.stderr, "helper: find_torrent: The torrent dictionary does not contain a torrent_dir field" 
+                print >> sys.stderr, time.asctime(),'-', "helper: find_torrent: The torrent dictionary does not contain a torrent_dir field" 
             return None
 
 
@@ -325,12 +326,12 @@ class HelperMessageHandler:
             infohash = message[1:]
         except:
             if DEBUG:
-                print >> sys.stderr, "helper: got_stop_helping: bad data in STOP_HELPING"
+                print >> sys.stderr, time.asctime(),'-', "helper: got_stop_helping: bad data in STOP_HELPING"
             return False
 
         if len(infohash) != 20:
             if DEBUG:
-                print >> sys.stderr, "helper: got_stop_helping: bad infohash in STOP_HELPING"
+                print >> sys.stderr, time.asctime(),'-', "helper: got_stop_helping: bad infohash in STOP_HELPING"
             return False
 
         network_got_stop_helping_lambda = lambda:self.network_got_stop_helping(permid, infohash, selversion)
@@ -353,12 +354,12 @@ class HelperMessageHandler:
         helper_obj = self.session.lm.get_coopdl_role_object(infohash, COOPDL_ROLE_HELPER)
         if helper_obj is None:
             if DEBUG:
-                print >> sys.stderr, "helper: network_got_stop_helping: There is no helper object associated with this infohash"
+                print >> sys.stderr, time.asctime(),'-', "helper: network_got_stop_helping: There is no helper object associated with this infohash"
             return
         
         if not helper_obj.is_coordinator(permid): 
             if DEBUG:
-                print >> sys.stderr, "helper: network_got_stop_helping: The node asking for help is not the current coordinator"
+                print >> sys.stderr, time.asctime(),'-', "helper: network_got_stop_helping: The node asking for help is not the current coordinator"
             return
         
 #        helper_obj.got_stop_helping(permid, infohash)
@@ -386,7 +387,7 @@ class HelperMessageHandler:
             infohash = message[1:21]
             pieces = bdecode(message[21:])
         except:
-            print >> sys.stderr, "helper: got_request_pieces: bad data in REQUEST_PIECES"
+            print >> sys.stderr, time.asctime(),'-', "helper: got_request_pieces: bad data in REQUEST_PIECES"
             return False
 
         network_got_request_pieces_lambda = lambda:self.network_got_request_pieces(permid, message, selversion, infohash, pieces)
@@ -406,12 +407,12 @@ class HelperMessageHandler:
         helper_obj = self.session.lm.get_coopdl_role_object(infohash, COOPDL_ROLE_HELPER)
         if helper_obj is None:
             if DEBUG:
-                print >> sys.stderr, "helper: network_got_request_pieces: There is no helper object associated with this infohash"
+                print >> sys.stderr, time.asctime(),'-', "helper: network_got_request_pieces: There is no helper object associated with this infohash"
             return
 
         if not helper_obj.is_coordinator(permid): 
             if DEBUG:
-                print >> sys.stderr, "helper: network_got_request_pieces: The node asking for help is not the current coordinator"
+                print >> sys.stderr, time.asctime(),'-', "helper: network_got_request_pieces: The node asking for help is not the current coordinator"
             return
 
         helper_obj.got_request_pieces(permid, pieces)

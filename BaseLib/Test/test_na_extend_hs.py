@@ -1,3 +1,4 @@
+import time 
 # Written by Arno Bakker
 # see LICENSE.txt for license information
 #
@@ -89,7 +90,7 @@ class TestNetworkAwareExtendHandshake(TestExtendHandshake):
         
     def _test_good(self,msg_gen_func,options=None,infohash=None):
         
-        print >>sys.stderr,"test: test good, gen_func",msg_gen_func
+        print >>sys.stderr,time.asctime(),'-', "test: test good, gen_func",msg_gen_func
         
         if options is None and infohash is None:
             s = BTConnection('localhost',self.hisport,myid=self.myid)
@@ -109,12 +110,12 @@ class TestNetworkAwareExtendHandshake(TestExtendHandshake):
             s.s.settimeout(10.0)
             resp = s.recv()
             self.assert_(len(resp) > 0)
-            print >>sys.stderr,"test: Got reply",getMessageName(resp[0])
+            print >>sys.stderr,time.asctime(),'-', "test: Got reply",getMessageName(resp[0])
             self.assert_(resp[0] == EXTEND)
             self.check_tribler_extend_hs(resp[1:])
             #s.close()
         except socket.timeout:
-            print >> sys.stderr,"test: Timeout, bad, peer didn't reply with EXTEND message"
+            print >> sys.stderr,time.asctime(),'-', "test: Timeout, bad, peer didn't reply with EXTEND message"
             self.assert_(False)
 
         # Tribler should try to connect to our internal interface
@@ -132,7 +133,7 @@ class TestNetworkAwareExtendHandshake(TestExtendHandshake):
             while True:
                 resp = s.recv()
                 if len(resp) > 0:
-                    print >>sys.stderr,"test: Got data on internal conn",getMessageName(resp[0])
+                    print >>sys.stderr,time.asctime(),'-', "test: Got data on internal conn",getMessageName(resp[0])
                 else:
                     break
         except socket.timeout:
@@ -164,7 +165,7 @@ class TestNetworkAwareExtendHandshake(TestExtendHandshake):
         self.assert_(type(val) == IntType)
         self.assert_(val == 253)
         
-        print >>sys.stderr,"test: Reply is",`d`
+        print >>sys.stderr,time.asctime(),'-', "test: Reply is",`d`
 
 def test_suite():
     suite = unittest.TestSuite()

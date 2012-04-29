@@ -1,3 +1,4 @@
+import time 
 # Written by John Hoffman, Arno Bakker
 # derived from NATPortMapping.py by Yejun Yang
 # and from example code by Myers Carpenter
@@ -28,7 +29,7 @@ try:
     win32_imported = 1
 except ImportError:
     if DEBUG and (sys.platform == 'win32'):
-        print >>sys.stderr,"natpunch: ERROR: pywin32 package not installed, UPnP mode 2 won't work now" 
+        print >>sys.stderr,time.asctime(),'-', "natpunch: ERROR: pywin32 package not installed, UPnP mode 2 won't work now" 
     win32_imported = 0
 
 UPnPError = UPnPError
@@ -69,11 +70,11 @@ class _UPnP1:   # derived from Myers Carpenter's code
         try:
             map.Add(p, iproto, p, ip, True, ID)
             if DEBUG:
-                print >>sys.stderr,'upnp1: succesfully opened port: '+ip+':'+str(p)
+                print >>sys.stderr,time.asctime(),'-', 'upnp1: succesfully opened port: '+ip+':'+str(p)
             success = True
         except:
             if DEBUG:
-                print >>sys.stderr,"upnp1: COULDN'T OPEN "+str(p)
+                print >>sys.stderr,time.asctime(),'-', "upnp1: COULDN'T OPEN "+str(p)
                 print_exc()
             success = False
         return success
@@ -85,10 +86,10 @@ class _UPnP1:   # derived from Myers Carpenter's code
             map.Remove(p, iproto)
             success = True
             if DEBUG:
-                print >>sys.stderr,'upnp1: succesfully closed port: '+str(p)
+                print >>sys.stderr,time.asctime(),'-', 'upnp1: succesfully closed port: '+str(p)
         except:
             if DEBUG:
-                print >>sys.stderr,"upnp1: COULDN'T CLOSE "+str(p)
+                print >>sys.stderr,time.asctime(),'-', "upnp1: COULDN'T CLOSE "+str(p)
                 print_exc()
             success = False
         return success
@@ -184,7 +185,7 @@ class _UPnP2:   # derived from Yejun Yang's code
                 if DEBUG:
                     print_exc()
         if DEBUG and not success:
-            print >>sys.stderr,"upnp2: COULDN'T OPEN "+str(p)
+            print >>sys.stderr,time.asctime(),'-', "upnp2: COULDN'T OPEN "+str(p)
             print_exc()
         return success
 
@@ -200,7 +201,7 @@ class _UPnP2:   # derived from Yejun Yang's code
                 if DEBUG:
                     print_exc()
         if DEBUG and not success:
-            print >>sys.stderr,"upnp2: COULDN'T CLOSE "+str(p)
+            print >>sys.stderr,time.asctime(),'-', "upnp2: COULDN'T CLOSE "+str(p)
             print_exc()
         return success
 
@@ -215,17 +216,17 @@ class _UPnP2:   # derived from Yejun Yang's code
                 # - Good reply is: (None, (u'130.37.168.199',))
                 # - When router disconnected from Internet:  (None, (u'',))
                 if DEBUG:
-                    print >>sys.stderr,"upnp2: GetExternapIPAddress returned",ret
+                    print >>sys.stderr,time.asctime(),'-', "upnp2: GetExternapIPAddress returned",ret
                 dns = ret[1]
                 if str(dns[0]) != '':
                     success = str(dns[0])
                 elif DEBUG:
-                    print >>sys.stderr,"upnp2: RETURNED IP ADDRESS EMPTY"
+                    print >>sys.stderr,time.asctime(),'-', "upnp2: RETURNED IP ADDRESS EMPTY"
             except:
                 if DEBUG:
                     print_exc()
         if DEBUG and not success:
-            print >>sys.stderr,"upnp2: COULDN'T GET EXT IP ADDR"
+            print >>sys.stderr,time.asctime(),'-', "upnp2: COULDN'T GET EXT IP ADDR"
         return success
 
 class _UPnP3:
@@ -326,33 +327,33 @@ class UPnPWrapper:    # master holding class
                         if local_ips.includes(self.local_ip):
                             self.last_got_ip = clock()
                             if DEBUG:
-                                print >>sys.stderr,'upnpX: Local IP found: '+self.local_ip
+                                print >>sys.stderr,time.asctime(),'-', 'upnpX: Local IP found: '+self.local_ip
                             break
                     else:
                         raise ValueError('upnpX: couldn\'t find intranet IP')
                 except:
                     self.local_ip = None
                     if DEBUG:
-                        print >>sys.stderr,'upnpX: Error finding local IP'
+                        print >>sys.stderr,time.asctime(),'-', 'upnpX: Error finding local IP'
                         print_exc()
         return self.local_ip
 
     def test(self, upnp_type):
         if DEBUG:
-            print >>sys.stderr,'upnpX: testing UPnP type '+str(upnp_type)
+            print >>sys.stderr,time.asctime(),'-', 'upnpX: testing UPnP type '+str(upnp_type)
         if not upnp_type or self.get_ip() is None or (upnp_type <= 2 and not win32_imported):
             if DEBUG:
-                print >>sys.stderr,'upnpX: UPnP not supported'
+                print >>sys.stderr,time.asctime(),'-', 'upnpX: UPnP not supported'
             return 0
         if upnp_type != 3:
             pythoncom.CoInitialize()                # leave initialized
         self.upnp = self.upnplist[upnp_type]    # cache this
         if self.upnp.test():
             if DEBUG:
-                print >>sys.stderr,'upnpX: ok'
+                print >>sys.stderr,time.asctime(),'-', 'upnpX: ok'
             return upnp_type
         if DEBUG:
-            print >>sys.stderr,'upnpX: tested bad'
+            print >>sys.stderr,time.asctime(),'-', 'upnpX: tested bad'
         return 0
 
     def open(self, p, iproto='TCP'):
@@ -372,10 +373,10 @@ class UPnPWrapper:    # master holding class
 
 if __name__ == '__main__':
     ip = get_my_wan_ip()
-    print >>sys.stderr,"guessed ip",ip
+    print >>sys.stderr,time.asctime(),'-', "guessed ip",ip
     u = UPnPWrapper()
     u.register(ip)
-    print >>sys.stderr,"TEST RETURNED",u.test(3)
-    print >>sys.stderr,"IGD says my external IP is",u.get_ext_ip()
-    print >>sys.stderr,"IGD open returned",u.open(6881)
-    print >>sys.stderr,"IGD close returned",u.close(6881)
+    print >>sys.stderr,time.asctime(),'-', "TEST RETURNED",u.test(3)
+    print >>sys.stderr,time.asctime(),'-', "IGD says my external IP is",u.get_ext_ip()
+    print >>sys.stderr,time.asctime(),'-', "IGD open returned",u.open(6881)
+    print >>sys.stderr,time.asctime(),'-', "IGD close returned",u.close(6881)

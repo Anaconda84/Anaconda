@@ -1,3 +1,4 @@
+import time 
 # Written by Arno Bakker 
 # see LICENSE.txt for license information
 
@@ -19,7 +20,7 @@ class DownloadRuntimeConfig(DownloadConfigInterface):
     """
     def set_max_speed(self,direct,speed):
         if DEBUG:
-            print >>sys.stderr,"Download: set_max_speed",`self.get_def().get_metainfo()['info']['name']`,direct,speed
+            print >>sys.stderr,time.asctime(),'-', "Download: set_max_speed",`self.get_def().get_metainfo()['info']['name']`,direct,speed
         #print_stack()
         
         self.dllock.acquire()

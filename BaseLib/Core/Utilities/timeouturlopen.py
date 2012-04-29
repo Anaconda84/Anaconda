@@ -1,3 +1,4 @@
+import time 
 # Written by Feek Zindel
 # see LICENSE.txt for license information
 
@@ -68,7 +69,7 @@ def find_proxy(url):
             proxyhost = proxyelems[1]
             
     if DEBUG:
-        print >>sys.stderr,"find_proxy: Got proxies",proxies,"selected",proxyhost,"URL was",url
+        print >>sys.stderr,time.asctime(),'-', "find_proxy: Got proxies",proxies,"selected",proxyhost,"URL was",url
     return proxyhost
 
 

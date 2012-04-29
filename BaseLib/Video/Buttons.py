@@ -1,3 +1,4 @@
+import time 
 # Written by Jelle Roozenburg, Maarten ten Brinke 
 # see LICENSE.txt for license information
 import wx, os, sys
@@ -258,7 +259,7 @@ class PlayerSwitchButton(PlayerButton):
                 
                     
         if not os.path.isdir(self.imagedir):
-            print >>sys.stderr,'PlayerSwitchButton: Error: no image directory found in',self.imagedir
+            print >>sys.stderr,time.asctime(),'-', 'PlayerSwitchButton: Error: no image directory found in',self.imagedir
             return
         
         # find a file with same name as this panel

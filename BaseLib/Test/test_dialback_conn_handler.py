@@ -1,3 +1,4 @@
+import time 
 # Written by Arno Bakker
 # see LICENSE.txt for license information
 #
@@ -59,7 +60,7 @@ class Peer(Thread):
                                 reuse = True,
                                 ipv6_socket_style = config['ipv6_binds_v4'], 
                                 randomizer = config['random_port'])
-                print >> sys.stderr,"test: Got listen port", self.listen_port
+                print >> sys.stderr,time.asctime(),'-', "test: Got listen port", self.listen_port
                 break
             except socketerror, e:
                 self.report_failure(str(e))
@@ -82,7 +83,7 @@ class Peer(Thread):
         self.rawserver.add_task(self.dummy_task,0)
 
     def run(self):
-        print >> sys.stderr,"test: MyServer: run called by",currentThread().getName()
+        print >> sys.stderr,time.asctime(),'-', "test: MyServer: run called by",currentThread().getName()
         self.multihandler.listen_forever()
 
     def report_failure(self,msg):
@@ -115,7 +116,7 @@ class TestReturnConnHandler(unittest.TestCase):
         sleep(2) # let server threads start
 
     def tearDown(self):
-        print >> sys.stderr,"test: tearDown: waiting 10 secs"
+        print >> sys.stderr,time.asctime(),'-', "test: tearDown: waiting 10 secs"
         sleep(10)
         if self.wanted and not self.got:
             self.assert_(False,"callback was not called")
@@ -128,7 +129,7 @@ class TestReturnConnHandler(unittest.TestCase):
     # connect_dns() to an address that noone responds at
     #
     def singtest_connect_dns_to_dead_peer(self):
-        print >> sys.stderr,"test: test_connect_dns_to_dead_peer"
+        print >> sys.stderr,time.asctime(),'-', "test: test_connect_dns_to_dead_peer"
         self.wanted = True
         self.peer1.dialback_connhand.connect_dns(("127.0.0.1", 22220),self.connect_dns_to_dead_peer_callback)
         # Arno, 2009-04-23: was 2 secs, somehow the failed event comes in real slow now.
@@ -136,7 +137,7 @@ class TestReturnConnHandler(unittest.TestCase):
         self.assert_(len(self.peer1.dialback_connhand.iplport2oc) == 0)
 
     def connect_dns_to_dead_peer_callback(self,exc,dns):
-        print >> sys.stderr,"test: connect_dns_to_dead_peer_callback"
+        print >> sys.stderr,time.asctime(),'-', "test: connect_dns_to_dead_peer_callback"
         self.assert_(exc is not None)
         self.assert_(dns == ("127.0.0.1", 22220))
         self.got = True
@@ -146,7 +147,7 @@ class TestReturnConnHandler(unittest.TestCase):
     # connect_dns() to an address that peer2 responds
     #
     def singtest_connect_dns_to_live_peer(self):
-        print >> sys.stderr,"test: test_connect_dns_to_live_peer"
+        print >> sys.stderr,time.asctime(),'-', "test: test_connect_dns_to_live_peer"
         self.wanted = True
         self.peer1.dialback_connhand.connect_dns(("127.0.0.1", 5678),self.connect_dns_to_live_peer_callback)
         sleep(2) # let rawserver thread establish connection, which should succeed
@@ -154,7 +155,7 @@ class TestReturnConnHandler(unittest.TestCase):
         self.assert_(self.peer1.dialback_connhand.iplport2oc.has_key('127.0.0.1:5678'))
 
     def connect_dns_to_live_peer_callback(self,exc,dns):
-        print >> sys.stderr,"test: connect_dns_to_live_peer_callback",exc
+        print >> sys.stderr,time.asctime(),'-', "test: connect_dns_to_live_peer_callback",exc
         self.assert_(exc is None)
         self.assert_(dns == ("127.0.0.1", 5678))
         self.got = True
@@ -164,7 +165,7 @@ class TestReturnConnHandler(unittest.TestCase):
     # send() over a non-existing connection to peer2
     #
     def singtest_send_unopenedA(self):
-        print >> sys.stderr,"test: test_send_unopenedA"
+        print >> sys.stderr,time.asctime(),'-', "test: test_send_unopenedA"
         self.wanted = True
         hisdns = ("127.0.0.1", 5678)
         self.peer1.dialback_connhand.send(hisdns,'msg=bla',self.send_unopenedA_send_callback)
@@ -172,7 +173,7 @@ class TestReturnConnHandler(unittest.TestCase):
         self.assert_(len(self.peer1.dialback_connhand.iplport2oc) == 0)
 
     def send_unopenedA_send_callback(self,exc,dns):
-        print >> sys.stderr,"test: send_unopenedA_send_callback",exc
+        print >> sys.stderr,time.asctime(),'-', "test: send_unopenedA_send_callback",exc
         self.assert_(exc is not None)
         self.assert_(dns == ("127.0.0.1", 5678))
         self.got = True
@@ -181,7 +182,7 @@ class TestReturnConnHandler(unittest.TestCase):
     # send() over a connection to peer2 that peer1 closed
     #
     def singtest_send_local_close(self):
-        print >> sys.stderr,"test: test_send_local_close"
+        print >> sys.stderr,time.asctime(),'-', "test: test_send_local_close"
         self.wanted = True
 
         self.peer1.dialback_connhand.connect_dns(("127.0.0.1", 5678),self.connect_dns_to_live_peer_callback)
@@ -196,7 +197,7 @@ class TestReturnConnHandler(unittest.TestCase):
         self.assert_(len(self.peer1.dialback_connhand.iplport2oc) == 0)
 
     def send_local_close_send_callback(self,exc,dns):
-        print >> sys.stderr,"test: send_local_close_send_callback",exc
+        print >> sys.stderr,time.asctime(),'-', "test: send_local_close_send_callback",exc
         self.assert_(exc is not None)
         self.assert_(dns == ("127.0.0.1", 5678))
         self.got = True
@@ -205,7 +206,7 @@ class TestReturnConnHandler(unittest.TestCase):
     # send() over a connection to peer2 that peer2 closed
     #
     def singtest_send_remote_close(self):
-        print >> sys.stderr,"test: test_send_remote_close"
+        print >> sys.stderr,time.asctime(),'-', "test: test_send_remote_close"
 
         self.wanted = True
         self.wanted2 = True
@@ -221,26 +222,26 @@ class TestReturnConnHandler(unittest.TestCase):
         self.assert_(len(self.peer1.dialback_connhand.iplport2oc) == 0)
 
     def send_remote_close_conns_callback(self,exc,dns,locally_initiated):
-        print  >> sys.stderr,"test: send_remote_close_conns_callback",exc,dns
+        print  >> sys.stderr,time.asctime(),'-', "test: send_remote_close_conns_callback",exc,dns
         hisdns = ("127.0.0.1", 1234)
         if self.first:
-            print >>sys.stderr,"test: send_remote_close_conns_callback: FIRST:"
+            print >>sys.stderr,time.asctime(),'-', "test: send_remote_close_conns_callback: FIRST:"
             self.assert_(exc is None)
             self.assert_(dns == hisdns)
             self.assert_(not locally_initiated)
             self.first = False
             self.got2 = True
 
-            print >>sys.stderr,"test: send_remote_close_conns_callback: FIRST: BEFORE CLOSE"
+            print >>sys.stderr,time.asctime(),'-', "test: send_remote_close_conns_callback: FIRST: BEFORE CLOSE"
             self.peer2.dialback_connhand.close(hisdns)
         else:
-            print >>sys.stderr,"test: send_remote_close_conns_callback: SECOND"
+            print >>sys.stderr,time.asctime(),'-', "test: send_remote_close_conns_callback: SECOND"
             self.assert_(exc is not None)
             self.assert_(dns == hisdns)
             self.assert_(not locally_initiated)
 
     def send_remote_close_connect_callback(self,exc,dns):
-        print >> sys.stderr,"test: send_remote_close_connect_callback"
+        print >> sys.stderr,time.asctime(),'-', "test: send_remote_close_connect_callback"
         self.assert_(exc is not None)
         self.assert_(dns == ("127.0.0.1", 5678))
         self.got = True
@@ -250,7 +251,7 @@ class TestReturnConnHandler(unittest.TestCase):
     # send() over an open connection to peer2
     #
     def singtest_send_opened(self):
-        print >> sys.stderr,"test: test_send_opened"
+        print >> sys.stderr,time.asctime(),'-', "test: test_send_opened"
         self.wanted = True
         self.wanted2 = True
         hisdns = ("127.0.0.1", 5678)
@@ -258,14 +259,14 @@ class TestReturnConnHandler(unittest.TestCase):
         self.peer1.dialback_connhand.connect_dns(hisdns,lambda e,d: self.send_opened_connect_callback(e,d,msg))
 
     def send_opened_connect_callback(self,exc,dns,msg):
-        print >> sys.stderr,"test: send_opened_connect_callback"
+        print >> sys.stderr,time.asctime(),'-', "test: send_opened_connect_callback"
         self.assert_(exc is None)
         self.assert_(dns == ("127.0.0.1", 5678))
         self.peer1.dialback_connhand.send(dns,msg,self.send_opened_send_callback)
         self.got = True
 
     def send_opened_send_callback(self,exc,dns):
-        print >> sys.stderr,"test: send_opened_send_callback"
+        print >> sys.stderr,time.asctime(),'-', "test: send_opened_send_callback"
         self.assert_(exc is None)
         self.assert_(dns == ("127.0.0.1", 5678))
         self.got2 = True
@@ -275,7 +276,7 @@ class TestReturnConnHandler(unittest.TestCase):
     # close() a non-existing to peer2
     #
     def singtest_close_unopened(self):
-        print >> sys.stderr,"test: test_close_unopened"
+        print >> sys.stderr,time.asctime(),'-', "test: test_close_unopened"
         hisdns = ("127.0.0.1", 5678)
         self.peer1.dialback_connhand.close(hisdns)
         sleep(2) # let rawserver thread close connection, which should succeed
@@ -286,7 +287,7 @@ class TestReturnConnHandler(unittest.TestCase):
     # close() an open connection to peer2
     #
     def singtest_close_opened(self):
-        print >> sys.stderr,"test: test_close_opened"
+        print >> sys.stderr,time.asctime(),'-', "test: test_close_opened"
         hisdns = ("127.0.0.1", 5678)
         self.peer1.dialback_connhand.connect_dns(hisdns,self.connect_dns_to_live_peer_callback)
         sleep(2) # let rawserver thread establish connection, which should succeed
@@ -302,7 +303,7 @@ class TestReturnConnHandler(unittest.TestCase):
     # Let peer2 register an receive callback and let peer1 send a message
     #
     def singtest_receive(self):
-        print >> sys.stderr,"test: test_receive"
+        print >> sys.stderr,time.asctime(),'-', "test: test_receive"
         self.wanted = True
         self.wanted2 = True
         # register handler for messages
@@ -313,20 +314,20 @@ class TestReturnConnHandler(unittest.TestCase):
         self.peer1.dialback_connhand.connect_dns(hisdns,lambda e,d: self.receive_connect_callback(e,d,msg))
 
     def receive_connect_callback(self,exc,dns,msg):
-        print >> sys.stderr,"test: receive_connect_callback"
+        print >> sys.stderr,time.asctime(),'-', "test: receive_connect_callback"
         self.assert_(exc is None)
         self.assert_(dns == ("127.0.0.1", 5678))
         self.peer1.dialback_connhand.send(dns,msg,self.receive_send_callback)
-        print >> sys.stderr,"test: test_receive exiting"
+        print >> sys.stderr,time.asctime(),'-', "test: test_receive exiting"
 
     def receive_send_callback(self,exc,dns):
-        print >> sys.stderr,"test: receive_send_callback"
+        print >> sys.stderr,time.asctime(),'-', "test: receive_send_callback"
         self.assert_(exc is None)
         self.assert_(dns == ("127.0.0.1", 5678))
         self.got2 = True
 
     def receive_msg_callback(self,dns,message):
-        print  >> sys.stderr,"test: testcase succesfully received message"
+        print  >> sys.stderr,time.asctime(),'-', "test: testcase succesfully received message"
         self.got = True
         self.assert_(message[0] == DIALBACK_REQUEST)
         self.assert_(dns == ("127.0.0.1", 1234))
@@ -337,7 +338,7 @@ class TestReturnConnHandler(unittest.TestCase):
     # which implies setting up a connection
     #
     def singtest_got_conn_incoming(self):
-        print >> sys.stderr,"test: test_got_conn_incoming"
+        print >> sys.stderr,time.asctime(),'-', "test: test_got_conn_incoming"
         self.wanted = True
         self.wanted2 = True
         # register handler for messages
@@ -352,14 +353,14 @@ class TestReturnConnHandler(unittest.TestCase):
 
 
     def got_conn_incoming_connect_callback(self,exc,dns,msg):
-        print >> sys.stderr,"test: got_conn_incoming_connect_callback",exc
+        print >> sys.stderr,time.asctime(),'-', "test: got_conn_incoming_connect_callback",exc
         self.assert_(exc is None)
         self.assert_(dns == ("127.0.0.1", 5678))
         self.peer1.dialback_connhand.send(dns,msg,self.receive_send_callback)
-        print >> sys.stderr,"test: test_got_conn_incoming exiting"
+        print >> sys.stderr,time.asctime(),'-', "test: test_got_conn_incoming exiting"
 
     def got_conn_incoming_conns_callback(self,exc,dns,locally_initiated):
-        print  >> sys.stderr,"test: got_conn_incoming_conns_callback",dns
+        print  >> sys.stderr,time.asctime(),'-', "test: got_conn_incoming_conns_callback",dns
         self.assert_(exc is None)
         self.assert_(dns == ("127.0.0.1", 1234))
         self.assert_(not locally_initiated)
@@ -371,7 +372,7 @@ class TestReturnConnHandler(unittest.TestCase):
     # which implies setting up a connection
     #
     def singtest_got_conn_outgoing(self):
-        print >> sys.stderr,"test: test_got_conn_outgoing"
+        print >> sys.stderr,time.asctime(),'-', "test: test_got_conn_outgoing"
         self.wanted = True
         self.wanted2 = True
         # register handler for connections
@@ -383,13 +384,13 @@ class TestReturnConnHandler(unittest.TestCase):
 
 
     def got_conn_outgoing_connect_callback(self,exc,dns,msg):
-        print >> sys.stderr,"test: got_conn_outgoing_connect_callback",exc
+        print >> sys.stderr,time.asctime(),'-', "test: got_conn_outgoing_connect_callback",exc
         self.assert_(exc is None)
         self.assert_(dns == ("127.0.0.1", 5678))
         self.got2 = True
 
     def got_conn_outgoing_conns_callback(self,exc,dns,locally_initiated):
-        print  >> sys.stderr,"test: got_conn_outgoing_conns_callback",exc,dns
+        print  >> sys.stderr,time.asctime(),'-', "test: got_conn_outgoing_conns_callback",exc,dns
         self.assert_(exc is None)
         self.assert_(dns == ("127.0.0.1", 5678))
         self.assert_(locally_initiated)
@@ -402,7 +403,7 @@ class TestReturnConnHandler(unittest.TestCase):
     # after succesful setup.
     #
     def singtest_got_conn_local_close(self):
-        print >> sys.stderr,"test: test_got_conn_local_close"
+        print >> sys.stderr,time.asctime(),'-', "test: test_got_conn_local_close"
 
         self.wanted = True
         self.wanted2 = True
@@ -422,7 +423,7 @@ class TestReturnConnHandler(unittest.TestCase):
 
 
     def got_conn_local_close_conns_callback(self,exc,dns,locally_initiated):
-        print  >> sys.stderr,"test: got_conn_local_close_conns_callback",exc,dns
+        print  >> sys.stderr,time.asctime(),'-', "test: got_conn_local_close_conns_callback",exc,dns
         if self.first:
             self.assert_(exc is None)
             self.assert_(dns == ("127.0.0.1", 1234))
@@ -440,7 +441,7 @@ class TestReturnConnHandler(unittest.TestCase):
     # after succesful setup.
     #
     def singtest_got_conn_remote_close(self):
-        print >> sys.stderr,"test: test_got_conn_remote_close"
+        print >> sys.stderr,time.asctime(),'-', "test: test_got_conn_remote_close"
 
         self.wanted = True
         self.wanted2 = True
@@ -456,7 +457,7 @@ class TestReturnConnHandler(unittest.TestCase):
 
 
     def got_conn_remote_close_conns_callback(self,exc,dns,locally_initiated):
-        print  >> sys.stderr,"test: got_conn_remote_close_conns_callback",exc,dns
+        print  >> sys.stderr,time.asctime(),'-', "test: got_conn_remote_close_conns_callback",exc,dns
         if self.first:
             self.assert_(exc is None)
             self.assert_(dns == ("127.0.0.1", 1234))

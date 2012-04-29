@@ -1,3 +1,4 @@
+import time 
 # Written by Arno Bakker
 # see LICENSE.txt for license information
 #
@@ -86,13 +87,13 @@ class OverlayThreadingBridge:
         """ Called by NetworkThread """
         # called by SecureOverlay.got_auth_connection() or cleanup_admin_and_callbacks()
         if DEBUG:
-            print >>sys.stderr,"olbridge: handleConnection",exc,show_permid_short(permid),selversion,locally_initiated,hisdns,currentThread().getName()
+            print >>sys.stderr,time.asctime(),'-', "olbridge: handleConnection",exc,show_permid_short(permid),selversion,locally_initiated,hisdns,currentThread().getName()
         
         def olbridge_handle_conn_func():
             # Called by OverlayThread
 
             if DEBUG:
-                print >>sys.stderr,"olbridge: handle_conn_func",exc,show_permid_short(permid),selversion,locally_initiated,hisdns,currentThread().getName()
+                print >>sys.stderr,time.asctime(),'-', "olbridge: handle_conn_func",exc,show_permid_short(permid),selversion,locally_initiated,hisdns,currentThread().getName()
              
             try:
                 if hisdns:
@@ -112,13 +113,13 @@ class OverlayThreadingBridge:
         """ Called by NetworkThread """
         
         if DEBUG:
-            print >>sys.stderr,"olbridge: handleMessage",show_permid_short(permid),selversion,getMessageName(message[0]),currentThread().getName()
+            print >>sys.stderr,time.asctime(),'-', "olbridge: handleMessage",show_permid_short(permid),selversion,getMessageName(message[0]),currentThread().getName()
         
         def olbridge_handle_msg_func():
             # Called by OverlayThread
             
             if DEBUG:
-                print >>sys.stderr,"olbridge: handle_msg_func",show_permid_short(permid),selversion,getMessageName(message[0]),currentThread().getName()
+                print >>sys.stderr,time.asctime(),'-', "olbridge: handle_msg_func",show_permid_short(permid),selversion,getMessageName(message[0]),currentThread().getName()
              
             try:
                 if self.olappsmsghandler is None:
@@ -139,13 +140,13 @@ class OverlayThreadingBridge:
         """ Called by OverlayThread/NetworkThread """
         
         if DEBUG:
-            print >>sys.stderr,"olbridge: connect_dns",dns
+            print >>sys.stderr,time.asctime(),'-', "olbridge: connect_dns",dns
         
         def olbridge_connect_dns_callback(cexc,cdns,cpermid,cselver):
             # Called by network thread
 
             if DEBUG:
-                print >>sys.stderr,"olbridge: connect_dns_callback",cexc,cdns,show_permid_short(cpermid),cselver
+                print >>sys.stderr,time.asctime(),'-', "olbridge: connect_dns_callback",cexc,cdns,show_permid_short(cpermid),cselver
              
             olbridge_connect_dns_callback_lambda = lambda:callback(cexc,cdns,cpermid,cselver)
             self.add_task(olbridge_connect_dns_callback_lambda,0)
@@ -157,13 +158,13 @@ class OverlayThreadingBridge:
         """ Called by OverlayThread """
 
         if DEBUG:
-            print >>sys.stderr,"olbridge: connect",show_permid_short(permid), currentThread().getName()
+            print >>sys.stderr,time.asctime(),'-', "olbridge: connect",show_permid_short(permid), currentThread().getName()
         
         def olbridge_connect_callback(cexc,cdns,cpermid,cselver):
             # Called by network thread
             
             if DEBUG:
-                print >>sys.stderr,"olbridge: connect_callback",cexc,cdns,show_permid_short(cpermid),cselver, callback, currentThread().getName()
+                print >>sys.stderr,time.asctime(),'-', "olbridge: connect_callback",cexc,cdns,show_permid_short(cpermid),cselver, callback, currentThread().getName()
 
              
             olbridge_connect_callback_lambda = lambda:callback(cexc,cdns,cpermid,cselver)
@@ -178,13 +179,13 @@ class OverlayThreadingBridge:
         """ Called by OverlayThread """
 
         if DEBUG:
-            print >>sys.stderr,"olbridge: send",show_permid_short(permid),len(msg)
+            print >>sys.stderr,time.asctime(),'-', "olbridge: send",show_permid_short(permid),len(msg)
 
         def olbridge_send_callback(cexc,cpermid):
             # Called by network thread
             
             if DEBUG:
-                print >>sys.stderr,"olbridge: send_callback",cexc,show_permid_short(cpermid)
+                print >>sys.stderr,time.asctime(),'-', "olbridge: send_callback",cexc,show_permid_short(cpermid)
 
              
             olbridge_send_callback_lambda = lambda:callback(cexc,cpermid)

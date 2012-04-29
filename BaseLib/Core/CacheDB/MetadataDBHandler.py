@@ -1,3 +1,4 @@
+import time 
 # Written by Andrea Reale
 # see LICENSE.txt for license information
 
@@ -248,12 +249,12 @@ class MetadataDBHandler (object, BasicDBHandler):
             # them 'till a countrary proof! (Ask Nitin) 
             # BasicDBHandler.__init__(self,db,METADATA_TABLE)
             # BasicDBHandler.__init__(self,db,SUBTITLES_TABLE)
-            print >> sys.stderr, "Metadata: DB made" 
+            print >> sys.stderr, time.asctime(),'-', "Metadata: DB made" 
         except: 
-            print >> sys.stderr, "Metadata: couldn't make the tables"
+            print >> sys.stderr, time.asctime(),'-', "Metadata: couldn't make the tables"
         
         
-        print >> sys.stderr, "Metadata DB Handler initialized"
+        print >> sys.stderr, time.asctime(),'-', "Metadata DB Handler initialized"
         
     def commit(self):
         self._db.commit()
@@ -564,7 +565,7 @@ class MetadataDBHandler (object, BasicDBHandler):
                                    True) 
             
             if DEBUG:
-                print >> sys.stderr, "Performing query on db: " + query
+                print >> sys.stderr, time.asctime(),'-', "Performing query on db: " + query
             
             newRows = self._db.fetchall(select_query,
                                 (infohash, channel))
@@ -693,7 +694,7 @@ class MetadataDBHandler (object, BasicDBHandler):
             raise MetadataDBException("Metadata DB constraint violated")
         elif len(res) == 0 :
             if DEBUG:
-                print >> sys.stderr, "Nothing to update for channel %s, infohash %s, lang"\
+                print >> sys.stderr, time.asctime(),'-', "Nothing to update for channel %s, infohash %s, lang"\
                         " %s. Doing nothing." % (channel[-10:],\
                                                  infohash, lang)
             return False
@@ -769,7 +770,7 @@ class MetadataDBHandler (object, BasicDBHandler):
         query = QUERIES["SELECT METADATA"]
         
         if DEBUG:
-            print >> sys.stderr, "Performing query on db: " + query
+            print >> sys.stderr, time.asctime(),'-', "Performing query on db: " + query
         
         res = self._db.fetchall(query, (infohash, channel))
         

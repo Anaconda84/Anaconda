@@ -1,3 +1,4 @@
+import time 
 # Written by Arno Bakker 
 # see LICENSE.txt for license information
 #
@@ -31,7 +32,7 @@ def get_usage(defs):
 if __name__ == "__main__":
 
     config, fileargs = parseargs.parseargs(sys.argv, argsdef, presets = {})
-    print >>sys.stderr,"config is",config
+    print >>sys.stderr,time.asctime(),'-', "config is",config
     
     if config['source'] == '':
         print "Usage:  ",get_usage(argsdef)

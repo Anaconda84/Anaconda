@@ -1,3 +1,4 @@
+import time 
 # Written by Fabian van der Werf and Arno Bakker
 # see LICENSE.txt for license information
 
@@ -48,9 +49,9 @@ class DelayTimer(wx.Timer):
     def Notify(self):
         if self.embedplay.GetState() != MEDIASTATE_PLAYING:
             if DEBUG:
-                print >>sys.stderr,"embedplay: VLC has stopped playing previous video, starting it on new"
+                print >>sys.stderr,time.asctime(),'-', "embedplay: VLC has stopped playing previous video, starting it on new"
             self.Stop()
             self.embedplay.Play()
         elif DEBUG:
-            print >>sys.stderr,"embedplay: VLC is still playing old video"
+            print >>sys.stderr,time.asctime(),'-', "embedplay: VLC is still playing old video"
 

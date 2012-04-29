@@ -1,3 +1,4 @@
+import time 
 # Written by Njaal Borch
 # see LICENSE.txt for license information
 
@@ -29,27 +30,27 @@ class MyLogger:
     
     def debug(self, message):
         if self.enabled:
-            print >> sys.stderr, "pdisc: DEBUG:", message
+            print >> sys.stderr, time.asctime(),'-', "pdisc: DEBUG:", message
     
     def info(self, message):
         if self.enabled:
-            print >> sys.stderr, "pdisc: INFO:", message
+            print >> sys.stderr, time.asctime(),'-', "pdisc: INFO:", message
 
     def warning(self, message):
         if self.enabled:
-            print >> sys.stderr, "pdisc: WARNING:", message
+            print >> sys.stderr, time.asctime(),'-', "pdisc: WARNING:", message
 
     def error(self, message):
         if self.enabled:
-            print >> sys.stderr, "pdisc: ERROR:", message
+            print >> sys.stderr, time.asctime(),'-', "pdisc: ERROR:", message
 
     def fatal(self, message):
         if self.enabled:
-            print >> sys.stderr, "pdisc: FATAL:", message
+            print >> sys.stderr, time.asctime(),'-', "pdisc: FATAL:", message
 
     def exception(self, message):
         if self.enabled:
-            print >> sys.stderr, "pdisc: EXCEPTION:", message
+            print >> sys.stderr, time.asctime(),'-', "pdisc: EXCEPTION:", message
             import traceback
             traceback.print_exc()
             
@@ -556,13 +557,13 @@ class Multicast:
                 self.log.debug("Adding peer at %s to database"%addr[0])
                 self.add_peer_to_db(permid, (addr[0], port), selversion)
             except Exception,e:
-                print >> sys.stderr, "pdisc: Could not add node:",e
+                print >> sys.stderr, time.asctime(),'-', "pdisc: Could not add node:",e
 
             try:
                 self.flag_peer_as_local_to_db(permid, True)
                 self.log.debug("node flagged as local")
             except Exception,e:
-                print >> sys.stderr, "pdisc: Could not flag node as local:",e
+                print >> sys.stderr, time.asctime(),'-', "pdisc: Could not flag node as local:",e
 
             # Now trigger a buddycast exchange
             bc_core = BuddyCastFactory.getInstance().buddycast_core
@@ -672,7 +673,7 @@ class Multicast:
         """
         peer = self.peer_db.getPeer(permid, ('is_local',))
         
-        print >>sys.stderr,"pdisc: flag_peer_as_local returns",peer
+        print >>sys.stderr,time.asctime(),'-', "pdisc: flag_peer_as_local returns",peer
         
         if not peer is None:
             # Arno, 2010-02-09: Somehow return value is not std.
@@ -687,6 +688,6 @@ class Multicast:
             
         # if is_local:
         #     pass
-            ##print >>sys.stderr,"pdisc: Flagging a peer as local"
+            ##print >>sys.stderr,time.asctime(),'-', "pdisc: Flagging a peer as local"
         # return self.peer_db.setPeerLocalFlag(permid, is_local)
 

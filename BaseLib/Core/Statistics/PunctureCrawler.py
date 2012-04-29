@@ -1,3 +1,4 @@
+import time 
 # Written by Gertjan Halkes
 # see LICENSE.txt for license information
 
@@ -46,7 +47,7 @@ class SimpleFileReporter:
                 self.file.flush()
             except:
                 if DEBUG:
-                    print >>sys.stderr, 'Error writing puncture log'
+                    print >>sys.stderr, time.asctime(),'-', 'Error writing puncture log'
         finally:
             SimpleFileReporter.lock.release()
 
@@ -84,7 +85,7 @@ class PunctureCrawler:
         call in the query_initiator method.
         """
         if not exc:
-            if DEBUG: print >>sys.stderr, "puncturecrawler: request sent to", show_permid_short(permid)
+            if DEBUG: print >>sys.stderr, time.asctime(),'-', "puncturecrawler: request sent to", show_permid_short(permid)
             self._file.write("REQUEST %s %.2f\n" % (show_permid(permid), time.time()))
             self._file.flush()
 
@@ -98,7 +99,7 @@ class PunctureCrawler:
         @param reply_callback Call this function once to send the reply: reply_callback(payload [, error=123])
         """
         if DEBUG:
-            print >> sys.stderr, "puncturecrawler: handle_crawler_request", show_permid_short(permid), message
+            print >> sys.stderr, time.asctime(),'-', "puncturecrawler: handle_crawler_request", show_permid_short(permid), message
 
         SimpleFileReporter.lock.acquire()
         try:
@@ -139,14 +140,14 @@ class PunctureCrawler:
         try:
             if error:
                 if DEBUG:
-                    print >> sys.stderr, "puncturecrawler: handle_crawler_reply", error, message
+                    print >> sys.stderr, time.asctime(),'-', "puncturecrawler: handle_crawler_reply", error, message
 
                 self._file.write("ERROR %s %.2f %d %s\n" % (show_permid(permid), time.time(), error, message))
                 self._file.flush()
 
             else:
                 if DEBUG:
-                    print >> sys.stderr, "puncturecrawler: handle_crawler_reply", show_permid_short(permid)
+                    print >> sys.stderr, time.asctime(),'-', "puncturecrawler: handle_crawler_reply", show_permid_short(permid)
 
                 # 25/05/10 Boudewijn: We found that, for unknown
                 # reasons, the decompressed(message) contains many
@@ -162,4 +163,4 @@ class PunctureCrawler:
                 self._file.flush()
         except:
             if DEBUG:
-                print >>sys.stderr, "puncturecrawler: error writing to file"
+                print >>sys.stderr, time.asctime(),'-', "puncturecrawler: error writing to file"

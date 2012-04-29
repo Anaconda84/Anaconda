@@ -1,3 +1,4 @@
+import time 
 # Written by Jie Yang
 # see LICENSE.txt for license information
 
@@ -112,7 +113,7 @@ class SuperPeerDBHandler(BasicDBHandler):
             filepath = os.path.abspath(filename)
             file = open(filepath, "r")
         except IOError:
-            print >> sys.stderr, "superpeer: cannot open superpeer file", filepath
+            print >> sys.stderr, time.asctime(),'-', "superpeer: cannot open superpeer file", filepath
             return []
             
         superpeers = file.readlines()
@@ -151,7 +152,7 @@ class SuperPeerDBHandler(BasicDBHandler):
             validPermid(superpeer_info[2])
         except Exception:
             if DEBUG:
-                print >>sys.stderr,"superpeer: Parse error reading",superpeer_info
+                print >>sys.stderr,time.asctime(),'-', "superpeer: Parse error reading",superpeer_info
                 print_exc(file=sys.stderr)
             return False
         else:
@@ -288,7 +289,7 @@ class PeerDBHandler(BasicDBHandler):
             
             count += 1
             if count % 1000 == 0:
-                print >>sys.stderr,"peerdb: Read items",count,currentThread().getName() 
+                print >>sys.stderr,time.asctime(),'-', "peerdb: Read items",count,currentThread().getName() 
         
         return peers
         
@@ -529,7 +530,7 @@ class TorrentDBHandler(BasicDBHandler):
         try:
             os.remove(src)
         except Exception, msg:
-            print >> sys.stderr, "cachedbhandler: failed to erase torrent", src, Exception, msg
+            print >> sys.stderr, time.asctime(),'-', "cachedbhandler: failed to erase torrent", src, Exception, msg
             return False
         
         return True
@@ -607,7 +608,7 @@ class TorrentDBHandler(BasicDBHandler):
                 break #database not available any more
             if not type(p) == dict or not p.get('torrent_name', None) or not p.get('info', None):
                 deleted = self.deleteTorrent(torrent)     # remove infohashes without torrent
-                print >> sys.stderr, "TorrentDBHandler: deleted empty torrent", deleted, p.get('torrent_name', None), p.get('info', None)
+                print >> sys.stderr, time.asctime(),'-', "TorrentDBHandler: deleted empty torrent", deleted, p.get('torrent_name', None), p.get('info', None)
             
 #            if torrent not in mypref_set:
 #                live = p.get('status', 'unknown')
@@ -629,7 +630,7 @@ class TorrentDBHandler(BasicDBHandler):
             
             count += 1
             if count % 1000 == 0:
-                print >>sys.stderr,"torrentdb: Read items",count,currentThread().getName()
+                print >>sys.stderr,time.asctime(),'-', "torrentdb: Read items",count,currentThread().getName()
                 if countcallback is not None:
                     countcallback(count)
             
@@ -638,7 +639,7 @@ class TorrentDBHandler(BasicDBHandler):
         
 #        from traceback import print_stack
 #        print_stack()
-#        print >> sys.stderr, '[StartUpDebug]----------- from getRecommendedTorrents ----------', time()-start_time, currentThread().getName(), '\n\n'
+#        print >> sys.stderr, time.asctime(),'-', '[StartUpDebug]----------- from getRecommendedTorrents ----------', time()-start_time, currentThread().getName(), '\n\n'
         
 #        self.torrent_db.num_metadatalive = num_live_torrents
         #print 'Returning %d torrents' % len(torrents)
@@ -907,7 +908,7 @@ class OwnerDBHandler(BasicDBHandler):
                 break
             value = self.torrent_db._get(torrent)
             if not value:    # sth. is wrong
-                print >> sys.stderr, "cachedbhandler: getSimItems meets error in getting data"
+                print >> sys.stderr, time.asctime(),'-', "cachedbhandler: getSimItems meets error in getting data"
                 break
             info = value.get('info', {})
             name = info.get('name', None)

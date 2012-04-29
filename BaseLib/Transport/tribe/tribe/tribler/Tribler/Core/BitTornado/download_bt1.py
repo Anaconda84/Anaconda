@@ -1,3 +1,4 @@
+import time 
 # Written by Bram Cohen and Pawel Garbacki
 # see LICENSE.txt for license information
 
@@ -120,7 +121,7 @@ class BT1Download:
             
             if self.config['download_help']:
                 if DEBUG:
-                    print >>sys.stderr,"BT1Download: coopdl_role is",self.config['coopdl_role'],`self.config['coopdl_coordinator_permid']`
+                    print >>sys.stderr,time.asctime(),'-', "BT1Download: coopdl_role is",self.config['coopdl_role'],`self.config['coopdl_coordinator_permid']`
                 
                 if self.config['coopdl_role'] == COOPDL_ROLE_COORDINATOR:
                     from Tribler.Core.CoopDownload.Coordinator import Coordinator
@@ -159,13 +160,13 @@ class BT1Download:
                              config['rarest_first_priority_cutoff'], helper = self.helper)
         except:
             print_exc()
-            print >> sys.stderr,"BT1Download: EXCEPTION in __init__ :'" + str(sys.exc_info()) + "' '"
+            print >> sys.stderr,time.asctime(),'-', "BT1Download: EXCEPTION in __init__ :'" + str(sys.exc_info()) + "' '"
 # _2fastbt
 
         self.choker = Choker(config, rawserver.add_task, 
                              self.picker, self.finflag.isSet)
 
-        #print >>sys.stderr,"download_bt1.BT1Download: play_video is",self.play_video
+        #print >>sys.stderr,time.asctime(),'-', "download_bt1.BT1Download: play_video is",self.play_video
 
     def set_videoinfo(self,videoinfo,videostatus):
         self.videoinfo = videoinfo
@@ -252,7 +253,7 @@ class BT1Download:
         self.datalength = file_length
         
         if DEBUG:
-            print >>sys.stderr,"BT1Download: saveas returning ",`file`,"self.files is",`self.files`
+            print >>sys.stderr,time.asctime(),'-', "BT1Download: saveas returning ",`file`,"self.files is",`self.files`
                 
         return file
 
@@ -392,7 +393,7 @@ class BT1Download:
     def startEngine(self, ratelimiter = None, vodeventfunc = None):
         
         if DEBUG:
-            print >>sys.stderr,"BT1Download: startEngine",`self.info['name']`
+            print >>sys.stderr,time.asctime(),'-', "BT1Download: startEngine",`self.info['name']`
         
         if self.doneflag.isSet():
             return
@@ -478,7 +479,7 @@ class BT1Download:
         elif self.play_video:
             if self.picker.am_I_complete():
                 if DEBUG:
-                    print >>sys.stderr,"BT1Download: startEngine: VOD requested, but file complete on disk",self.videoinfo
+                    print >>sys.stderr,time.asctime(),'-', "BT1Download: startEngine: VOD requested, but file complete on disk",self.videoinfo
                 vodeventfunc( self.videoinfo, VODEVENT_START, {
                     "complete":  True,
                     "filename":  self.videoinfo["outpath"],
@@ -488,24 +489,24 @@ class BT1Download:
                 } )
             else:
                 if DEBUG:
-                    print >>sys.stderr,"BT1Download: startEngine: Going into VOD mode",self.videoinfo
+                    print >>sys.stderr,time.asctime(),'-', "BT1Download: startEngine: Going into VOD mode",self.videoinfo
 
                 self.voddownload = MovieOnDemandTransporter(self,self.videostatus,self.videoinfo,self.videoanalyserpath,vodeventfunc)
         elif DEBUG:
-            print >>sys.stderr,"BT1Download: startEngine: Going into standard mode"
+            print >>sys.stderr,time.asctime(),'-', "BT1Download: startEngine: Going into standard mode"
 
         if self.am_video_source:
             from Tribler.Core.Video.VideoSource import VideoSourceTransporter,RateLimitedVideoSourceTransporter
 
             if DEBUG:
-                print >>sys.stderr,"BT1Download: startEngine: Acting as VideoSource"
+                print >>sys.stderr,time.asctime(),'-', "BT1Download: startEngine: Acting as VideoSource"
             if self.config['video_ratelimit']:
                 self.videosourcetransporter = RateLimitedVideoSourceTransporter(self.config['video_ratelimit'],self.config['video_source'],self,self.config['video_source_authconfig'])
             else:
                 self.videosourcetransporter = VideoSourceTransporter(self.config['video_source'],self,self.config['video_source_authconfig'])
             self.videosourcetransporter.start()
         elif DEBUG:
-            print >>sys.stderr,"BT1Download: startEngine: Not a VideoSource"
+            print >>sys.stderr,time.asctime(),'-', "BT1Download: startEngine: Not a VideoSource"
             
         if not self.doneflag.isSet():
             self.started = True
@@ -625,7 +626,7 @@ class BT1Download:
         try:
             def s(self = self, rate = rate):
                 if DEBUG:
-                    print >>sys.stderr,"BT1Download: set max upload to",rate
+                    print >>sys.stderr,time.asctime(),'-', "BT1Download: set max upload to",rate
                 self.config['max_upload_rate'] = rate
                 self.ratelimiter.set_upload_rate(rate)
             if networkcalling:

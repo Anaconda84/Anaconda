@@ -1,3 +1,4 @@
+import time 
 # Written by Bram Cohen
 # see LICENSE.txt for license information
 
@@ -159,7 +160,7 @@ class HTTPHandler:
             responsecode, length, referrer, useragent):
         year, month, day, hour, minute, second, a, b, c = time.localtime(time.time())
         if DEBUG:
-            print >>sys.stderr,'HTTPHandler: %s %s %s [%02d/%3s/%04d:%02d:%02d:%02d] "%s" %i %i "%s" "%s"' % (
+            print >>sys.stderr,time.asctime(),'-', 'HTTPHandler: %s %s %s [%02d/%3s/%04d:%02d:%02d:%02d] "%s" %i %i "%s" "%s"' % (
                 ip, ident, username, day, months[month], year, hour,
                 minute, second, header, responsecode, length, referrer, useragent)
         t = clock()
@@ -173,7 +174,7 @@ class DummyHTTPHandler:
         pass
 
     def external_connection_made(self, connection):
-        print >> sys.stderr,"DummyHTTPHandler: ext_conn_made"
+        print >> sys.stderr,time.asctime(),'-', "DummyHTTPHandler: ext_conn_made"
         reply = 'HTTP/1.1 404 Not Found\r\nContent-Type: text/plain\r\n\r\nTribler Internal Tracker not activated.\r\n'
         connection.write(reply)
         connection.close()
@@ -185,7 +186,7 @@ class DummyHTTPHandler:
         pass
 
     def data_came_in(self, connection, data):
-        print >> sys.stderr,"DummyHTTPHandler: data_came_in",len(data)
+        print >> sys.stderr,time.asctime(),'-', "DummyHTTPHandler: data_came_in",len(data)
         pass
 
     def log(self, ip, ident, username, header,

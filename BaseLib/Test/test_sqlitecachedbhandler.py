@@ -1,3 +1,4 @@
+import time 
 import os
 import sys
 import unittest
@@ -13,7 +14,7 @@ from bak_tribler_sdb import *
 CREATE_SQL_FILE = os.path.join('..',"schema_sdb_v"+str(CURRENT_MAIN_DB_VERSION)+".sql")
 
 import BaseLib.Core.CacheDB.sqlitecachedb
-print >>sys.stderr,"TEST: ENABLE DBUPGRADE HACK"
+print >>sys.stderr,time.asctime(),'-', "TEST: ENABLE DBUPGRADE HACK"
 BaseLib.Core.CacheDB.sqlitecachedb.TEST_SQLITECACHEDB_UPGRADE = True
 
 
@@ -334,8 +335,8 @@ class TestSqlitePeerDBHandler(unittest.TestCase):
         sp2 = db.getPeer(self.sp2)
         assert isinstance(sp1, dict)
         assert isinstance(sp2, dict)
-        print >>sys.stderr,"singtest_GETLIST SP1",`sp1`
-        print >>sys.stderr,"singtest_GETLIST SP1",`sp2`
+        print >>sys.stderr,time.asctime(),'-', "singtest_GETLIST SP1",`sp1`
+        print >>sys.stderr,time.asctime(),'-', "singtest_GETLIST SP1",`sp2`
         assert sp1['port'] == 628
         assert sp2['port'] == 3287
 

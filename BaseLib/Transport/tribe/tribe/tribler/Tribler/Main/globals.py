@@ -1,3 +1,4 @@
+import time 
 # Written by Arno Bakker 
 # see LICENSE.txt for license information
 
@@ -34,7 +35,7 @@ class DefaultDownloadStartupConfig(DownloadStartupConfig):
         if oldver != DLDEFAULTS_VERSION:
             for key in dldefaults.keys():
                 if key not in self.dlconfig:
-                    print >>sys.stderr,"DefaultDownloadStartupConfig: Adding field",key
+                    print >>sys.stderr,time.asctime(),'-', "DefaultDownloadStartupConfig: Adding field",key
                     self.dlconfig[key] = dldefaults[key]
             self.dlconfig['version'] = DLDEFAULTS_VERSION
 

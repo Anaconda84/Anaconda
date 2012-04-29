@@ -1,3 +1,4 @@
+import time 
 # Written by John Hoffman
 # see LICENSE.txt for license information
 
@@ -77,7 +78,7 @@ class SingleDownload(SingleDownloadHelperInterface):
         self.measure = Measure(downloader.max_rate_period)
         self.index = None
         # DIE
-        print >>sys.stderr, "DEBUG DIEGO : SingleDownload (HTTP), SeedURL: ", self.seedurl
+        print >>sys.stderr, time.asctime(),'-', "DEBUG DIEGO : SingleDownload (HTTP), SeedURL: ", self.seedurl
         self.pice_size = self.downloader.storage._piecelen( 0 )
         self.total_len = self.downloader.storage.total_length
         # DIE
@@ -167,7 +168,7 @@ class SingleDownload(SingleDownloadHelperInterface):
         self.received_data = None
         try:
             # DIE
-            #print >>sys.stderr, 'HTTP bytes %s/%d' % ( self.request_range, self.total_len )
+            #print >>sys.stderr, time.asctime(),'-', 'HTTP bytes %s/%d' % ( self.request_range, self.total_len )
             self.connection.request( 'GET',self.url, None,
                                 {'Host': self.netloc,
                                  'User-Agent': VERSION,
@@ -212,7 +213,7 @@ class SingleDownload(SingleDownloadHelperInterface):
 
     def _got_data(self):
         # DIE
-        #print >>sys.stderr, "DIEGO DEBUG : response status = ", self.connection_status
+        #print >>sys.stderr, time.asctime(),'-', "DIEGO DEBUG : response status = ", self.connection_status
         # DIE
         if self.connection_status == 503:   # seed is busy
             try:
@@ -329,7 +330,7 @@ class HTTPDownloader:
 
     def make_download(self, url):
         # DIE
-        print >>sys.stderr, "DIEGO DEBUG : make_download : URL = ", url
+        print >>sys.stderr, time.asctime(),'-', "DIEGO DEBUG : make_download : URL = ", url
         # DIE
         self.downloads.append(SingleDownload(self, url))
         return self.downloads[-1]

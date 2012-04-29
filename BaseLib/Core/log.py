@@ -1,3 +1,4 @@
+import time 
 import glob
 import logging
 import logging.handlers
@@ -40,14 +41,14 @@ class Log():
     def rotate(self):
         """  Rotate logs. """
         # Add timestamp
-        print >> sys.stderr,'\n---------\nLog closed on %s.\n---------\n' % time.asctime()
+        print >> sys.stderr,time.asctime(),'-', '\n---------\nLog closed on %s.\n---------\n' % time.asctime()
 	sys.stderr.flush()
 	sys.stderr.close()
         # Roll over on application start
         self.my_logger.handlers[0].doRollover()
 	sys.stderr = file( self.logfile, "a+" )
         # Add timestamp
-        print >> sys.stderr,'\n---------\nLog started on %s.\n---------\n' % time.asctime()
+        print >> sys.stderr,time.asctime(),'-', '\n---------\nLog started on %s.\n---------\n' % time.asctime()
 	sys.stderr.flush()
 
     def message(self, level, msg, *args):
@@ -72,6 +73,6 @@ class Log():
 
 if __name__ == '__main__':
     my_log = Log('logging_rotatingfile_example.out')
-    print >> sys.stderr,'Durak!!!!!!!!!!!';
+    print >> sys.stderr,time.asctime(),'-', 'Durak!!!!!!!!!!!';
     my_log.rotate()
-    print >> sys.stderr,'Idiot!!!!!!!!!!!';
+    print >> sys.stderr,time.asctime(),'-', 'Idiot!!!!!!!!!!!';

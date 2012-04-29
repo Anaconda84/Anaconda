@@ -1,3 +1,4 @@
+import time 
 # Written by Arno Bakker
 # see LICENSE.txt for license information
 
@@ -84,7 +85,7 @@ class UPnPThread(Thread):
                 if self.upnp_type != 3:
                     self.error_func(self.upnp_type,self.listen_port,2)
                 elif DEBUG:
-                    print >>sys.stderr,"upnp: thread: Initialization failed, but didn't report error because UPnP mode 3 is now enabled by default"
+                    print >>sys.stderr,time.asctime(),'-', "upnp: thread: Initialization failed, but didn't report error because UPnP mode 3 is now enabled by default"
 
         # Now that the firewall is hopefully open, activate other services
         # here. For Buddycast we don't have an explicit notification that it
@@ -94,7 +95,7 @@ class UPnPThread(Thread):
 
         if self.upnp_type > 0:
             if DEBUG:
-                print >>sys.stderr,"upnp: thread: Waiting till shutdown"
+                print >>sys.stderr,time.asctime(),'-', "upnp: thread: Waiting till shutdown"
             self.shutdownevent.wait()
             # Don't write to sys.stderr, that sometimes doesn't seem to exist
             # any more?! Python garbage collection funkiness of module sys import?

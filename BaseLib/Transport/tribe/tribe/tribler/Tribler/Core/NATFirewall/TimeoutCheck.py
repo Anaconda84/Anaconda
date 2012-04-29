@@ -1,3 +1,4 @@
+import time 
 # Written by Lucia D'Acunto
 # see LICENSE.txt for license information
 
@@ -25,7 +26,7 @@ def pingback(ping, pingbacksrvr):
     udpsock.connect(pingbacksrvr)
     udpsock.settimeout(ping+10)
     
-    if DEBUG: print >> sys.stderr, "TIMEOUTCHECK:", "-> ping"
+    if DEBUG: print >> sys.stderr, time.asctime(),'-', "TIMEOUTCHECK:", "-> ping"
 
     # Send the ping to the server specifying the delay of the reply
     pingMsg = (str("ping:"+str(ping)))
@@ -46,7 +47,7 @@ def pingback(ping, pingbacksrvr):
             if udpsock:
                 udpsock.close()
 
-            if DEBUG: print >> sys.stderr, "TIMEOUTCHECK:", "UDP connection to the pingback server has timed out for ping", ping
+            if DEBUG: print >> sys.stderr, time.asctime(),'-', "TIMEOUTCHECK:", "UDP connection to the pingback server has timed out for ping", ping
 
             lck.acquire()
             evnt.set()
@@ -54,15 +55,15 @@ def pingback(ping, pingbacksrvr):
             lck.release()
             break
 
-        if DEBUG: print >> sys.stderr, pingbacksrvr
-        if DEBUG: print >> sys.stderr, rcvaddr
+        if DEBUG: print >> sys.stderr, time.asctime(),'-', pingbacksrvr
+        if DEBUG: print >> sys.stderr, time.asctime(),'-', rcvaddr
 
         if reply:
             data = reply.split(':')
-            if DEBUG: print >> sys.stderr, data, "received from the pingback server"
+            if DEBUG: print >> sys.stderr, time.asctime(),'-', data, "received from the pingback server"
 
             if data[0] == "pong":
-                if DEBUG: print >> sys.stderr, "TIMEOUTCHECK:", "<-", data[0], "after", data[1], "seconds"
+                if DEBUG: print >> sys.stderr, time.asctime(),'-', "TIMEOUTCHECK:", "<-", data[0], "after", data[1], "seconds"
                 to = ping
                 if int(data[1])==145:
                     lck.acquire()
@@ -89,5 +90,5 @@ def GetTimeout(pingbacksrvr):
     global evnt
     evnt.wait()
 
-    if DEBUG: print >> sys.stderr, "TIMEOUTCHECK: timeout is", to
+    if DEBUG: print >> sys.stderr, time.asctime(),'-', "TIMEOUTCHECK: timeout is", to
     return to

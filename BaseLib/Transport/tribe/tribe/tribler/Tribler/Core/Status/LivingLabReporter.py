@@ -1,3 +1,4 @@
+import time 
 # Written by Njaal Borch
 # see LICENSE.txt for license information
 
@@ -100,7 +101,7 @@ class LivingLabPeriodicReporter(Status.PeriodicStatusReporter):
         
         # all done
         xml_printer = XmlPrinter.XmlPrinter(root)
-        print >>sys.stderr, xml_printer.to_pretty_xml()
+        print >>sys.stderr, time.asctime(),'-', xml_printer.to_pretty_xml()
         xml_str = xml_printer.to_xml()
 
         # Now we send this to the service using a HTTP POST
@@ -112,7 +113,7 @@ class LivingLabPeriodicReporter(Status.PeriodicStatusReporter):
         This is a bit on the messy side, but it does work
         """
 
-        #print >>sys.stderr, xml_str
+        #print >>sys.stderr, time.asctime(),'-', xml_str
         
         self.num_reports += 1
         
@@ -150,7 +151,7 @@ class LivingLabPeriodicReporter(Status.PeriodicStatusReporter):
                 except Exception,e:
                     pass
             else:
-                print >>sys.stderr, "Error posting but no error handler:", errcode, h.file.read()
+                print >>sys.stderr, time.asctime(),'-', "Error posting but no error handler:", errcode, h.file.read()
         
 
 if __name__ == "__main__":

@@ -1,3 +1,4 @@
+import time 
 # Written by Arno Bakker, Diego Rabioli
 # see LICENSE.txt for license information
 
@@ -103,10 +104,10 @@ class SearchPathMapper(AbstractPathMapper):
         fakeurl = 'http://127.0.0.1'+urlpath
         o = urlparse.urlparse(fakeurl)
         
-        print >>sys.stderr,"searchmap: Parsed",o
+        print >>sys.stderr,time.asctime(),'-', "searchmap: Parsed",o
         
         qdict = cgi.parse_qs(o.query)
-        print >>sys.stderr,"searchmap: qdict",qdict
+        print >>sys.stderr,time.asctime(),'-', "searchmap: qdict",qdict
         
         searchstr = qdict['q'][0]
         searchstr = searchstr.strip()
@@ -114,7 +115,7 @@ class SearchPathMapper(AbstractPathMapper):
         metafeedurl = qdict['metafeed'][0]
         
 
-        print >>sys.stderr,"searchmap: searchstr",`searchstr`
+        print >>sys.stderr,time.asctime(),'-', "searchmap: searchstr",`searchstr`
         
         # Garbage collect:
         self.id2hits.garbage_collect_timestamp_smaller(time.time() - HITS_TIMEOUT)
@@ -144,7 +145,7 @@ class SearchPathMapper(AbstractPathMapper):
         
         for hitentry in allhits:
             titleelement = hitentry.find('{http://www.w3.org/2005/Atom}title')
-            print >>sys.stderr,"bg: search: meta: Got hit",titleelement.text
+            print >>sys.stderr,time.asctime(),'-', "bg: search: meta: Got hit",titleelement.text
 
         
         id = str(random.random())[2:]
@@ -171,7 +172,7 @@ class SearchPathMapper(AbstractPathMapper):
         # Parallel:  initiate remote query
         q = P2PQUERYTYPE+' '+searchstr
         
-        print >>sys.stderr,"bg: search: p2p: Remote query for",q
+        print >>sys.stderr,time.asctime(),'-', "bg: search: p2p: Remote query for",q
         got_remote_hits_lambda = lambda permid,query,remotehits:self.sesscb_got_remote_hits(id,permid,query,remotehits)
         self.st = time.time()
         self.session.query_connected_peers(q,got_remote_hits_lambda,max_peers_to_query=20)
@@ -179,7 +180,7 @@ class SearchPathMapper(AbstractPathMapper):
         # Query local DB while waiting
         torrent_db = self.session.open_dbhandler(NTFY_TORRENTS)
         localdbhits = torrent_db.searchNames(keywords)
-        print >>sys.stderr,"bg: Local hits",len(localdbhits)
+        print >>sys.stderr,time.asctime(),'-', "bg: Local hits",len(localdbhits)
         self.session.close_dbhandler(torrent_db)
         
         # Convert list to dict keyed by infohash
@@ -205,7 +206,7 @@ class SearchPathMapper(AbstractPathMapper):
             
             et = time.time()
             diff = et - self.st
-            print >>sys.stderr,"bg: sesscb_got_remote_hits",len(remotehits),"after",diff
+            print >>sys.stderr,time.asctime(),'-', "bg: sesscb_got_remote_hits",len(remotehits),"after",diff
 
             hits = remotehits2hits(remotehits)
             self.id2hits.add_hits(id,hits)
@@ -223,7 +224,7 @@ class SearchPathMapper(AbstractPathMapper):
             self.metafp = MetaFeedParser(metafeedurl)
             try:
                 self.metafp.parse() # TODO: offload to separate thread?
-                print >>sys.stderr,"bg: search: meta: Found feeds",self.metafp.get_feedurls()
+                print >>sys.stderr,time.asctime(),'-', "bg: search: meta: Found feeds",self.metafp.get_feedurls()
                 self.metafeedurl = metafeedurl
             except:
                 print_exc()
@@ -268,7 +269,7 @@ class SearchPathMapper(AbstractPathMapper):
         filename = get_collected_torrent_filename(infohash)
         torrentpath = os.path.join(colldir, filename)
         
-        print >>sys.stderr,"bg: search: saving remotehit",torrentpath
+        print >>sys.stderr,time.asctime(),'-', "bg: search: saving remotehit",torrentpath
         tdef.save(torrentpath)
         return torrentpath
 
@@ -288,7 +289,7 @@ def remotehits2hits(remotehits):
     hits = {}
     for infohash,hit in remotehits.iteritems():
         
-        #print >>sys.stderr,"remotehit2hits: keys",hit.keys()
+        #print >>sys.stderr,time.asctime(),'-', "remotehit2hits: keys",hit.keys()
         
         remotehit = {}
         remotehit['hittype'] = "remote"
@@ -326,7 +327,7 @@ class Query2HitsMap:
         
     def add_query(self,id,searchstr,timestamp):
         if DEBUG:
-            print >>sys.stderr,"q2h: lock1",id
+            print >>sys.stderr,time.asctime(),'-', "q2h: lock1",id
         self.lock.acquire()
         try:
             qrec = self.d.get(id,{})
@@ -336,44 +337,44 @@ class Query2HitsMap:
             self.d[id] = qrec
         finally:
             if DEBUG:
-                print >>sys.stderr,"q2h: unlock1"
+                print >>sys.stderr,time.asctime(),'-', "q2h: unlock1"
             self.lock.release()
 
         
     def add_hits(self,id,hits):
         if DEBUG:
-            print >>sys.stderr,"q2h: lock2",id,len(hits)
+            print >>sys.stderr,time.asctime(),'-', "q2h: lock2",id,len(hits)
         self.lock.acquire()
         try:
             qrec = self.d[id]
             qrec['hitlist'].update(hits)
         finally:
             if DEBUG:
-                print >>sys.stderr,"q2h: unlock2"
+                print >>sys.stderr,time.asctime(),'-', "q2h: unlock2"
             self.lock.release()
             
     def get_hits(self,id):
         if DEBUG:
-            print >>sys.stderr,"q2h: lock3",id
+            print >>sys.stderr,time.asctime(),'-', "q2h: lock3",id
         self.lock.acquire()
         try:
             qrec = self.d[id]
             return copy.copy(qrec['hitlist']) # return shallow copy
         finally:
             if DEBUG:
-                print >>sys.stderr,"q2h: unlock3"
+                print >>sys.stderr,time.asctime(),'-', "q2h: unlock3"
             self.lock.release()
 
     def get_searchstr(self,id):
         if DEBUG:
-            print >>sys.stderr,"q2h: lock4"
+            print >>sys.stderr,time.asctime(),'-', "q2h: lock4"
         self.lock.acquire()
         try:
             qrec = self.d[id]
             return qrec['searchstr']
         finally:
             if DEBUG:
-                print >>sys.stderr,"q2h: unlock4"
+                print >>sys.stderr,time.asctime(),'-', "q2h: unlock4"
             self.lock.release()
 
     def garbage_collect_timestamp_smaller(self,timethres):
@@ -406,7 +407,7 @@ class Hits2AnyPathMapper(AbstractPathMapper):
         /hits/id/infohash.tstream/thumbnail -> Thumbnail
         """
         if DEBUG:
-            print >>sys.stderr,"hitsmap: Got",urlpath
+            print >>sys.stderr,time.asctime(),'-', "hitsmap: Got",urlpath
         
         if not urlpath.startswith(URLPATH_HITS_PREFIX):
             return streaminfo404()
@@ -422,19 +423,19 @@ class Hits2AnyPathMapper(AbstractPathMapper):
             hits = self.id2hits.get_hits(id)
 
             if DEBUG:
-                print >>sys.stderr,"hitsmap: Found",len(hits),"hits"
+                print >>sys.stderr,time.asctime(),'-', "hitsmap: Found",len(hits),"hits"
 
             
             atomhits = hits2atomhits(hits,urlpath)
 
             if DEBUG:
-                print >>sys.stderr,"hitsmap: Found",len(atomhits),"atomhits"
+                print >>sys.stderr,time.asctime(),'-', "hitsmap: Found",len(atomhits),"atomhits"
             
             
             atomxml = atomhits2atomxml(atomhits,searchstr,urlpath)
             
             #if DEBUG:
-            #    print >>sys.stderr,"hitsmap: atomstring is",`atomxml`
+            #    print >>sys.stderr,time.asctime(),'-', "hitsmap: atomstring is",`atomxml`
                 
             atomstream = StringIO(atomxml)
             atomstreaminfo = { 'statuscode':200,'mimetype': 'application/atom+xml', 'stream': atomstream, 'length': len(atomxml)}
@@ -444,7 +445,7 @@ class Hits2AnyPathMapper(AbstractPathMapper):
             # Either NS Metadata, Torrent file, or thumbnail
             urlinfohash = paths[3]
             
-            print >>sys.stderr,"hitsmap: path3 is",urlinfohash
+            print >>sys.stderr,time.asctime(),'-', "hitsmap: path3 is",urlinfohash
             
             if urlinfohash.endswith(URLPATH_TORRENT_POSTFIX):
                 # Torrent file, or thumbnail
@@ -457,7 +458,7 @@ class Hits2AnyPathMapper(AbstractPathMapper):
             
             # Check if hit:
             hits = self.id2hits.get_hits(id)
-            print >>sys.stderr,"hitsmap: meta: Found",len(hits),"hits"
+            print >>sys.stderr,time.asctime(),'-', "hitsmap: meta: Found",len(hits),"hits"
             
             hit = hits.get(infohash,None)
             if hit is not None:
@@ -477,7 +478,7 @@ class Hits2AnyPathMapper(AbstractPathMapper):
     def get_torrentstreaminfo(self,infohash,hit):
         
         if DEBUG:
-            print >>sys.stderr,"hitmap: get_torrentstreaminfo",infohash2urlpath(infohash)
+            print >>sys.stderr,time.asctime(),'-', "hitmap: get_torrentstreaminfo",infohash2urlpath(infohash)
         
         torrent_db = self.session.open_dbhandler(NTFY_TORRENTS)
         try:
@@ -507,7 +508,7 @@ class Hits2AnyPathMapper(AbstractPathMapper):
     def get_thumbstreaminfo(self,infohash,hit):
         
         if DEBUG:
-            print >>sys.stderr,"hitmap: get_thumbstreaminfo",infohash2urlpath(infohash)
+            print >>sys.stderr,time.asctime(),'-', "hitmap: get_thumbstreaminfo",infohash2urlpath(infohash)
         
         torrent_db = self.session.open_dbhandler(NTFY_TORRENTS)
         try:
@@ -526,7 +527,7 @@ class Hits2AnyPathMapper(AbstractPathMapper):
                     return streaminfo404()
                 else:
                     if DEBUG:
-                        print >>sys.stderr,"hitmap: get_thumbstreaminfo: looking for thumb in remote hit"
+                        print >>sys.stderr,time.asctime(),'-', "hitmap: get_thumbstreaminfo: looking for thumb in remote hit"
                     
                     metainfo = bdecode(hit['metadata'])
                     tdef = TorrentDef.load_from_dict(metainfo)
@@ -551,7 +552,7 @@ class Hits2AnyPathMapper(AbstractPathMapper):
         nsmetahit = hit2nsmetahit(hit,hiturlpathprefix,colltorrdir)
         
         if DEBUG:
-            print >>sys.stderr,"hitmap: get_nsmetastreaminfo: nsmetahit is",`nsmetahit`
+            print >>sys.stderr,time.asctime(),'-', "hitmap: get_nsmetastreaminfo: nsmetahit is",`nsmetahit`
         
         nsmetarepr = nsmetahit2nsmetarepr(nsmetahit,hitpath)
         nsmetastream = StringIO(nsmetarepr)
@@ -608,7 +609,7 @@ def localdbhit2atomhit(dbhit,urlpathprefix):
 def remotehit2atomhit(remotehit,urlpathprefix):
     # TODO: make RemoteQuery return full DB schema of TorrentDB
     
-    #print >>sys.stderr,"remotehit2atomhit: keys",remotehit.keys()
+    #print >>sys.stderr,time.asctime(),'-', "remotehit2atomhit: keys",remotehit.keys()
     
     atomhit = {}
     atomhit['title'] = htmlfilter(remotehit['content_name'])
@@ -678,7 +679,7 @@ def now2formatRFC3339():
 def hit2nsmetahit(hit,hiturlprefix,colltorrdir):
     """ Convert common hit to the fields required for the MPEG7 NS metadata """
 
-    print >>sys.stderr,"his2nsmetahit:"
+    print >>sys.stderr,time.asctime(),'-', "his2nsmetahit:"
     
     # Read info from torrent files / P2PURLs
     if hit['hittype'] == "localdb":

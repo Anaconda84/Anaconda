@@ -1,3 +1,4 @@
+import time 
 # Written by Bram Cohen, Pawel Garbacki, Boxun Zhang
 # see LICENSE.txt for license information
 
@@ -95,7 +96,7 @@ class Choker:
             checkinternalbias = 0
 
         if DEBUG:
-            print >>sys.stderr,"choker: _rechoke: checkinternalbias",checkinternalbias
+            print >>sys.stderr,time.asctime(),'-', "choker: _rechoke: checkinternalbias",checkinternalbias
             
         # 0. Construct candidate list
         preferred = []
@@ -126,7 +127,7 @@ class Choker:
                     if checkinternalbias and c.na_get_address_distance() == 0:
                         r += checkinternalbias
                         if DEBUG:
-                            print >>sys.stderr,"choker: _rechoke: BIASING",c.get_ip(),c.get_port()
+                            print >>sys.stderr,time.asctime(),'-', "choker: _rechoke: BIASING",c.get_ip(),c.get_port()
 
                     preferred.append((-r, c))
                     
@@ -134,7 +135,7 @@ class Choker:
             preferred.sort()
             del preferred[maxuploads-1:]
             if DEBUG:
-                print >>sys.stderr,"choker: _rechoke: NORMAL UNCHOKE",preferred
+                print >>sys.stderr,time.asctime(),'-', "choker: _rechoke: NORMAL UNCHOKE",preferred
             preferred = [x[1] for x in preferred]
 
             # 2. Get some g2g candidates 
@@ -155,14 +156,14 @@ class Choker:
                         r[0] += checkinternalbias
                         r[1] += checkinternalbias
                         if DEBUG:
-                            print >>sys.stderr,"choker: _rechoke: G2G BIASING",c.get_ip(),c.get_port()
+                            print >>sys.stderr,time.asctime(),'-', "choker: _rechoke: G2G BIASING",c.get_ip(),c.get_port()
                    
                     g2g_preferred.append((-r[0], -r[1], c))
                     
             g2g_preferred.sort()
             del g2g_preferred[maxuploads-1:]
             if DEBUG:
-                print  >>sys.stderr,"choker: _rechoke: G2G UNCHOKE",g2g_preferred
+                print  >>sys.stderr,time.asctime(),'-', "choker: _rechoke: G2G UNCHOKE",g2g_preferred
             g2g_preferred = [x[2] for x in g2g_preferred]
 
             preferred += g2g_preferred
@@ -182,7 +183,7 @@ class Choker:
                     if c.get_ip() == hostport[0]:
                         u = c.get_upload()
                         to_unchoke.append(u)
-                        #print >>sys.stderr,"Choker: _rechoke: LIVE: Permanently unchoking aux seed",hostport
+                        #print >>sys.stderr,time.asctime(),'-', "Choker: _rechoke: LIVE: Permanently unchoking aux seed",hostport
 
         # 4. Select from candidate lists, aux seeders always selected
         for c in self.connections:
@@ -195,7 +196,7 @@ class Choker:
                         to_unchoke.append(u)
                         if u.is_interested():
                             count += 1
-                            if DEBUG and not hit: print  >>sys.stderr,"choker: OPTIMISTIC UNCHOKE",c
+                            if DEBUG and not hit: print  >>sys.stderr,time.asctime(),'-', "choker: OPTIMISTIC UNCHOKE",c
                             hit = True
                         
                 else:
@@ -214,7 +215,7 @@ class Choker:
         Just add a connection, do not start doing anything yet
         Must call "start_connection" later!
         """
-        print >>sys.stderr, "Added connection",connection
+        print >>sys.stderr, time.asctime(),'-', "Added connection",connection
         if p is None:
             p = randrange(-2, len(self.connections) + 1)
         connection.get_upload().choke()

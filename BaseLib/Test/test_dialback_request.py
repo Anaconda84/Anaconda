@@ -1,3 +1,4 @@
+import time 
 # Written by Arno Bakker
 # see LICENSE.txt for license information
 
@@ -54,7 +55,7 @@ class TestDialbackRequest(TestAsServer):
 
     def tearDown(self):
         """ override TestAsServer """
-        print >> sys.stderr,"test: *** TEARDOWN"
+        print >> sys.stderr,time.asctime(),'-', "test: *** TEARDOWN"
         TestAsServer.tearDown(self)
         self.tearDownMyListenSocket()
 
@@ -94,7 +95,7 @@ class TestDialbackRequest(TestAsServer):
         s2 = BTConnection('',0,conn,mylistenport=self.mylistenport,user_infohash=dialback_infohash)
         s2.read_handshake_medium_rare()
         resp = s2.recv()
-        print >> sys.stderr,"test: Me got DIALBACK_REPLY from him, len",len(resp)
+        print >> sys.stderr,time.asctime(),'-', "test: Me got DIALBACK_REPLY from him, len",len(resp)
         self.assert_(resp[0] == DIALBACK_REPLY)
         self.check_drequest(resp[1:])
 
@@ -118,7 +119,7 @@ class TestDialbackRequest(TestAsServer):
     #
     def _test_bad(self,gen_drequest_func):
         s = OLConnection(self.my_keypair,'localhost',self.hisport)
-        print >> sys.stderr,"\ntest: ",gen_drequest_func
+        print >> sys.stderr,time.asctime(),'-', "\ntest: ",gen_drequest_func
         msg = gen_drequest_func()
         s.send(msg)
         time.sleep(5)
@@ -131,18 +132,18 @@ class TestDialbackRequest(TestAsServer):
         # that he doesn't connect back
         try:
             self.myss.settimeout(10.0)
-            print >> sys.stderr,"test: See if peer connects back (would be bad)"
+            print >> sys.stderr,time.asctime(),'-', "test: See if peer connects back (would be bad)"
             conn, addr = self.myss.accept()
             s = BTConnection('',0,conn,mylistenport=self.mylistenport,user_infohash=dialback_infohash)
             s.read_handshake_medium_rare()
             resp = s.recv()
-            print >> sys.stderr,"test: Got reply back, len",len(resp),"see if expected"
+            print >> sys.stderr,time.asctime(),'-', "test: Got reply back, len",len(resp),"see if expected"
             self.assert_(len(resp) > 0)
             self.assert_(resp[0] != DIALBACK_REPLY)
-            print >> sys.stderr,"test: Reply was acceptable",getMessageName(resp[0])
+            print >> sys.stderr,time.asctime(),'-', "test: Reply was acceptable",getMessageName(resp[0])
         except socket.timeout:
             self.assert_(True)
-            print >> sys.stderr,"test: Good, accept() timed out"
+            print >> sys.stderr,time.asctime(),'-', "test: Good, accept() timed out"
 
     #
     # Bad message creators

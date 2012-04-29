@@ -1,3 +1,4 @@
+import time 
 # written by Jan David Mol
 # see LICENSE.txt for license information
 #
@@ -79,7 +80,7 @@ class VideoSourceTransporter:
     def input_thread(self):
         """ A thread reading the stream and buffering it. """
 
-        print >>sys.stderr,"VideoSource: started input thread"
+        print >>sys.stderr,time.asctime(),'-', "VideoSource: started input thread"
 
         # we can't set the playback position from this thread, so
         # we assume all pieces are vs.piecelen in size.
@@ -92,7 +93,7 @@ class VideoSourceTransporter:
                     break
 
                 if DEBUG:
-                    print >>sys.stderr,"VideoSource: read %d bytes" % len(data)
+                    print >>sys.stderr,time.asctime(),'-', "VideoSource: read %d bytes" % len(data)
 
                 self.process_data(data)
         except IOError:
@@ -104,7 +105,7 @@ class VideoSourceTransporter:
     def shutdown(self):
         """ Stop transporting data. """
 
-        print >>sys.stderr,"VideoSource: shutting down"
+        print >>sys.stderr,time.asctime(),'-', "VideoSource: shutting down"
 
         if self.exiting:
             return
@@ -155,7 +156,7 @@ class VideoSourceTransporter:
                 del self.buffer[0]
             else:
                 if DEBUG:
-                    print >>sys.stderr,"VideoSource: JOIN ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"
+                    print >>sys.stderr,time.asctime(),'-', "VideoSource: JOIN ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"
                 buffer = "".join(self.buffer)
                 self.buffer = [buffer[contentbs:]]
                 content = buffer[:contentbs]
@@ -192,7 +193,7 @@ class VideoSourceTransporter:
                 f.close()
                 lastseqnum = int(data)
                 
-                print >>sys.stderr,"VideoSource: Restarting stream at abs.piece",lastseqnum
+                print >>sys.stderr,time.asctime(),'-', "VideoSource: Restarting stream at abs.piece",lastseqnum
                 
                 # Set playback pos of source and absolute piece nr.
                 lastpiecenum = lastseqnum % self.authenticator.get_npieces()
@@ -220,13 +221,13 @@ class VideoSourceTransporter:
         # was never requested from another peer.
 
         if DEBUG:
-            print >>sys.stderr,"VideoSource: created piece #%d" % index
+            print >>sys.stderr,time.asctime(),'-', "VideoSource: created piece #%d" % index
             # ECDSA
-            #print >>sys.stderr,"VideoSource: sig",`piece[-64:]`
-            #print >>sys.stderr,"VideoSource: dig",sha(piece[:-64]).hexdigest()
+            #print >>sys.stderr,time.asctime(),'-', "VideoSource: sig",`piece[-64:]`
+            #print >>sys.stderr,time.asctime(),'-', "VideoSource: dig",sha(piece[:-64]).hexdigest()
             # RSA, 768 bits
-            #print >>sys.stderr,"VideoSource: sig",`piece[-96:]`
-            #print >>sys.stderr,"VideoSource: dig",sha(piece[:-112]).hexdigest()
+            #print >>sys.stderr,time.asctime(),'-', "VideoSource: sig",`piece[-96:]`
+            #print >>sys.stderr,time.asctime(),'-', "VideoSource: dig",sha(piece[:-112]).hexdigest()
 
 
         # act as if the piece was requested and just came in
@@ -248,7 +249,7 @@ class VideoSourceTransporter:
 
     def del_piece(self,piece):
         if DEBUG:
-            print >>sys.stderr,"VideoSource: del_piece",piece
+            print >>sys.stderr,time.asctime(),'-', "VideoSource: del_piece",piece
         # See Tribler/Core/Video/VideoOnDemand.py, live_invalidate_piece_globally
         self.picker.invalidate_piece(piece)
         self.picker.downloader.live_invalidate(piece)

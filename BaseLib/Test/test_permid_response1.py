@@ -1,3 +1,4 @@
+import time 
 # Written by Arno Bakker, Jie Yang
 # see LICENSE.txt for license information
 
@@ -134,7 +135,7 @@ class MyServer(Thread):
         self._test_response1(ss, self.create_bad_resp1_sig_by_other_key,False)
 
     def _test_response1(self,ss,gen_resp1,good):
-        print >>sys.stderr,"test: myserver running:",gen_resp1
+        print >>sys.stderr,time.asctime(),'-', "test: myserver running:",gen_resp1
         conn, addr = ss.accept()
         s = BTConnection('',0,conn)
         s.read_handshake_medium_rare()

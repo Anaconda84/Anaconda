@@ -1,3 +1,4 @@
+import time 
 # Written by Arno Bakker
 # see LICENSE.txt for license information
 #
@@ -18,7 +19,7 @@ class TestOverlayThreadingBridge(TestSecureOverlay):
     
     def setUp(self):
         
-        print >>sys.stderr,"test: TestOverlayThreadingBridge.setUp()"
+        print >>sys.stderr,time.asctime(),'-', "test: TestOverlayThreadingBridge.setUp()"
 
         self.config_path = tempfile.mkdtemp()
         config = {}
@@ -53,8 +54,8 @@ class TestOverlayThreadingBridge(TestSecureOverlay):
         self.got2 = False
         self.first = True
 
-        print >>sys.stderr,"test: setUp: peer1 permid is",show_permid_short(self.peer1.my_permid)
-        print >>sys.stderr,"test: setUp: peer2 permid is",show_permid_short(self.peer2.my_permid)
+        print >>sys.stderr,time.asctime(),'-', "test: setUp: peer1 permid is",show_permid_short(self.peer1.my_permid)
+        print >>sys.stderr,time.asctime(),'-', "test: setUp: peer2 permid is",show_permid_short(self.peer2.my_permid)
 
         time.sleep(2) # let server threads start
 

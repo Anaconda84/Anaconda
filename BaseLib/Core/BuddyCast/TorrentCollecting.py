@@ -1,3 +1,4 @@
+import time 
 # Written by Jie Yang
 # see LICENSE.txt for license information
 
@@ -19,7 +20,7 @@ class SimpleTorrentCollecting:
         
     def trigger(self, permid, selversion, collect_candidate=None):
         infohash = self.torrent_db.selectTorrentToCollect(permid, collect_candidate)
-        #print >> sys.stderr, '*****-----------***** trigger torrent collecting', `infohash`
+        #print >> sys.stderr, time.asctime(),'-', '*****-----------***** trigger torrent collecting', `infohash`
         if infohash and self.metadata_handler:
             self.metadata_handler.send_metadata_request(permid, infohash, selversion)
 

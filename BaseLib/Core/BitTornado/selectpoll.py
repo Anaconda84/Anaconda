@@ -1,3 +1,4 @@
+import time 
 # Written by Bram Cohen
 # see LICENSE.txt for license information
 # Arno,2007-02-23: this poll class is used on win32
@@ -47,16 +48,16 @@ class poll:
                 elist = elist.union(self.wlist)
                 elist = list(elist)    # in Python2.3, elist must be a list type
                 if DEBUG:
-                    print >>sys.stderr,"selectpoll: elist = ",elist
+                    print >>sys.stderr,time.asctime(),'-', "selectpoll: elist = ",elist
                     
-                #print >>sys.stderr,"selectpoll: rlist",self.rlist,"wlist",self.wlist,"elist",elist
+                #print >>sys.stderr,time.asctime(),'-', "selectpoll: rlist",self.rlist,"wlist",self.wlist,"elist",elist
                     
                 r, w, e = select(self.rlist, self.wlist, elist, timeout)
                 if DEBUG:
-                    print >>sys.stderr,"selectpoll: e = ",e
+                    print >>sys.stderr,time.asctime(),'-', "selectpoll: e = ",e
             except ValueError:
                 if DEBUG:
-                    print >>sys.stderr,"selectpoll: select: bad param"
+                    print >>sys.stderr,time.asctime(),'-', "selectpoll: select: bad param"
                 return None
         else:
             sleep(timeout)

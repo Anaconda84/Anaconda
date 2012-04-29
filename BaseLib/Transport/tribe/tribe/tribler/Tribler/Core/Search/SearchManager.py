@@ -1,3 +1,4 @@
+import time 
 # Written by Jelle Roozenburg, Arno Bakker
 # see LICENSE.txt for license information
 
@@ -22,7 +23,7 @@ class SearchManager:
     def search(self,kws,maxhits=None):
         """ Called by any thread """
         if DEBUG:
-            print >>sys.stderr,"SearchManager: search",kws
+            print >>sys.stderr,time.asctime(),'-', "SearchManager: search",kws
             
         hits = self.dbhandler.searchNames(kws)
         if maxhits is None:

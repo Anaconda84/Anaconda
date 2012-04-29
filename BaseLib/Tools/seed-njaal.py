@@ -1,3 +1,4 @@
+import time 
 # Written by Njaal Borch
 # see LICENSE.txt for license information
 #
@@ -26,7 +27,7 @@ argsdef = [('nuploads', 200, 'the max number of peers to serve directly'),
 
 def state_callback(ds):
     d = ds.get_download()
-    print >>sys.stderr,`d.get_def().get_name()`,dlstatus_strings[ds.get_status()],ds.get_progress(),"%",ds.get_error(),"up",ds.get_current_speed(UPLOAD),"down",ds.get_current_speed(DOWNLOAD)
+    print >>sys.stderr,time.asctime(),'-', `d.get_def().get_name()`,dlstatus_strings[ds.get_status()],ds.get_progress(),"%",ds.get_error(),"up",ds.get_current_speed(UPLOAD),"down",ds.get_current_speed(DOWNLOAD)
 
     return (1.0,False)
 
@@ -42,7 +43,7 @@ class PrintStatusReporter(Status.OnChangeStatusReporter):
         """
         print to screen
         """
-        print >> sys.stderr, "STATUS: %s=%s"%(event.get_name(),
+        print >> sys.stderr, time.asctime(),'-', "STATUS: %s=%s"%(event.get_name(),
                                               event.get_value())
 
 
@@ -64,7 +65,7 @@ if __name__ == "__main__":
     
     s = Session(sscfg)
 
-    print >>sys.stderr,"My permid:",encodestring(s.get_permid()).replace("\n","")
+    print >>sys.stderr,time.asctime(),'-', "My permid:",encodestring(s.get_permid()).replace("\n","")
     
     source = sys.argv[1]
     if source.startswith("http://"):

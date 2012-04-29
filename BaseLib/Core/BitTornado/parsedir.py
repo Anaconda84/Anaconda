@@ -1,3 +1,4 @@
+import time 
 # Written by John Hoffman and Uoti Urpala
 # see LICENSE.txt for license information
 import os
@@ -19,7 +20,7 @@ except:
 DEBUG = False
 
 def _errfunc(x):
-    print >>sys.stderr,"tracker: parsedir: "+x
+    print >>sys.stderr,time.asctime(),'-', "tracker: parsedir: "+x
 
 def parsedir(directory, parsed, files, blocked,
              exts = ['.torrent', TRIBLER_TORRENT_EXT], return_metainfo = False, errfunc = _errfunc):

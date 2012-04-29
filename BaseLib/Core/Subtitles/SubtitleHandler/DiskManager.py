@@ -10,6 +10,7 @@ from traceback import print_exc
 import codecs
 import os
 import sys
+import time 
 
 DISK_FULL_REJECT_WRITES = 0x0
 DISK_FULL_DELETE_SOME = 0x1
@@ -112,7 +113,7 @@ class DiskManager(object):
             or "diskPolicy" not in config.keys() \
             or "encoding" not in config.keys():
             if DEBUG:
-                print >> sys.stderr, "Invalid config. Using default"
+                print >> sys.stderr, time.asctime(),'-', "Invalid config. Using default"
             config = DEFAULT_CONFIG
             
         dedicatedDiskManager = BaseSingleDirDiskManager(directory, config, self)
@@ -132,7 +133,7 @@ class DiskManager(object):
             freespace = getfreespace(self._baseDir) / 1024.0
             return freespace 
         except:
-            print >> sys.stderr, "cannot get free space of", self._baseDir
+            print >> sys.stderr, time.asctime(),'-', "cannot get free space of", self._baseDir
             print_exc()
             return 0
         
@@ -150,7 +151,7 @@ class DiskManager(object):
         if directory not in self._registeredDirs.keys():
             msg = "Directory %s not registered" % directory
             if DEBUG:
-                print >> sys.stderr, msg
+                print >> sys.stderr, time.asctime(),'-', msg
             raise DiskManagerException(msg)
         
         return self._registeredDirs[directory].writeContent(filename, content)
@@ -164,7 +165,7 @@ class DiskManager(object):
         if directory not in self._registeredDirs.keys():
             msg = "Directory %s not registered" % directory
             if DEBUG:
-                print >> sys.stderr, msg
+                print >> sys.stderr, time.asctime(),'-', msg
                 
             raise DiskManagerException(msg)
         
@@ -174,7 +175,7 @@ class DiskManager(object):
         if directory not in self._registeredDirs.keys():
             msg = "Directory %s not registered" % directory
             if DEBUG:
-                print >> sys.stderr, msg
+                print >> sys.stderr, time.asctime(),'-', msg
             raise DiskManagerException(msg)
         
         return self._registeredDirs[directory].deleteContent(filename)
@@ -189,7 +190,7 @@ class DiskManager(object):
         if directory not in self._registeredDirs.keys():
             msg = "Directory %s not registered" % directory
             if DEBUG:
-                print >> sys.stderr, msg
+                print >> sys.stderr, time.asctime(),'-', msg
             raise DiskManagerException(msg)
         
         return self._registeredDirs[directory].tryReserveSpace(amount)
@@ -198,7 +199,7 @@ class DiskManager(object):
         if directory not in self._registeredDirs.keys():
             msg = "Directory %s not registered" % directory
             if DEBUG:
-                print >> sys.stderr, msg
+                print >> sys.stderr, time.asctime(),'-', msg
             raise DiskManagerException(msg)
         
         return self._registeredDirs[directory].isFileOnDisk(filename)
@@ -250,23 +251,23 @@ class BaseSingleDirDiskManager(object):
     
     def deleteContent(self, filename):
         if DEBUG:
-            print >> sys.stderr, "Deleting " + filename
+            print >> sys.stderr, time.asctime(),'-', "Deleting " + filename
         path = os.path.join(self.workingDir, filename)
         if not os.path.isfile(path):
             if DEBUG:
-                print >> sys.stderr, "Noting to delete at %s" % path
+                print >> sys.stderr, time.asctime(),'-', "Noting to delete at %s" % path
             return False
         try:
             os.remove(path)
             self._updateDirectoryUsage()
             return True
         except OSError,e:
-            print >> sys.stderr, "Warning: Error removing %s: %s" % (path, e)
+            print >> sys.stderr, time.asctime(),'-', "Warning: Error removing %s: %s" % (path, e)
             return False
     
     def makeFreeSpace(self, amount):
         if DEBUG:
-            print >> sys.stderr, "Trying to retrieve %d KB of free space for %s" % (amount, self.workingDir)
+            print >> sys.stderr, time.asctime(),'-', "Trying to retrieve %d KB of free space for %s" % (amount, self.workingDir)
         if amount >= self.maxDiskUsage:
             return False
         if amount >= (self.dm.getAvailableSpace() + self._currentDiskUsage()):
@@ -276,7 +277,7 @@ class BaseSingleDirDiskManager(object):
         tries = 0
         while self._actualAvailableSpace() <= amount:
             if tries >= maxTries:
-                print >> sys.stderr, "Unable to make up necessary free space for %s" % \
+                print >> sys.stderr, time.asctime(),'-', "Unable to make up necessary free space for %s" % \
                          self.workingDir
                 return False
             toDelete = self._selectOneToDelete()
@@ -300,7 +301,7 @@ class BaseSingleDirDiskManager(object):
         path = os.path.join(self.workingDir, filename)
         if os.path.exists(path):
             if DEBUG:
-                print >> sys.stderr, "File %s exists. Overwriting it."
+                print >> sys.stderr, time.asctime(),'-', "File %s exists. Overwriting it."
             os.remove(path)
         try:
             if not isinstance(content,unicode):

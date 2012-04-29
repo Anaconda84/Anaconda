@@ -1,3 +1,4 @@
+import time 
 # Written by Boudewijn Schoon
 # see LICENSE.txt for license information
 
@@ -43,7 +44,7 @@ class DatabaseCrawler:
         @param selversion The oberlay protocol version
         @param request_callback Call this function one or more times to send the requests: request_callback(message_id, payload)
         """
-        if DEBUG: print >>sys.stderr, "databasecrawler: query_initiator", show_permid_short(permid)
+        if DEBUG: print >>sys.stderr, time.asctime(),'-', "databasecrawler: query_initiator", show_permid_short(permid)
         sql = []
         if selversion >= OLPROTO_VER_SEVENTH:
             sql.extend(("SELECT 'peer_count', count(*) FROM Peer",
@@ -71,7 +72,7 @@ class DatabaseCrawler:
         call in the query_initiator method.
         """
         if not exc:
-            if DEBUG: print >>sys.stderr, "databasecrawler: request send to", show_permid_short(permid)
+            if DEBUG: print >>sys.stderr, time.asctime(),'-', "databasecrawler: request send to", show_permid_short(permid)
             self._file.write("; ".join((strftime("%Y/%m/%d %H:%M:%S"), "REQUEST", show_permid(permid), "\n")))
             self._file.flush()
 
@@ -85,7 +86,7 @@ class DatabaseCrawler:
         @param reply_callback Call this function once to send the reply: reply_callback(payload [, error=123])
         """
         if DEBUG:
-            print >> sys.stderr, "databasecrawler: handle_crawler_request", show_permid_short(permid), message
+            print >> sys.stderr, time.asctime(),'-', "databasecrawler: handle_crawler_request", show_permid_short(permid), message
 
         # execute the sql
         try:
@@ -111,14 +112,14 @@ class DatabaseCrawler:
         """
         if error:
             if DEBUG:
-                print >> sys.stderr, "databasecrawler: handle_crawler_reply", error, message
+                print >> sys.stderr, time.asctime(),'-', "databasecrawler: handle_crawler_reply", error, message
 
             self._file.write("; ".join((strftime("%Y/%m/%d %H:%M:%S"), "  REPLY", show_permid(permid), str(error), message, "\n")))
             self._file.flush()
 
         else:
             if DEBUG:
-                print >> sys.stderr, "databasecrawler: handle_crawler_reply", show_permid_short(permid), cPickle.loads(message)
+                print >> sys.stderr, time.asctime(),'-', "databasecrawler: handle_crawler_reply", show_permid_short(permid), cPickle.loads(message)
 
             self._file.write("; ".join((strftime("%Y/%m/%d %H:%M:%S"), "  REPLY", show_permid(permid), str(error), str(cPickle.loads(message)), "\n")))
             self._file.flush()

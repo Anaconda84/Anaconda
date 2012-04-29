@@ -1,3 +1,4 @@
+import time 
 # Written by Arno Bakker 
 # see LICENSE.txt for license information
 
@@ -55,7 +56,7 @@ class DownloadImpl:
             self.correctedinfoname = fix_filebasename(uniname)
 
             if DEBUG:
-                print >>sys.stderr,"Download: setup: piece size",metainfo['info']['piece length']
+                print >>sys.stderr,time.asctime(),'-', "Download: setup: piece size",metainfo['info']['piece length']
             
             # See if internal tracker used
             itrackerurl = self.session.get_internal_tracker_url()
@@ -64,7 +65,7 @@ class DownloadImpl:
             usingitracker = False
             
             if DEBUG:
-                print >>sys.stderr,"Download: setup: internal tracker?",metainfo['announce'],itrackerurl,"#"
+                print >>sys.stderr,time.asctime(),'-', "Download: setup: internal tracker?",metainfo['announce'],itrackerurl,"#"
 
             if itrackerurl.endswith('/'):
                 slashless = itrackerurl[:-1]
@@ -80,13 +81,13 @@ class DownloadImpl:
                      
             if usingitracker:
                 if DEBUG:
-                    print >>sys.stderr,"Download: setup: Using internal tracker"
+                    print >>sys.stderr,time.asctime(),'-', "Download: setup: Using internal tracker"
                 # Copy .torrent to state_dir/itracker so the tracker thread 
                 # finds it and accepts peer registrations for it.
                 #
                 self.session.add_to_internal_tracker(self.tdef) 
             elif DEBUG:
-                print >>sys.stderr,"Download: setup: Not using internal tracker"
+                print >>sys.stderr,time.asctime(),'-', "Download: setup: Not using internal tracker"
             
             # Copy dlconfig, from default if not specified
             if dcfg is None:
@@ -109,17 +110,17 @@ class DownloadImpl:
             self.dlruntimeconfig['max_desired_download_rate'] = 0
     
             if DEBUG:
-                print >>sys.stderr,"DownloadImpl: setup: initialdlstatus",`self.tdef.get_name_as_unicode()`,initialdlstatus
+                print >>sys.stderr,time.asctime(),'-', "DownloadImpl: setup: initialdlstatus",`self.tdef.get_name_as_unicode()`,initialdlstatus
 
             # Closed swarms config
             self.dlconfig['cs_keys'] = self.tdef.get_cs_keys_as_ders()
             self.dlconfig['permid'] = self.session.get_permid()
             if self.dlconfig['cs_keys']:
-                print >> sys.stderr,"This is a CLOSED SWARM"
+                print >> sys.stderr,time.asctime(),'-', "This is a CLOSED SWARM"
                 #if dcfg.get_poa():
                 #    self.dlconfig['poa'] = dcfg.get_poa()
                 #else:
-                #    print >> sys.stderr,"POA not available - seeding?"
+                #    print >> sys.stderr,time.asctime(),'-', "POA not available - seeding?"
 
             # Set progress
             if pstate is not None and pstate.has_key('dlstate'):
@@ -142,7 +143,7 @@ class DownloadImpl:
     def create_engine_wrapper(self,lmcreatedcallback,pstate,lmvodeventcallback,initialdlstatus=None):
         """ Called by any thread, assume dllock already acquired """
         if DEBUG:
-            print >>sys.stderr,"Download: create_engine_wrapper()"
+            print >>sys.stderr,time.asctime(),'-', "Download: create_engine_wrapper()"
         
         # all thread safe
         infohash = self.get_def().get_infohash()
@@ -250,7 +251,7 @@ class DownloadImpl:
             vodfileindex['mimetype'] = 'application/octet-stream'
             
         if DEBUG:
-            print >>sys.stderr,"Download: create_engine_wrapper: vodfileindex",`vodfileindex` 
+            print >>sys.stderr,time.asctime(),'-', "Download: create_engine_wrapper: vodfileindex",`vodfileindex` 
 
         # Delegate creation of engine wrapper to network thread
         network_create_engine_wrapper_lambda = lambda:self.network_create_engine_wrapper(infohash,metainfo,kvconfig,multihandler,listenport,vapath,vodfileindex,lmcreatedcallback,pstate,lmvodeventcallback)
@@ -301,7 +302,7 @@ class DownloadImpl:
             
             if self.sd is None:
                 if DEBUG:
-                    print >>sys.stderr,"DownloadImpl: network_get_state: Download not running"
+                    print >>sys.stderr,time.asctime(),'-', "DownloadImpl: network_get_state: Download not running"
                 ds = DownloadState(self,DLSTATUS_STOPPED,self.error,self.progressbeforestop,swarmcache=swarmcache)
             else:
                 # RePEX: try getting the swarmcache from SingleDownload or use our last known swarmcache:
@@ -347,7 +348,7 @@ class DownloadImpl:
     def stop_remove(self,removestate=False,removecontent=False):
         """ Called by any thread """
         if DEBUG:
-            print >>sys.stderr,"DownloadImpl: stop_remove:",`self.tdef.get_name_as_unicode()`,"state",removestate,"content",removecontent
+            print >>sys.stderr,time.asctime(),'-', "DownloadImpl: stop_remove:",`self.tdef.get_name_as_unicode()`,"state",removestate,"content",removecontent
         self.dllock.acquire()
         try:
             network_stop_lambda = lambda:self.network_stop(removestate,removecontent)
@@ -358,7 +359,7 @@ class DownloadImpl:
     def network_stop(self,removestate,removecontent):
         """ Called by network thread """
         if DEBUG:
-            print >>sys.stderr,"DownloadImpl: network_stop",`self.tdef.get_name_as_unicode()`
+            print >>sys.stderr,time.asctime(),'-', "DownloadImpl: network_stop",`self.tdef.get_name_as_unicode()`
         self.dllock.acquire()
         try:
             infohash = self.tdef.get_infohash() 
@@ -375,7 +376,7 @@ class DownloadImpl:
                 #
                 if self.pstate_for_restart is not None:
                     if DEBUG:
-                        print >>sys.stderr,"DownloadImpl: network_stop: Reusing previously saved engineresume data for checkpoint"
+                        print >>sys.stderr,time.asctime(),'-', "DownloadImpl: network_stop: Reusing previously saved engineresume data for checkpoint"
                     # Don't copy full pstate_for_restart, as the torrent
                     # may have gone from e.g. HASHCHECK at startup to STOPPED
                     # now, at shutdown. In other words, it was never active
@@ -409,7 +410,7 @@ class DownloadImpl:
         # RePEX: added initialdlstatus parameter
         # RePEX: TODO: Should we mention the initialdlstatus behaviour in the docstring?
         if DEBUG:
-            print >>sys.stderr,"DownloadImpl: restart:",`self.tdef.get_name_as_unicode()`
+            print >>sys.stderr,time.asctime(),'-', "DownloadImpl: restart:",`self.tdef.get_name_as_unicode()`
         self.dllock.acquire()
         try:
             network_restart_lambda = lambda:self.network_restart(initialdlstatus)
@@ -424,7 +425,7 @@ class DownloadImpl:
         
         # RePEX: added initialdlstatus parameter
         if DEBUG:
-            print >>sys.stderr,"DownloadImpl: network_restart",`self.tdef.get_name_as_unicode()`
+            print >>sys.stderr,time.asctime(),'-', "DownloadImpl: network_restart",`self.tdef.get_name_as_unicode()`
         self.dllock.acquire()
         try:
             if self.sd is None:
@@ -434,7 +435,7 @@ class DownloadImpl:
                 self.create_engine_wrapper(self.session.lm.network_engine_wrapper_created_callback,pstate=self.pstate_for_restart,lmvodeventcallback=self.session.lm.network_vod_event_callback,initialdlstatus=initialdlstatus)
             else:
                 if DEBUG:
-                    print >>sys.stderr,"DownloadImpl: network_restart: SingleDownload already running",`self`
+                    print >>sys.stderr,time.asctime(),'-', "DownloadImpl: network_restart: SingleDownload already running",`self`
                 # RePEX: leave decision what to do to SingleDownload
                 self.sd.restart(initialdlstatus)
 
@@ -448,7 +449,7 @@ class DownloadImpl:
     #
     def set_max_desired_speed(self,direct,speed):
         if DEBUG:
-            print >>sys.stderr,"Download: set_max_desired_speed",direct,speed
+            print >>sys.stderr,time.asctime(),'-', "Download: set_max_desired_speed",direct,speed
         #if speed < 10:
         #    print_stack()
         
@@ -553,7 +554,7 @@ class DownloadImpl:
         pstate['dlstate']['swarmcache'] = ds.get_swarmcache() # RePEX: store SwarmCache
         
         if DEBUG:
-            print >>sys.stderr,"Download: netw_get_pers_state: status",dlstatus_strings[ds.get_status()],"progress",ds.get_progress()
+            print >>sys.stderr,time.asctime(),'-', "Download: netw_get_pers_state: status",dlstatus_strings[ds.get_status()],"progress",ds.get_progress()
         
         pstate['engineresumedata'] = None
         return pstate
@@ -587,7 +588,7 @@ class DownloadImpl:
         """ Determine which file maps to which piece ranges for progress info """
         
         if DEBUG:
-            print >>sys.stderr,"Download: set_filepieceranges:",self.dlconfig['selected_files']
+            print >>sys.stderr,time.asctime(),'-', "Download: set_filepieceranges:",self.dlconfig['selected_files']
         (length,self.filepieceranges) = maketorrent.get_length_filepieceranges_from_metainfo(metainfo,self.dlconfig['selected_files'])
 
     def get_content_dest(self):
@@ -608,7 +609,7 @@ class DownloadImpl:
 
                 [mimetype,playcmd] = win32_retrieve_video_play_command(ext,file)
                 if DEBUG:
-                    print >>sys.stderr,"DownloadImpl: Win32 reg said MIME type is",mimetype
+                    print >>sys.stderr,time.asctime(),'-', "DownloadImpl: Win32 reg said MIME type is",mimetype
             except:
                 if DEBUG:
                     print_exc()
@@ -624,7 +625,7 @@ class DownloadImpl:
                 (mimetype,encoding) = mimetypes.guess_type(file)
                 
                 if DEBUG:
-                    print >>sys.stderr,"DownloadImpl: /etc/mimetypes+ said MIME type is",mimetype,file
+                    print >>sys.stderr,time.asctime(),'-', "DownloadImpl: /etc/mimetypes+ said MIME type is",mimetype,file
             except:
                 print_exc()
 

@@ -1,3 +1,4 @@
+import time 
 # Written by Bram Cohen and Pawel Garbacki
 # see LICENSE.txt for license information
 
@@ -85,7 +86,7 @@ class RawServer:
 
     def add_task(self, func, delay = 0, id = None):
         #if DEBUG:
-        #    print >>sys.stderr,"rawserver: add_task(",func,delay,")"
+        #    print >>sys.stderr,time.asctime(),'-', "rawserver: add_task(",func,delay,")"
         if delay < 0:
             delay = 0
         self.lock.acquire()
@@ -128,7 +129,7 @@ class RawServer:
 
     def listen_forever(self, handler):
         if DEBUG:
-            print >>sys.stderr,"rawserver: listen forever()"
+            print >>sys.stderr,time.asctime(),'-', "rawserver: listen forever()"
         # handler=btlanuchmany: MultiHandler, btdownloadheadless: Encoder
         self.thread_ident = get_ident()
         self.sockethandler.set_handler(handler)
@@ -145,15 +146,15 @@ class RawServer:
                         period = 0
                         
                     #if DEBUG:
-                    #    print >>sys.stderr,"rawserver: do_poll",period
+                    #    print >>sys.stderr,time.asctime(),'-', "rawserver: do_poll",period
                     events = self.sockethandler.do_poll(period)
 
                     if self.doneflag.isSet():
                         if DEBUG:
-                            print >> sys.stderr,"rawserver: stopping because done flag set"
+                            print >> sys.stderr,time.asctime(),'-', "rawserver: stopping because done flag set"
                         return
                     
-                    #print >>sys.stderr,"RawServer: funcs is",`self.funcs`
+                    #print >>sys.stderr,time.asctime(),'-', "RawServer: funcs is",`self.funcs`
                     
                     
                     while self.funcs and self.funcs[0][0] <= clock():
@@ -164,12 +165,12 @@ class RawServer:
 #                            print func.func_name
                             if DEBUG:
                                 if func.func_name != "_bgalloc":
-                                    print >> sys.stderr,"RawServer:f",func.func_name
+                                    print >> sys.stderr,time.asctime(),'-', "RawServer:f",func.func_name
                             #st = time.time()
                             func()
                             #et = time.time()
                             #diff = et - st
-                            #print >>sys.stderr,func,"took %.5f" % (diff)
+                            #print >>sys.stderr,time.asctime(),'-', func,"took %.5f" % (diff)
                             
                         except (SystemError, MemoryError), e:
                             self.failfunc(e)
@@ -179,12 +180,12 @@ class RawServer:
                             return
                         except error:
                             if DEBUG:
-                                print >> sys.stderr,"rawserver: func: ERROR exception"
+                                print >> sys.stderr,time.asctime(),'-', "rawserver: func: ERROR exception"
                                 print_exc()
                             pass
                         except Exception,e:
                             if DEBUG:
-                                print >> sys.stderr,"rawserver: func: any exception"
+                                print >> sys.stderr,time.asctime(),'-', "rawserver: func: any exception"
                                 print_exc()
                             if self.noisy:
                                 self.exception(e)
@@ -192,17 +193,17 @@ class RawServer:
                     self.sockethandler.handle_events(events)
                     if self.doneflag.isSet():
                         if DEBUG:
-                            print >> sys.stderr,"rawserver: stopping because done flag set2"
+                            print >> sys.stderr,time.asctime(),'-', "rawserver: stopping because done flag set2"
                         return
                     self.sockethandler.close_dead()
                 except (SystemError, MemoryError), e:
                     if DEBUG:
-                        print >> sys.stderr,"rawserver: SYS/MEM exception",e
+                        print >> sys.stderr,time.asctime(),'-', "rawserver: SYS/MEM exception",e
                     self.failfunc(e)
                     return
                 except error:
                     if DEBUG:
-                        print >> sys.stderr,"rawserver: ERROR exception"
+                        print >> sys.stderr,time.asctime(),'-', "rawserver: ERROR exception"
                         print_exc()
                     if self.doneflag.isSet():
                         return
@@ -211,12 +212,12 @@ class RawServer:
                     return
                 except Exception,e:
                     if DEBUG:
-                        print >> sys.stderr,"rawserver: other exception"
+                        print >> sys.stderr,time.asctime(),'-', "rawserver: other exception"
                     print_exc()
                     self.exception(e)
                 ## Arno: Don't stop till we drop
                 ##if self.exccount > 10:
-                ##    print >> sys.stderr,"rawserver: stopping because exccount > 10"
+                ##    print >> sys.stderr,time.asctime(),'-', "rawserver: stopping because exccount > 10"
                 ##    return
         finally:
 #            self.sockethandler.shutdown()
@@ -259,16 +260,16 @@ class RawServer:
     #
     def create_udpsocket(self,port,host):
         if DEBUG:
-            print >>sys.stderr,"rawudp: create_udp_socket",host,port
+            print >>sys.stderr,time.asctime(),'-', "rawudp: create_udp_socket",host,port
         return self.sockethandler.create_udpsocket(port,host)
         
     def start_listening_udp(self,serversocket,handler):
         if DEBUG:
-            print >>sys.stderr,"rawudp: start_listen:",serversocket,handler
+            print >>sys.stderr,time.asctime(),'-', "rawudp: start_listen:",serversocket,handler
         self.sockethandler.start_listening_udp(serversocket,handler)
     
     def stop_listening_udp(self,serversocket):
         if DEBUG:
-            print >>sys.stderr,"rawudp: stop_listen:",serversocket
+            print >>sys.stderr,time.asctime(),'-', "rawudp: stop_listen:",serversocket
         self.sockethandler.stop_listening_udp(serversocket)
 

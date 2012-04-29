@@ -1,3 +1,4 @@
+import time 
 # Written by Bram Cohen, Pawel Garbacki, Arno Bakker and Njaal Borch, George Milescu
 # see LICENSE.txt for license information
 
@@ -161,7 +162,7 @@ class Connection:
 
         if self.connecter.is_closed_swarm:
             if DEBUG_CS:
-                print >>sys.stderr,"connecter: conn: CS: This is a closed swarm"
+                print >>sys.stderr,time.asctime(),'-', "connecter: conn: CS: This is a closed swarm"
             self.is_closed_swarm = True
             if 'poa' in self.connecter.config:
                 try:
@@ -173,7 +174,7 @@ class Connection:
                     print_exc()
                     poa = None
             else:
-                print >>sys.stderr,"connecter: conn: CS: Missing POA"
+                print >>sys.stderr,time.asctime(),'-', "connecter: conn: CS: Missing POA"
                 poa = None
         
             # Need to also get the rest of the info, like my keys
@@ -184,7 +185,7 @@ class Connection:
                                                                  self.connecter.config['cs_keys'],
                                                                  poa)
             if DEBUG_CS:                                                                 
-                print >>sys.stderr,"connecter: conn: CS: Closed swarm ready to start handshake"
+                print >>sys.stderr,time.asctime(),'-', "connecter: conn: CS: Closed swarm ready to start handshake"
 
 
     def get_myip(self, real=False):
@@ -213,7 +214,7 @@ class Connection:
     def close(self):
         if DEBUG:
             if self.get_ip() == self.connecter.tracker_ip:
-                print >>sys.stderr,"connecter: close: live: WAAH closing SOURCE"
+                print >>sys.stderr,time.asctime(),'-', "connecter: close: live: WAAH closing SOURCE"
 
         self.connection.close()
         self.closed = True
@@ -242,13 +243,13 @@ class Connection:
     def send_unchoke(self):
         if not self.cs_complete:
             if DEBUG_CS:
-                print >> sys.stderr, 'Connection: send_unchoke: Not sending UNCHOKE, closed swarm handshanke not done'
+                print >> sys.stderr, time.asctime(),'-', 'Connection: send_unchoke: Not sending UNCHOKE, closed swarm handshanke not done'
             return False
 
         if self.send_choke_queued:
             self.send_choke_queued = False
             if DEBUG_NORMAL_MSGS:
-                print >>sys.stderr,'Connection: send_unchoke: CHOKE SUPPRESSED'
+                print >>sys.stderr,time.asctime(),'-', 'Connection: send_unchoke: CHOKE SUPPRESSED'
         else:
             self._send_message(UNCHOKE)
             if (self.partial_message or self.just_unchoked is None
@@ -262,25 +263,25 @@ class Connection:
         self._send_message(REQUEST + tobinary(index) + 
             tobinary(begin) + tobinary(length))
         if DEBUG_NORMAL_MSGS:
-            print >>sys.stderr,"sending REQUEST to",self.get_ip()
-            print >>sys.stderr,'sent request: '+str(index)+': '+str(begin)+'-'+str(begin+length)
+            print >>sys.stderr,time.asctime(),'-', "sending REQUEST to",self.get_ip()
+            print >>sys.stderr,time.asctime(),'-', 'sent request: '+str(index)+': '+str(begin)+'-'+str(begin+length)
 
     def send_cancel(self, index, begin, length):
         self._send_message(CANCEL + tobinary(index) + 
             tobinary(begin) + tobinary(length))
         if DEBUG_NORMAL_MSGS:
-            print >>sys.stderr,'sent cancel: '+str(index)+': '+str(begin)+'-'+str(begin+length)
+            print >>sys.stderr,time.asctime(),'-', 'sent cancel: '+str(index)+': '+str(begin)+'-'+str(begin+length)
 
     def send_bitfield(self, bitfield):
         if not self.cs_complete:
-            print >> sys.stderr, "Connection: send_bitfield: Not sending bitfield - CS handshake not done"
+            print >> sys.stderr, time.asctime(),'-', "Connection: send_bitfield: Not sending bitfield - CS handshake not done"
             return 
 
         if self.can_send_to():
             self._send_message(BITFIELD + bitfield)
         else:
             self.cs_status_unauth_requests.inc()
-            print >>sys.stderr,"Connection: send_bitfield: Sending empty bitfield to unauth node"
+            print >>sys.stderr,time.asctime(),'-', "Connection: send_bitfield: Sending empty bitfield to unauth node"
             self._send_message(BITFIELD + Bitfield(self.connecter.numpieces).tostring())
 
 
@@ -288,7 +289,7 @@ class Connection:
         if self.can_send_to():
             self._send_message(HAVE + tobinary(index))
         #elif DEBUG_CS:
-        #    print >>sys.stderr,"Supressing HAVE messages"
+        #    print >>sys.stderr,time.asctime(),'-', "Supressing HAVE messages"
 
     def send_keepalive(self):
         self._send_message('')
@@ -344,7 +345,7 @@ class Connection:
                             tobinary(len(piece) + 9), PIECE, 
                             tobinary(index), tobinary(begin), piece.tostring()))
             if DEBUG_NORMAL_MSGS:
-                print >>sys.stderr,'sending chunk: '+str(index)+': '+str(begin)+'-'+str(begin+len(piece))
+                print >>sys.stderr,time.asctime(),'-', 'sending chunk: '+str(index)+': '+str(begin)+'-'+str(begin+len(piece))
 
         if bytes < len(self.partial_message):
             self.connection.send_message_raw(self.partial_message[:bytes])
@@ -393,7 +394,7 @@ class Connection:
     
     def got_extend_handshake(self,d):
         if DEBUG:
-            print >>sys.stderr,"connecter: Got EXTEND handshake:",d
+            print >>sys.stderr,time.asctime(),'-', "connecter: Got EXTEND handshake:",d
         if 'm' in d:
             if type(d['m']) != DictType:
                 raise ValueError('Key m does not map to a dict')
@@ -417,24 +418,24 @@ class Connection:
                 # This peer understands our overlay swarm extension
                 if self.connection.locally_initiated:
                     if DEBUG:
-                        print >>sys.stderr,"connecter: Peer supports Tr_OVERLAYSWARM, attempt connection"
+                        print >>sys.stderr,time.asctime(),'-', "connecter: Peer supports Tr_OVERLAYSWARM, attempt connection"
                     self.connect_overlay()
                     
             if EXTEND_MSG_CS in self.extend_hs_dict['m']:
                 self.remote_supports_cs = True
                 self.cs_status_supported.inc()
                 if DEBUG_CS:
-                    print >>sys.stderr,"connecter: Peer supports Closed swarms"
+                    print >>sys.stderr,time.asctime(),'-', "connecter: Peer supports Closed swarms"
 
                 if self.is_closed_swarm and self.connection.locally_initiated:
                     if DEBUG_CS:
-                        print >>sys.stderr,"connecter: Initiating Closed swarm handshake"
+                        print >>sys.stderr,time.asctime(),'-', "connecter: Initiating Closed swarm handshake"
                     self.start_cs_handshake()
             else:
                 self.remote_supports_cs = False
                 self.cs_status_not_supported.inc()
                 if DEBUG_CS:
-                    print >>sys.stderr,"connecter: conn: Remote node does not support CS, flagging CS as done"
+                    print >>sys.stderr,time.asctime(),'-', "connecter: conn: Remote node does not support CS, flagging CS as done"
                 self.connecter.cs_handshake_completed()
                 status = Status.get_status_holder("LivingLab")
                 status.add_event(self.cs_status)
@@ -445,7 +446,7 @@ class Connection:
                 # Both us and the peer want to use G2G
                 if self.connection.locally_initiated:
                     if DEBUG:
-                        print >>sys.stderr,"connecter: Peer supports Tr_G2G"
+                        print >>sys.stderr,time.asctime(),'-', "connecter: Peer supports Tr_G2G"
 
                 self.use_g2g = True
                 if EXTEND_MSG_G2G_V2 in self.extend_hs_dict['m']:
@@ -463,12 +464,12 @@ class Connection:
                         if livever < CURRENT_LIVE_VERSION:
                             raise ValueError("Too old LIVE VERSION "+livever)
                         else:
-                            print >>sys.stderr,"Connecter: live: Keeping connection to up-to-date peer v",livever,self.get_ip()
+                            print >>sys.stderr,time.asctime(),'-', "Connecter: live: Keeping connection to up-to-date peer v",livever,self.get_ip()
                         
                 if not peerhaslivekey:
                     if self.get_ip() == self.connecter.tracker_ip:
                         # Keep connection to tracker / source
-                        print >>sys.stderr,"Connecter: live: Keeping connection to SOURCE",self.connecter.tracker_ip 
+                        print >>sys.stderr,time.asctime(),'-', "Connecter: live: Keeping connection to SOURCE",self.connecter.tracker_ip 
                     else:
                         raise ValueError("Kicking old LIVE peer "+self.get_ip())
 
@@ -479,7 +480,7 @@ class Connection:
             if key in d:
                 self.extend_hs_dict[key] = d[key]
         
-        #print >>sys.stderr,"connecter: got_extend_hs: keys",d.keys()
+        #print >>sys.stderr,time.asctime(),'-', "connecter: got_extend_hs: keys",d.keys()
 
         # If he tells us our IP, record this and see if we get a majority vote on it
         if 'yourip' in d:
@@ -535,7 +536,7 @@ class Connection:
         ipv4 = None
         if self.connecter.config.get('same_nat_try_internal',0):
             is_tribler_peer = self.is_tribler_peer()
-            print >>sys.stderr,"connecter: send_extend_hs: Peer is Tribler client",is_tribler_peer
+            print >>sys.stderr,time.asctime(),'-', "connecter: send_extend_hs: Peer is Tribler client",is_tribler_peer
             if is_tribler_peer:
                 # If we're connecting to a Tribler peer, show our internal IP address
                 # as 'ipv4'.
@@ -558,14 +559,14 @@ class Connection:
             
         self._send_message(EXTEND + EXTEND_MSG_HANDSHAKE_ID + bencode(d))
         if DEBUG:
-            print >>sys.stderr,'connecter: sent extend: id=0+',d,"yourip",hisip,"ipv4",ipv4
+            print >>sys.stderr,time.asctime(),'-', 'connecter: sent extend: id=0+',d,"yourip",hisip,"ipv4",ipv4
 
     #
     # ut_pex support
     #
     def got_ut_pex(self,d):
         if DEBUG_UT_PEX:
-            print >>sys.stderr,"connecter: Got uTorrent PEX:",d
+            print >>sys.stderr,time.asctime(),'-', "connecter: Got uTorrent PEX:",d
         (same_added_peers,added_peers,dropped_peers) = check_ut_pex(d)
         
         # RePEX: increase counter
@@ -589,7 +590,7 @@ class Connection:
         # an untrusted source, so be a bit careful
         mx = self.connecter.ut_pex_max_addrs_from_peer
         if DEBUG_UT_PEX:
-            print >>sys.stderr,"connecter: Got",len(added_peers),"peers via uTorrent PEX, using max",mx
+            print >>sys.stderr,time.asctime(),'-', "connecter: Got",len(added_peers),"peers via uTorrent PEX, using max",mx
             
         # for now we have a strong bias towards Tribler peers
         if self.is_tribler_peer():
@@ -611,7 +612,7 @@ class Connection:
             sample_added_peers_with_id.append(peer_with_id)
         if len(sample_added_peers_with_id) > 0:
             if DEBUG_UT_PEX:
-                print >>sys.stderr,"connecter: Starting ut_pex conns to",len(sample_added_peers_with_id)
+                print >>sys.stderr,time.asctime(),'-', "connecter: Starting ut_pex conns to",len(sample_added_peers_with_id)
             self.connection.Encoder.start_connections(sample_added_peers_with_id)
 
     def send_extend_ut_pex(self,payload):
@@ -637,7 +638,7 @@ class Connection:
         t = cs_list[0]
         if t == CS_CHALLENGE_A:
             if DEBUG_CS:
-                print >>sys.stderr,"connecter: conn: CS: Got initial challenge"
+                print >>sys.stderr,time.asctime(),'-', "connecter: conn: CS: Got initial challenge"
             # Got a challenge to authenticate to participate in a closed swarm
             try:
                 response = self.closed_swarm_protocol.b_create_challenge(cs_list)
@@ -645,46 +646,46 @@ class Connection:
             except Exception,e:
                 self.cs_status.add_value("CS_bad_initial_challenge")
                 if DEBUG_CS:
-                    print >>sys.stderr,"connecter: conn: CS: Bad initial challenge:",e
+                    print >>sys.stderr,time.asctime(),'-', "connecter: conn: CS: Bad initial challenge:",e
         elif t == CS_CHALLENGE_B:
             if DEBUG_CS:
-                print >>sys.stderr,"connecter: conn: CS: Got return challenge"
+                print >>sys.stderr,time.asctime(),'-', "connecter: conn: CS: Got return challenge"
             try:
                 response = self.closed_swarm_protocol.a_provide_poa_message(cs_list)
                 if DEBUG_CS and not response:
-                    print >> sys.stderr, "connecter: I'm not intererested in data"
+                    print >> sys.stderr, time.asctime(),'-', "connecter: I'm not intererested in data"
                 self._send_cs_message(response)
             except Exception,e:
                 self.cs_status.add_value("CS_bad_return_challenge")
                 if DEBUG_CS:
-                    print >>sys.stderr,"connecter: conn: CS: Bad return challenge",e
+                    print >>sys.stderr,time.asctime(),'-', "connecter: conn: CS: Bad return challenge",e
                 print_exc()
                 
         elif t == CS_POA_EXCHANGE_A:
             if DEBUG_CS:
-               print >>sys.stderr,"connecter: conn: CS:Got POA from A"
+               print >>sys.stderr,time.asctime(),'-', "connecter: conn: CS:Got POA from A"
             try:
                 response = self.closed_swarm_protocol.b_provide_poa_message(cs_list)
                 self.remote_is_authenticated = self.closed_swarm_protocol.is_remote_node_authorized()
                 if DEBUG_CS:
-                    print >>sys.stderr,"connecter: conn: CS: Remote node authorized:",self.remote_is_authenticated
+                    print >>sys.stderr,time.asctime(),'-', "connecter: conn: CS: Remote node authorized:",self.remote_is_authenticated
                 if response:
                     self._send_cs_message(response)
             except Exception,e:
                 self.cs_status.add_value("CS_bad_POA_EXCHANGE_A")
                 if DEBUG_CS:
-                   print >>sys.stderr,"connecter: conn: CS: Bad POA from A:",e
+                   print >>sys.stderr,time.asctime(),'-', "connecter: conn: CS: Bad POA from A:",e
                 
         elif t == CS_POA_EXCHANGE_B:
             try:
                 self.closed_swarm_protocol.a_check_poa_message(cs_list)
                 self.remote_is_authenticated = self.closed_swarm_protocol.is_remote_node_authorized()
                 if DEBUG_CS:
-                   print >>sys.stderr,"connecter: conn: CS: Remote node authorized:",self.remote_is_authenticated
+                   print >>sys.stderr,time.asctime(),'-', "connecter: conn: CS: Remote node authorized:",self.remote_is_authenticated
             except Exception,e:
                 self.cs_status.add_value("CS_bad_POA_EXCHANGE_B")
                 if DEBUG_CS:
-                   print >>sys.stderr,"connecter: conn: CS: Bad POA from B:",e
+                   print >>sys.stderr,time.asctime(),'-', "connecter: conn: CS: Bad POA from B:",e
 
         if not self.closed_swarm_protocol.is_incomplete():
             self.connecter.cs_handshake_completed()
@@ -726,7 +727,7 @@ class Connection:
         psf = float(self.connecter.piece_size)
         ppdict = {}
         
-        #print >>sys.stderr,"connecter: g2g dq: orig",self.last_perc_sent
+        #print >>sys.stderr,time.asctime(),'-', "connecter: g2g dq: orig",self.last_perc_sent
         
         for index,perc in self.last_perc_sent.iteritems():
             # due to rerequests due to slow pieces the sum can be above 1.0
@@ -736,7 +737,7 @@ class Connection:
             ppdict[str(index)] = percb
         self.last_perc_sent = {}
         
-        #print >>sys.stderr,"connecter: g2g dq: dest",ppdict
+        #print >>sys.stderr,time.asctime(),'-', "connecter: g2g dq: dest",ppdict
         
         if len(ppdict) > 0:
             self.send_g2g_piece_xfer_v2(ppdict)
@@ -790,7 +791,7 @@ class Connection:
     #
     def connect_overlay(self):
         if DEBUG:
-            print >>sys.stderr,"connecter: Initiating overlay connection"
+            print >>sys.stderr,time.asctime(),'-', "connecter: Initiating overlay connection"
         if not self.initiated_overlay:
             from BaseLib.Core.Overlay.SecureOverlay import SecureOverlay
             
@@ -801,16 +802,16 @@ class Connection:
     def network_connect_dns_callback(self,exc,dns,permid,selversion):
         # WARNING: WILL BE CALLED BY NetworkThread
         if exc is not None:
-            print >>sys.stderr,"connecter: peer",dns,"said he supported overlay swarm, but we can't connect to him",exc
+            print >>sys.stderr,time.asctime(),'-', "connecter: peer",dns,"said he supported overlay swarm, but we can't connect to him",exc
 
     def start_cs_handshake(self):
         try:
             if DEBUG_CS:
-                print >>sys.stderr,"connecter: conn: CS: Initiating Closed Swarm Handshake"
+                print >>sys.stderr,time.asctime(),'-', "connecter: conn: CS: Initiating Closed Swarm Handshake"
             challenge = self.closed_swarm_protocol.a_create_challenge()
             self._send_cs_message(challenge)
         except Exception,e:
-            print >>sys.stderr,"connecter: conn: CS: Bad initial challenge:",e
+            print >>sys.stderr,time.asctime(),'-', "connecter: conn: CS: Bad initial challenge:",e
         
 
     #
@@ -828,7 +829,7 @@ class Connection:
             myintip = self.get_ip(real=True)
 
             if DEBUG:
-                print >>sys.stderr,"connecter: na_check_for_same_nat: his",hisip,"myext",myextip,"myint",myintip
+                print >>sys.stderr,time.asctime(),'-', "connecter: na_check_for_same_nat: his",hisip,"myext",myextip,"myint",myintip
             
             if hisip != myintip or hisip == '127.0.0.1': # to allow testing
                 # He can't fake his source addr, so we're not running on the
@@ -841,13 +842,13 @@ class Connection:
                     # I don't known my external IP and he's not on the same
                     # machine as me. yourip could be our real external IP, test.
                     if DEBUG:
-                        print >>sys.stderr,"connecter: na_check_same_nat: Don't know my ext ip, try to loopback to",yourip,"to see if that's me"
+                        print >>sys.stderr,time.asctime(),'-', "connecter: na_check_same_nat: Don't know my ext ip, try to loopback to",yourip,"to see if that's me"
                     self.na_start_loopback_connection(yourip)
                 elif hisip == myextip:
                     # Same NAT. He can't fake his source addr.
                     # Attempt local network connection
                     if DEBUG:
-                        print >>sys.stderr,"connecter: na_check_same_nat: Yes, trying to connect via internal"
+                        print >>sys.stderr,time.asctime(),'-', "connecter: na_check_same_nat: Yes, trying to connect via internal"
                     self.na_start_internal_connection()
                 else: 
                     # hisip != myextip
@@ -855,14 +856,14 @@ class Connection:
                     # is something different. Either he is lying or I'm
                     # mistaken, test
                     if DEBUG:
-                        print >>sys.stderr,"connecter: na_check_same_nat: Maybe, me thinks not, try to loopback to",yourip
+                        print >>sys.stderr,time.asctime(),'-', "connecter: na_check_same_nat: Maybe, me thinks not, try to loopback to",yourip
                     self.na_start_loopback_connection(yourip)
                 
                 
     def na_start_loopback_connection(self,yourip):
         """ Peer claims my external IP is "yourip". Try to connect back to myself """
         if DEBUG:
-            print >>sys.stderr,"connecter: na_start_loopback: Checking if my ext ip is",yourip
+            print >>sys.stderr,time.asctime(),'-', "connecter: na_start_loopback: Checking if my ext ip is",yourip
         self.na_candidate_ext_ip = yourip
         
         dns = (yourip,self.connecter.mylistenport)
@@ -876,7 +877,7 @@ class Connection:
         """
         himismeip = econnection.get_ip(real=True)
         if DEBUG:
-            print >>sys.stderr,"connecter: conn: na_got_loopback:",himismeip,self.na_candidate_ext_ip
+            print >>sys.stderr,time.asctime(),'-', "connecter: conn: na_got_loopback:",himismeip,self.na_candidate_ext_ip
         if self.na_candidate_ext_ip == himismeip:
             self.na_start_internal_connection()
                     
@@ -884,7 +885,7 @@ class Connection:
     def na_start_internal_connection(self):
         """ Reconnect to peer using internal network """
         if DEBUG:
-            print >>sys.stderr,"connecter: na_start_internal_connection"
+            print >>sys.stderr,time.asctime(),'-', "connecter: na_start_internal_connection"
         
         # Doesn't really matter who initiates. Letting other side do it makes
         # testing easier.
@@ -902,7 +903,7 @@ class Connection:
             
             hisdns = (hisip,hisport)
             if DEBUG:
-                print >>sys.stderr,"connecter: na_start_internal_connection to",hisdns
+                print >>sys.stderr,time.asctime(),'-', "connecter: na_start_internal_connection to",hisdns
             self.connection.Encoder.start_connection(hisdns,0)
 
     def na_get_address_distance(self):
@@ -954,16 +955,16 @@ class Connecter:
             except:
                 print_exc()
                 self.tracker_ip = None
-            #print >>sys.stderr,"Connecter: live: source/tracker is",self.tracker_ip
+            #print >>sys.stderr,time.asctime(),'-', "Connecter: live: source/tracker is",self.tracker_ip
         self.overlay_enabled = 0
         if self.config['overlay']:
             self.overlay_enabled = True
 
         if DEBUG:
             if self.overlay_enabled:
-                print >>sys.stderr,"connecter: Enabling overlay"
+                print >>sys.stderr,time.asctime(),'-', "connecter: Enabling overlay"
             else:
-                print >>sys.stderr,"connecter: Disabling overlay"
+                print >>sys.stderr,time.asctime(),'-', "connecter: Disabling overlay"
             
         self.ut_pex_enabled = 0
         if 'ut_pex_max_addrs_from_peer' in self.config:
@@ -982,13 +983,13 @@ class Connecter:
             # history is a list containing previous request served (to
             # limit our bandwidth usage)
             self.ut_metadata_history = []
-            if DEBUG: print >> sys.stderr,"connecter.__init__: Enable ut_metadata"
+            if DEBUG: print >> sys.stderr,time.asctime(),'-', "connecter.__init__: Enable ut_metadata"
         
         if DEBUG_UT_PEX:
             if self.ut_pex_enabled:
-                print >>sys.stderr,"connecter: Enabling uTorrent PEX",self.ut_pex_max_addrs_from_peer
+                print >>sys.stderr,time.asctime(),'-', "connecter: Enabling uTorrent PEX",self.ut_pex_max_addrs_from_peer
             else:
-                print >>sys.stderr,"connecter: Disabling uTorrent PEX"
+                print >>sys.stderr,time.asctime(),'-', "connecter: Disabling uTorrent PEX"
 
         # The set of messages we support. Note that the msg ID is an int not a byte in 
         # this dict.
@@ -996,7 +997,7 @@ class Connecter:
         
         # Say in the EXTEND handshake that we support Closed swarms
         if DEBUG:
-            print >>sys.stderr,"connecter: I support Closed Swarms"
+            print >>sys.stderr,time.asctime(),'-', "connecter: I support Closed Swarms"
         d = {EXTEND_MSG_CS:ord(CS_CHALLENGE_A)}
         self.EXTEND_HANDSHAKE_M_DICT.update(d)
 
@@ -1028,7 +1029,7 @@ class Connecter:
         self.EXTEND_HANDSHAKE_M_DICT.update(d)
 
         if DEBUG:
-            print >>sys.stderr,"Connecter: EXTEND: my dict",self.EXTEND_HANDSHAKE_M_DICT
+            print >>sys.stderr,time.asctime(),'-', "Connecter: EXTEND: my dict",self.EXTEND_HANDSHAKE_M_DICT
 
         # BarterCast
         if config['overlay']:
@@ -1048,10 +1049,10 @@ class Connecter:
             if self.config['cs_keys'] != None:
                 if len(self.config['cs_keys']) == 0:
                     if DEBUG_CS:
-                        print >>sys.stderr, "connecter: cs_keys is empty"
+                        print >>sys.stderr, time.asctime(),'-', "connecter: cs_keys is empty"
                 else:
                     if DEBUG_CS:
-                       print >>sys.stderr, "connecter: This is a closed swarm  - has cs_keys"
+                       print >>sys.stderr, time.asctime(),'-', "connecter: This is a closed swarm  - has cs_keys"
                     self.is_closed_swarm = True
 
 
@@ -1083,12 +1084,12 @@ class Connecter:
             [client,version] = decodePeerID(connection.id)
             
             if DEBUG:
-                print >>sys.stderr,"connecter: Peer is client",client,"version",version,c.get_ip(),c.get_port()
+                print >>sys.stderr,time.asctime(),'-', "connecter: Peer is client",client,"version",version,c.get_ip(),c.get_port()
             
             if self.overlay_enabled and client == TRIBLER_PEERID_LETTER and version <= '3.5.0' and connection.locally_initiated:
                 # Old Tribler, establish overlay connection<
                 if DEBUG:
-                    print >>sys.stderr,"connecter: Peer is previous Tribler version, attempt overlay connection"
+                    print >>sys.stderr,time.asctime(),'-', "connecter: Peer is previous Tribler version, attempt overlay connection"
                 c.connect_overlay()
             elif self.ut_pex_enabled:
                 # EXTEND handshake must be sent just after BT handshake, 
@@ -1101,11 +1102,11 @@ class Connecter:
         c.download = self.downloader.make_download(c)
         if not self.is_closed_swarm:
             if DEBUG_CS:
-               print >>sys.stderr,"connecter: connection_made: Freeing choker!"
+               print >>sys.stderr,time.asctime(),'-', "connecter: connection_made: Freeing choker!"
             self.choker.connection_made(c)
         else:
             if DEBUG_CS:
-                print >>sys.stderr,"connecter: connection_made: Will free choker later"
+                print >>sys.stderr,time.asctime(),'-', "connecter: connection_made: Will free choker later"
             self.choker.add_connection(c)
             #self.cs_post_func = lambda:self.choker.connection_made(c)
             #self.cs_post_func = lambda:self.choker.start_connection(c)
@@ -1133,19 +1134,19 @@ class Connecter:
             up_kb = int(c.total_uploaded / 1024)
             
             if DEBUG:
-                print >> sys.stderr, "bartercast: attempting database update, adding olthread"
+                print >> sys.stderr, time.asctime(),'-', "bartercast: attempting database update, adding olthread"
             
             olthread_bartercast_conn_lost_lambda = lambda:olthread_bartercast_conn_lost(ip,port,down_kb,up_kb)
             self.overlay_bridge.add_task(olthread_bartercast_conn_lost_lambda,0)
         else:
             if DEBUG:
-                print >> sys.stderr, "bartercast: no overlay bridge found"
+                print >> sys.stderr, time.asctime(),'-', "bartercast: no overlay bridge found"
             
         #########################
         
         if DEBUG:
             if c.get_ip() == self.tracker_ip:
-                print >>sys.stderr,"connecter: connection_lost: live: WAAH2 closing SOURCE"
+                print >>sys.stderr,time.asctime(),'-', "connecter: connection_lost: live: WAAH2 closing SOURCE"
             
         del self.connections[connection]
         if c.download:
@@ -1185,22 +1186,22 @@ class Connecter:
     def ut_pex_callback(self):
         """ Periocially send info about the peers you know to the other peers """
         if DEBUG_UT_PEX:
-            print >>sys.stderr,"connecter: Periodic ut_pex update"
+            print >>sys.stderr,time.asctime(),'-', "connecter: Periodic ut_pex update"
             
         currconns = self.get_ut_pex_conns()
         (addedconns,droppedconns) = ut_pex_get_conns_diff(currconns,self.get_ut_pex_previous_conns())
         self.set_ut_pex_previous_conns(currconns)
         if DEBUG_UT_PEX:
             for conn in addedconns:
-                print >>sys.stderr,"connecter: ut_pex: Added",conn.get_ip(),conn.get_extend_listenport()
+                print >>sys.stderr,time.asctime(),'-', "connecter: ut_pex: Added",conn.get_ip(),conn.get_extend_listenport()
             for conn in droppedconns:
-                print >>sys.stderr,"connecter: ut_pex: Dropped",conn.get_ip(),conn.get_extend_listenport()
+                print >>sys.stderr,time.asctime(),'-', "connecter: ut_pex: Dropped",conn.get_ip(),conn.get_extend_listenport()
             
         for c in currconns:
             if c.supports_extend_msg(EXTEND_MSG_UTORRENT_PEX):
                 try:
                     if DEBUG_UT_PEX:
-                        print >>sys.stderr,"connecter: ut_pex: Creating msg for",c.get_ip(),c.get_extend_listenport()
+                        print >>sys.stderr,time.asctime(),'-', "connecter: ut_pex: Creating msg for",c.get_ip(),c.get_extend_listenport()
                     if c.first_ut_pex():
                         aconns = currconns
                         dconns = []
@@ -1230,7 +1231,7 @@ class Connecter:
         DIC: The bdecoded dictionary
         MESSAGE: The entire message: <EXTEND-ID><METADATA-ID><BENCODED-DIC><OPTIONAL-DATA>
         """
-        if DEBUG: print >> sys.stderr, "connecter.got_ut_metadata:", dic
+        if DEBUG: print >> sys.stderr, time.asctime(),'-', "connecter.got_ut_metadata:", dic
 
         msg_type = dic.get("msg_type", None)
         if not type(msg_type) in (int, long):
@@ -1242,7 +1243,7 @@ class Connecter:
             raise ValueError("Invalid ut_metadata.piece value")
 
         if msg_type == 0: # request
-            if DEBUG: print >> sys.stderr, "connecter.got_ut_metadata: Received request for piece", piece
+            if DEBUG: print >> sys.stderr, time.asctime(),'-', "connecter.got_ut_metadata: Received request for piece", piece
 
             # our flood protection policy is to upload all metadata
             # once every n minutes.
@@ -1285,13 +1286,13 @@ class Connecter:
             
             if len(message) <= 13:
                 if DEBUG:
-                    print >>sys.stderr,"Close on bad HASHPIECE: msg len"
+                    print >>sys.stderr,time.asctime(),'-', "Close on bad HASHPIECE: msg len"
                 connection.close()
                 return
             i = toint(message[1:5])
             if i >= self.numpieces:
                 if DEBUG:
-                    print >>sys.stderr,"Close on bad HASHPIECE: index out of range"
+                    print >>sys.stderr,time.asctime(),'-', "Close on bad HASHPIECE: index out of range"
                 connection.close()
                 return
             begin = toint(message[5:9])
@@ -1310,20 +1311,20 @@ class Connecter:
             piece = message[13+len_hashlist:]
 
             if DEBUG_NORMAL_MSGS:
-                print >>sys.stderr,"connecter: Got HASHPIECE",i,begin
+                print >>sys.stderr,time.asctime(),'-', "connecter: Got HASHPIECE",i,begin
 
             if c.download.got_piece(i, begin, hashlist, piece):
                 self.got_piece(i)
         except Exception,e:
             if DEBUG:
-                print >>sys.stderr,"Close on bad HASHPIECE: exception",str(e)
+                print >>sys.stderr,time.asctime(),'-', "Close on bad HASHPIECE: exception",str(e)
                 print_exc()
             connection.close()
 
     # NETWORK AWARE
     def na_got_loopback(self,econnection):
         if DEBUG:
-            print >>sys.stderr,"connecter: na_got_loopback: Got connection from",econnection.get_ip(),econnection.get_port()
+            print >>sys.stderr,time.asctime(),'-', "connecter: na_got_loopback: Got connection from",econnection.get_ip(),econnection.get_port()
         for c in self.connections.itervalues():
             ret = c.na_got_loopback(econnection)
             if ret is not None:
@@ -1335,7 +1336,7 @@ class Connecter:
         Doesn't matter, only one is enough to close the original connection.
         """
         if DEBUG:
-            print >>sys.stderr,"connecter: na_got_internal: From",newconn.get_ip(),newconn.get_port()
+            print >>sys.stderr,time.asctime(),'-', "connecter: na_got_internal: From",newconn.get_ip(),newconn.get_port()
         
         origconn.close()
 
@@ -1351,7 +1352,7 @@ class Connecter:
             st = time.time()
 
         if DEBUG_NORMAL_MSGS:
-            print >>sys.stderr,"connecter: Got",getMessageName(t),connection.get_ip()
+            print >>sys.stderr,time.asctime(),'-', "connecter: Got",getMessageName(t),connection.get_ip()
         
         if t == EXTEND:
             self.got_extend_message(connection,c,message,self.ut_pex_enabled)
@@ -1360,7 +1361,7 @@ class Connecter:
         # If this is a closed swarm and we have not authenticated the 
         # remote node, we must NOT GIVE IT ANYTHING!
         #if self.is_closed_swarm and c.closed_swarm_protocol.is_incomplete():
-            #print >>sys.stderr, "connecter: Remote node not authorized, ignoring it"
+            #print >>sys.stderr, time.asctime(),'-', "connecter: Remote node not authorized, ignoring it"
             #return
 
         if self.is_closed_swarm and c.can_send_to():
@@ -1368,27 +1369,27 @@ class Connecter:
             
         if t == BITFIELD and c.got_anything:
             if DEBUG:
-                print >>sys.stderr,"Close on BITFIELD"
+                print >>sys.stderr,time.asctime(),'-', "Close on BITFIELD"
             connection.close()
             return
         c.got_anything = True
         if (t in [CHOKE, UNCHOKE, INTERESTED, NOT_INTERESTED] and 
                 len(message) != 1):
             if DEBUG:
-                print >>sys.stderr,"Close on bad (UN)CHOKE/(NOT_)INTERESTED",t
+                print >>sys.stderr,time.asctime(),'-', "Close on bad (UN)CHOKE/(NOT_)INTERESTED",t
             connection.close()
             return
         if t == CHOKE:
             if DEBUG_NORMAL_MSGS:
-                print >>sys.stderr,"connecter: Got CHOKE from",connection.get_ip()
+                print >>sys.stderr,time.asctime(),'-', "connecter: Got CHOKE from",connection.get_ip()
             c.download.got_choke()
         elif t == UNCHOKE:
             if DEBUG_NORMAL_MSGS:
-                print >>sys.stderr,"connecter: Got UNCHOKE from",connection.get_ip()
+                print >>sys.stderr,time.asctime(),'-', "connecter: Got UNCHOKE from",connection.get_ip()
             c.download.got_unchoke()
         elif t == INTERESTED:
             if DEBUG_NORMAL_MSGS:
-                print >>sys.stderr,"connecter: Got INTERESTED from",connection.get_ip()
+                print >>sys.stderr,time.asctime(),'-', "connecter: Got INTERESTED from",connection.get_ip()
             if c.upload is not None:
                 c.upload.got_interested()
         elif t == NOT_INTERESTED:
@@ -1396,26 +1397,26 @@ class Connecter:
         elif t == HAVE:
             if len(message) != 5:
                 if DEBUG:
-                    print >>sys.stderr,"Close on bad HAVE: msg len"
+                    print >>sys.stderr,time.asctime(),'-', "Close on bad HAVE: msg len"
                 connection.close()
                 return
             i = toint(message[1:])
             if i >= self.numpieces:
                 if DEBUG:
-                    print >>sys.stderr,"Close on bad HAVE: index out of range"
+                    print >>sys.stderr,time.asctime(),'-', "Close on bad HAVE: index out of range"
                 connection.close()
                 return
             if DEBUG_NORMAL_MSGS:
-                print >>sys.stderr,"connecter: Got HAVE(",i,") from",connection.get_ip()
+                print >>sys.stderr,time.asctime(),'-', "connecter: Got HAVE(",i,") from",connection.get_ip()
             c.download.got_have(i)
         elif t == BITFIELD:
             if DEBUG_NORMAL_MSGS:
-                print >>sys.stderr,"connecter: Got BITFIELD from",connection.get_ip()
+                print >>sys.stderr,time.asctime(),'-', "connecter: Got BITFIELD from",connection.get_ip()
             try:
                 b = Bitfield(self.numpieces, message[1:],calcactiveranges=self.live_streaming)
             except ValueError:
                 if DEBUG:
-                    print >>sys.stderr,"Close on bad BITFIELD"
+                    print >>sys.stderr,time.asctime(),'-', "Close on bad BITFIELD"
                 connection.close()
                 return
             if c.download is not None:
@@ -1423,33 +1424,33 @@ class Connecter:
         elif t == REQUEST:
             if not c.can_send_to():
                 c.cs_status_unauth_requests.inc()
-                print >> sys.stderr,"Got REQUEST but remote node is not authenticated"
+                print >> sys.stderr,time.asctime(),'-', "Got REQUEST but remote node is not authenticated"
                 return # TODO: Do this better
 
             if len(message) != 13:
                 if DEBUG:
-                    print >>sys.stderr,"Close on bad REQUEST: msg len"
+                    print >>sys.stderr,time.asctime(),'-', "Close on bad REQUEST: msg len"
                 connection.close()
                 return
             i = toint(message[1:5])
             if i >= self.numpieces:
                 if DEBUG:
-                    print >>sys.stderr,"Close on bad REQUEST: index out of range"
+                    print >>sys.stderr,time.asctime(),'-', "Close on bad REQUEST: index out of range"
                 connection.close()
                 return
             if DEBUG_NORMAL_MSGS:
-                print >>sys.stderr,"connecter: Got REQUEST(",i,") from",connection.get_ip()
+                print >>sys.stderr,time.asctime(),'-', "connecter: Got REQUEST(",i,") from",connection.get_ip()
             c.got_request(i, toint(message[5:9]), toint(message[9:]))
         elif t == CANCEL:
             if len(message) != 13:
                 if DEBUG:
-                    print >>sys.stderr,"Close on bad CANCEL: msg len"
+                    print >>sys.stderr,time.asctime(),'-', "Close on bad CANCEL: msg len"
                 connection.close()
                 return
             i = toint(message[1:5])
             if i >= self.numpieces:
                 if DEBUG:
-                    print >>sys.stderr,"Close on bad CANCEL: index out of range"
+                    print >>sys.stderr,time.asctime(),'-', "Close on bad CANCEL: index out of range"
                 connection.close()
                 return
             c.upload.got_cancel(i, toint(message[5:9]), 
@@ -1457,25 +1458,25 @@ class Connecter:
         elif t == PIECE:
             if len(message) <= 9:
                 if DEBUG:
-                    print >>sys.stderr,"Close on bad PIECE: msg len"
+                    print >>sys.stderr,time.asctime(),'-', "Close on bad PIECE: msg len"
                 connection.close()
                 return
             i = toint(message[1:5])
             if i >= self.numpieces:
                 if DEBUG:
-                    print >>sys.stderr,"Close on bad PIECE: msg len"
+                    print >>sys.stderr,time.asctime(),'-', "Close on bad PIECE: msg len"
                 connection.close()
                 return
             if DEBUG_NORMAL_MSGS: # or connection.get_ip().startswith("192"):
-                print >>sys.stderr,"connecter: Got PIECE(",i,") from",connection.get_ip()
+                print >>sys.stderr,time.asctime(),'-', "connecter: Got PIECE(",i,") from",connection.get_ip()
             #if connection.get_ip().startswith("192"):
-            #    print >>sys.stderr,"@",
+            #    print >>sys.stderr,time.asctime(),'-', "@",
             try:
                 if c.download.got_piece(i, toint(message[5:9]), [], message[9:]):
                     self.got_piece(i)
             except Exception,e:
                 if DEBUG:
-                    print >>sys.stderr,"Close on bad PIECE: exception",str(e)
+                    print >>sys.stderr,time.asctime(),'-', "Close on bad PIECE: exception",str(e)
                     print_exc()
                 connection.close()
                 return
@@ -1488,12 +1489,12 @@ class Connecter:
             # EXTEND_MSG_G2G_V1 only, V2 is proper EXTEND msg 
             if len(message) <= 12:
                 if DEBUG:
-                    print >>sys.stderr,"Close on bad G2G_PIECE_XFER: msg len"
+                    print >>sys.stderr,time.asctime(),'-', "Close on bad G2G_PIECE_XFER: msg len"
                 connection.close()
                 return
             if not c.use_g2g:
                 if DEBUG:
-                    print >>sys.stderr,"Close on receiving G2G_PIECE_XFER over non-g2g connection"
+                    print >>sys.stderr,time.asctime(),'-', "Close on receiving G2G_PIECE_XFER over non-g2g connection"
                 connection.close()
                 return
 
@@ -1509,24 +1510,24 @@ class Connecter:
             et = time.time()
             diff = et - st
             if diff > 0.1:
-                print >>sys.stderr,"connecter: $$$$$$$$$$$$",getMessageName(t),"took",diff
+                print >>sys.stderr,time.asctime(),'-', "connecter: $$$$$$$$$$$$",getMessageName(t),"took",diff
 
 
     def got_extend_message(self,connection,c,message,ut_pex_enabled):
         # connection: Encrypter.Connection; c: Connecter.Connection
         if DEBUG:
-            print >>sys.stderr,"connecter: Got EXTEND message, len",len(message)
-            print >>sys.stderr,"connecter: his handshake",c.extend_hs_dict,c.get_ip()
+            print >>sys.stderr,time.asctime(),'-', "connecter: Got EXTEND message, len",len(message)
+            print >>sys.stderr,time.asctime(),'-', "connecter: his handshake",c.extend_hs_dict,c.get_ip()
             
         try:
             if len(message) < 4:
                 if DEBUG:
-                    print >>sys.stderr,"Close on bad EXTEND: msg len"
+                    print >>sys.stderr,time.asctime(),'-', "Close on bad EXTEND: msg len"
                 connection.close()
                 return
             ext_id = message[1]
             if DEBUG:
-                print >>sys.stderr,"connecter: Got EXTEND message, id",ord(ext_id)
+                print >>sys.stderr,time.asctime(),'-', "connecter: Got EXTEND message, id",ord(ext_id)
             if ext_id == EXTEND_MSG_HANDSHAKE_ID: 
                 # Message is Handshake
                 d = bdecode(message[2:])
@@ -1534,7 +1535,7 @@ class Connecter:
                     c.got_extend_handshake(d)
                 else:
                     if DEBUG:
-                        print >>sys.stderr,"Close on bad EXTEND: payload of handshake is not a bencoded dict"
+                        print >>sys.stderr,time.asctime(),'-', "Close on bad EXTEND: payload of handshake is not a bencoded dict"
                     connection.close()
                     return
             else:
@@ -1542,24 +1543,24 @@ class Connecter:
                 ext_msg_name = self.our_extend_msg_id_to_name(ext_id)
                 if ext_msg_name is None:
                     if DEBUG:
-                        print >>sys.stderr,"Close on bad EXTEND: peer sent ID we didn't define in handshake"
+                        print >>sys.stderr,time.asctime(),'-', "Close on bad EXTEND: peer sent ID we didn't define in handshake"
                     connection.close()
                     return
                 elif ext_msg_name == EXTEND_MSG_OVERLAYSWARM:
                     if DEBUG:
-                        print >>sys.stderr,"Not closing EXTEND+CHALLENGE: peer didn't read our spec right, be liberal"
+                        print >>sys.stderr,time.asctime(),'-', "Not closing EXTEND+CHALLENGE: peer didn't read our spec right, be liberal"
                 elif ext_msg_name == EXTEND_MSG_UTORRENT_PEX and ut_pex_enabled:
                     d = bdecode(message[2:])
                     if type(d) == DictType:
                         c.got_ut_pex(d)
                     else:
                         if DEBUG:
-                            print >>sys.stderr,"Close on bad EXTEND: payload of ut_pex is not a bencoded dict"
+                            print >>sys.stderr,time.asctime(),'-', "Close on bad EXTEND: payload of ut_pex is not a bencoded dict"
                         connection.close()
                         return
                 elif ext_msg_name == EXTEND_MSG_METADATA:
                     if DEBUG:
-                        print >> sys.stderr, "Connecter.got_extend_message() ut_metadata"
+                        print >> sys.stderr, time.asctime(),'-', "Connecter.got_extend_message() ut_metadata"
                     # bdecode sloppy will make bdecode ignore the data
                     # in message that is placed -after- the bencoded
                     # data (this is the case for a data message)
@@ -1568,32 +1569,32 @@ class Connecter:
                         self.got_ut_metadata(c, d, message)
                     else:
                         if DEBUG:
-                            print >> sys.stderr, "Connecter.got_extend_message() close on bad ut_metadata message"
+                            print >> sys.stderr, time.asctime(),'-', "Connecter.got_extend_message() close on bad ut_metadata message"
                         connection.close()
                         return
                 elif ext_msg_name == EXTEND_MSG_G2G_V2 and self.use_g2g:
                     ppdict = bdecode(message[2:])
                     if type(ppdict) != DictType:
                         if DEBUG:
-                            print >>sys.stderr,"Close on bad EXTEND+G2G: payload not dict"
+                            print >>sys.stderr,time.asctime(),'-', "Close on bad EXTEND+G2G: payload not dict"
                         connection.close()
                         return
                     for k,v in ppdict.iteritems():
                         if type(k) != StringType or type(v) != StringType:
                             if DEBUG:
-                                print >>sys.stderr,"Close on bad EXTEND+G2G: key,value not of type int,char"
+                                print >>sys.stderr,time.asctime(),'-', "Close on bad EXTEND+G2G: key,value not of type int,char"
                             connection.close()
                             return
                         try:
                             int(k)
                         except:
                             if DEBUG:
-                                print >>sys.stderr,"Close on bad EXTEND+G2G: key not int"
+                                print >>sys.stderr,time.asctime(),'-', "Close on bad EXTEND+G2G: key not int"
                             connection.close()
                             return
                         if ord(v) > 100:
                             if DEBUG:
-                                print >>sys.stderr,"Close on bad EXTEND+G2G: value too big",ppdict,v,ord(v)
+                                print >>sys.stderr,time.asctime(),'-', "Close on bad EXTEND+G2G: value too big",ppdict,v,ord(v)
                             connection.close()
                             return
                             
@@ -1610,13 +1611,13 @@ class Connecter:
                     
                 else:
                     if DEBUG:
-                        print >>sys.stderr,"Close on bad EXTEND: peer sent ID that maps to name we don't support",ext_msg_name,`ext_id`,ord(ext_id)
+                        print >>sys.stderr,time.asctime(),'-', "Close on bad EXTEND: peer sent ID that maps to name we don't support",ext_msg_name,`ext_id`,ord(ext_id)
                     connection.close()
                     return
             return
         except Exception,e:
             if not DEBUG:
-                print >>sys.stderr,"Close on bad EXTEND: exception:",str(e),`message[2:]`
+                print >>sys.stderr,time.asctime(),'-', "Close on bad EXTEND: exception:",str(e),`message[2:]`
                 print_exc()
             connection.close()
             return
@@ -1636,15 +1637,15 @@ class Connecter:
             connection.got_anything = False
             self.choker.start_connection(connection)
         except Exception,e:
-            print >> sys.stderr,"connecter: CS: Error restarting after CS handshake:",e
+            print >> sys.stderr,time.asctime(),'-', "connecter: CS: Error restarting after CS handshake:",e
         
     def cs_handshake_completed(self):
         if DEBUG_CS:
-            print >>sys.stderr,"connecter: Closed swarm handshake completed!"
+            print >>sys.stderr,time.asctime(),'-', "connecter: Closed swarm handshake completed!"
         if self.cs_post_func:
             self.cs_post_func()
         elif DEBUG_CS:
-            print >>sys.stderr,"connecter: CS: Woops, don't have post function"
+            print >>sys.stderr,time.asctime(),'-', "connecter: CS: Woops, don't have post function"
 
 
 def olthread_bartercast_conn_lost(ip,port,down_kb,up_kb):
@@ -1662,7 +1663,7 @@ def olthread_bartercast_conn_lost(ip,port,down_kb,up_kb):
         my_permid = bartercastdb.my_permid
     
         if DEBUG:
-            print >> sys.stderr, "bartercast: (Connecter): Up %d down %d peer %s:%s (PermID = %s)" % (up_kb, down_kb, ip, port, `permid`)
+            print >> sys.stderr, time.asctime(),'-', "bartercast: (Connecter): Up %d down %d peer %s:%s (PermID = %s)" % (up_kb, down_kb, ip, port, `permid`)
     
         # Save exchanged KBs in BarterCastDB
         changed = False
@@ -1692,7 +1693,7 @@ def olthread_bartercast_conn_lost(ip,port,down_kb,up_kb):
 
     else:
         if DEBUG:
-            print >> sys.stderr, "BARTERCAST: No bartercastdb instance"
+            print >> sys.stderr, time.asctime(),'-', "BARTERCAST: No bartercastdb instance"
             
 
             

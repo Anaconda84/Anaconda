@@ -1,3 +1,4 @@
+import time 
 # Written by Pawel Garbacki, Arno Bakker
 # see LICENSE.txt for license information
 #
@@ -34,7 +35,7 @@ class HelperMessageHandler:
     def handleMessage(self,permid,selversion,message):
         t = message[0]
         #if DEBUG:
-        #    print >> sys.stderr,"helper: Got",getMessageName(t)
+        #    print >> sys.stderr,time.asctime(),'-', "helper: Got",getMessageName(t)
 
         if t == DOWNLOAD_HELP:
             return self.got_dlhelp_request(permid, message, selversion)
@@ -48,7 +49,7 @@ class HelperMessageHandler:
         try:
             infohash = message[1:]
         except:
-            print >> sys.stderr,"helper: warning: bad data in dlhelp_request"
+            print >> sys.stderr,time.asctime(),'-', "helper: warning: bad data in dlhelp_request"
             return False
         
         if len(infohash) != 20:
@@ -78,8 +79,8 @@ class HelperMessageHandler:
         tfile.close()
 
         if DEBUG:
-            print >> sys.stderr,"helpmsg: Got metadata required for helping",show_permid_short(permid)
-            print >> sys.stderr,"helpmsg: torrent: ",torrentfilename
+            print >> sys.stderr,time.asctime(),'-', "helpmsg: Got metadata required for helping",show_permid_short(permid)
+            print >> sys.stderr,time.asctime(),'-', "helpmsg: torrent: ",torrentfilename
 
         tdef = TorrentDef.load(torrentfilename)
         if self.dlconfig is None:
@@ -94,7 +95,7 @@ class HelperMessageHandler:
 
     def get_metadata(self, permid, infohash, selversion):
         if DEBUG:
-            print >> sys.stderr,"helpmsg: Don't have torrent yet, ask coordinator"
+            print >> sys.stderr,time.asctime(),'-', "helpmsg: Don't have torrent yet, ask coordinator"
         if not self.metadata_queue.has_key(infohash):
             self.metadata_queue[infohash] = []
         self.metadata_queue[infohash].append(permid)
@@ -102,10 +103,10 @@ class HelperMessageHandler:
 
     def metadatahandler_received_torrent(self, infohash, torrent_data):
         if DEBUG:
-            print >> sys.stderr,"helpmsg: Metadata handler reports torrent is in."
+            print >> sys.stderr,time.asctime(),'-', "helpmsg: Metadata handler reports torrent is in."
         if not self.metadata_queue.has_key(infohash) or not self.metadata_queue[infohash]:
             if DEBUG:
-                print >> sys.stderr,"helpmsg: Metadata handler reported a torrent we are not waiting for."
+                print >> sys.stderr,time.asctime(),'-', "helpmsg: Metadata handler reported a torrent we are not waiting for."
             return
         
         for permid in self.metadata_queue[infohash]:
@@ -137,7 +138,7 @@ class HelperMessageHandler:
         try:
             infohash = message[1:]
         except:
-            print >> sys.stderr,"helper: warning: bad data in STOP_DOWNLOAD_HELP"
+            print >> sys.stderr,time.asctime(),'-', "helper: warning: bad data in STOP_DOWNLOAD_HELP"
             return False
 
         network_got_stop_dlhelp_lambda = lambda:self.network_got_stop_dlhelp(permid,message,selversion,infohash)
@@ -158,7 +159,7 @@ class HelperMessageHandler:
 
         if not h.is_coordinator(permid): 
             if DEBUG:
-                print >> sys.stderr,"helpmsg: Got a STOP_DOWNLOAD_HELP message from non-coordinator",show_permid_short(permid)
+                print >> sys.stderr,time.asctime(),'-', "helpmsg: Got a STOP_DOWNLOAD_HELP message from non-coordinator",show_permid_short(permid)
             return
 
         # Find and remove download
@@ -173,7 +174,7 @@ class HelperMessageHandler:
             infohash = message[1:21]
             pieces = bdecode(message[21:])
         except:
-            print >> sys.stderr,"helper: warning: bad data in PIECES_RESERVED message"
+            print >> sys.stderr,time.asctime(),'-', "helper: warning: bad data in PIECES_RESERVED message"
             return False
 
         network_got_pieces_reserved_lambda = lambda:self.network_got_pieces_reserved(permid,message,selversion,infohash,pieces)

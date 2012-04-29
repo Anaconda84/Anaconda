@@ -1,3 +1,4 @@
+import time 
 # Written by Jie Yang
 # see LICENSE.txt for license information
 
@@ -138,7 +139,7 @@ class Bsddb2Sqlite:
                     self.commit_begined = 0
         
     def convert_PeerDB(self, limit=0):
-        print >>sys.stderr, "convert_PeerDB"
+        print >>sys.stderr, time.asctime(),'-', "convert_PeerDB"
         peer_db = PeerDB.getInstance(self.bsddb_dir)
         npeers = 0
         for permid,db_data in peer_db._data.iteritems():
@@ -169,7 +170,7 @@ class Bsddb2Sqlite:
                 data['thumbnail'] = icon_str
                 icon_path = os.path.join(self.icon_dir, iconfilename + '.jpg')
                 if os.path.isfile(icon_path):
-                    print >> sys.stderr, 'remove', icon_path
+                    print >> sys.stderr, time.asctime(),'-', 'remove', icon_path
                     os.remove(icon_path)
 
             self._addPeerToDB(permid, data)
@@ -185,7 +186,7 @@ class Bsddb2Sqlite:
 #         for iconfilename in self.icons:
 #             icon_path = os.path.join(self.icon_dir, iconfilename + '.jpg')
 #             if os.path.isfile(icon_path):
-#                 print >> sys.stderr, 'remove', icon_path
+#                 print >> sys.stderr, time.asctime(),'-', 'remove', icon_path
 #                 os.remove(icon_path)
         
     def readIcon(self, iconfilename):
@@ -297,7 +298,7 @@ class Bsddb2Sqlite:
         return data            
 
     def convert_TorrentDB(self, limit=0):
-        print >>sys.stderr, "convert_TorrentDB"
+        print >>sys.stderr, time.asctime(),'-', "convert_TorrentDB"
         torrent_db = TorrentDB.getInstance(self.bsddb_dir)
         ntorrents = 0
         
@@ -340,7 +341,7 @@ class Bsddb2Sqlite:
             if data['progress'] > 0:
                 self.progress[infohash] = data['progress']
 
-            #print >>sys.stderr,"bsddb2sqlite: _addTorrentToDB:",data['name'], data['torrent_name']
+            #print >>sys.stderr,time.asctime(),'-', "bsddb2sqlite: _addTorrentToDB:",data['name'], data['torrent_name']
 
             sql_insert_torrent = """
             INSERT INTO Torrent 
@@ -360,7 +361,7 @@ class Bsddb2Sqlite:
                   data['seeder'], data['leecher'], data['comment'])
                  )
             except Exception, msg:
-                print >> sys.stderr, "error input for _addTorrentToDB:", data, Exception, msg
+                print >> sys.stderr, time.asctime(),'-', "error input for _addTorrentToDB:", data, Exception, msg
                 #sys.exit(1)
             
         torrent_id = self._getTorrentID(infohash_str, False)
@@ -399,11 +400,11 @@ class Bsddb2Sqlite:
         try:
             self.cur.executemany(sql_insert_torrent_tracker, values)
         except Exception, msg:
-            print >> sys.stderr, "error input for addTorrentTracker", data, values, Exception, msg
+            print >> sys.stderr, time.asctime(),'-', "error input for addTorrentTracker", data, values, Exception, msg
         
 
     def convert_PreferenceDB(self):
-        print >>sys.stderr, "convert_PreferenceDB"
+        print >>sys.stderr, time.asctime(),'-', "convert_PreferenceDB"
         #print len(self.permid_id), len(self.infohash_id)
         pref_db = PreferenceDB.getInstance(self.bsddb_dir)
         nprefs = 0
@@ -437,7 +438,7 @@ class Bsddb2Sqlite:
             pass
 
     def convert_MyPreferenceDB(self):
-        print >>sys.stderr, "convert_MyPreferenceDB"
+        print >>sys.stderr, time.asctime(),'-', "convert_MyPreferenceDB"
         
         mypref_db = MyPreferenceDB.getInstance(self.bsddb_dir)
         nprefs = 0
@@ -458,7 +459,7 @@ class Bsddb2Sqlite:
             download_dir = data.get('content_dir', '')
             # Arno, 2008-10-23: destdir should be topdir
             dest_path = download_dir #os.path.join(download_dir, download_name)
-            #print >>sys.stderr,"bsddb2sqlite: mypreferences: Setting destdir to",dest_path
+            #print >>sys.stderr,time.asctime(),'-', "bsddb2sqlite: mypreferences: Setting destdir to",dest_path
             creation_time = data.get('created_time', 0)
             prog = self.progress.get(infohash, 0)    
             self.cur.execute(sql, (torrent_id, dest_path, prog, creation_time))
@@ -482,7 +483,7 @@ class Bsddb2Sqlite:
         self.cur.execute(sql)
         
     def convert_MyDB(self, torrent_dir=None):
-        print >>sys.stderr, "convert MyDB to MyInfo"
+        print >>sys.stderr, time.asctime(),'-', "convert MyDB to MyInfo"
         
         mydb = MyDB.getInstance(self.bsddb_dir)
             
@@ -503,7 +504,7 @@ class Bsddb2Sqlite:
 
     def create_sqlite(self, file_path, sql_file, autocommit=0):
         if os.path.exists(file_path):
-            print >>sys.stderr, "sqlite db already exists", os.path.abspath(file_path)
+            print >>sys.stderr, time.asctime(),'-', "sqlite db already exists", os.path.abspath(file_path)
             return False
         db_dir = os.path.dirname(os.path.abspath(file_path))
         if not os.path.exists(db_dir):
@@ -529,7 +530,7 @@ class Bsddb2Sqlite:
         return True
     
     def convert_BartercastDB(self):
-        print >>sys.stderr, "convert_BartercastDB"
+        print >>sys.stderr, time.asctime(),'-', "convert_BartercastDB"
         
         db_path = os.path.join(self.bsddb_dir, 'bartercast.bsd')
         if not os.path.isfile(db_path):
@@ -558,13 +559,13 @@ class Bsddb2Sqlite:
                 value = db_data.get('value', 0)
                 values.append((permid_id_from, permid_id_to, downloaded, uploaded, last_seen, value))
             except Exception, msg:
-                print >> sys.stderr, "error input for convert_BartercastDB:", key, db_data, Exception, msg
+                print >> sys.stderr, time.asctime(),'-', "error input for convert_BartercastDB:", key, db_data, Exception, msg
         self.cur.executemany(insert_bc_sql, values)
         self._commit()
         #print "converted bartercast db", len(values)
 
     def scan_PeerIcons(self, icon_dir):
-        print >>sys.stderr, "scan_PeerIcons", icon_dir
+        print >>sys.stderr, time.asctime(),'-', "scan_PeerIcons", icon_dir
         if not icon_dir or not os.path.isdir(icon_dir):
             return
         self.icon_dir = icon_dir
@@ -595,12 +596,12 @@ class Bsddb2Sqlite:
             return False
         
     def remove_bsddb(self):
-        print >> sys.stderr, self.bsddb_dir
+        print >> sys.stderr, time.asctime(),'-', self.bsddb_dir
         for filename in os.listdir(self.bsddb_dir):
             if filename.endswith('.bsd'):
                 db_path = os.path.abspath(os.path.join(self.bsddb_dir,filename))
                 if os.path.isfile(db_path):
-                    print >> sys.stderr, "delete", db_path
+                    print >> sys.stderr, time.asctime(),'-', "delete", db_path
                     os.remove(db_path)
             
 

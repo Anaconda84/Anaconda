@@ -1,3 +1,4 @@
+import time 
 # Written by Boudewijn Schoon
 # see LICENSE.txt for license information
 
@@ -81,7 +82,7 @@ class TestCrawler(TestAsServer):
         """
         Send crawler messages from a non-crawler peer
         """
-        print >>sys.stderr, "-"*80, "\ntest: invalid_permid"
+        print >>sys.stderr, time.asctime(),'-', "-"*80, "\ntest: invalid_permid"
 
         # make sure that the OLConnection is NOT in the crawler_db
         crawler_db = CrawlerDBHandler.getInstance()
@@ -106,7 +107,7 @@ class TestCrawler(TestAsServer):
         """
         Send an invalid message-id from a registered crawler peer
         """
-        print >>sys.stderr, "-"*80, "\ntest: invalid_messageid"
+        print >>sys.stderr, time.asctime(),'-', "-"*80, "\ntest: invalid_messageid"
 
         # make sure that the OLConnection IS in the crawler_db
         crawler_db = CrawlerDBHandler.getInstance()
@@ -130,7 +131,7 @@ class TestCrawler(TestAsServer):
         """
         Send an invalid sql query from a registered crawler peer
         """
-        print >>sys.stderr, "-"*80, "\ntest: invalid_sql_query"
+        print >>sys.stderr, time.asctime(),'-', "-"*80, "\ntest: invalid_sql_query"
 
         # make sure that the OLConnection IS in the crawler_db
         crawler_db = CrawlerDBHandler.getInstance()
@@ -148,7 +149,7 @@ class TestCrawler(TestAsServer):
             
             assert error == 1
             if DEBUG:
-                print >>sys.stderr, payload
+                print >>sys.stderr, time.asctime(),'-', payload
 
         time.sleep(1)
         s.close()
@@ -159,7 +160,7 @@ class TestCrawler(TestAsServer):
         indicate that the frequency should be large. This should
         result in a frequency error
         """
-        print >>sys.stderr, "-"*80, "\ntest: invalid_invalid_frequency"
+        print >>sys.stderr, time.asctime(),'-', "-"*80, "\ntest: invalid_invalid_frequency"
 
         # make sure that the OLConnection IS in the crawler_db
         crawler_db = CrawlerDBHandler.getInstance()
@@ -191,7 +192,7 @@ class TestCrawler(TestAsServer):
         Send an invalid query and check that we get the actual sql
         exception back
         """
-        print >>sys.stderr, "-"*80, "\ntest: invalid_tablename"
+        print >>sys.stderr, time.asctime(),'-', "-"*80, "\ntest: invalid_tablename"
 
         # make sure that the OLConnection IS in the crawler_db
         crawler_db = CrawlerDBHandler.getInstance()
@@ -207,7 +208,7 @@ class TestCrawler(TestAsServer):
         """
         Send a valid message-id from a registered crawler peer
         """
-        print >>sys.stderr, "-"*80, "\ntest: valid_messageid"
+        print >>sys.stderr, time.asctime(),'-', "-"*80, "\ntest: valid_messageid"
 
         # make sure that the OLConnection IS in the crawler_db
         crawler_db = CrawlerDBHandler.getInstance()
@@ -222,7 +223,7 @@ class TestCrawler(TestAsServer):
             error, payload = self.receive_crawler_reply(s, CRAWLER_DATABASE_QUERY, 0)
             assert error == 0
             if DEBUG:
-                print >>sys.stderr, cPickle.loads(payload)
+                print >>sys.stderr, time.asctime(),'-', cPickle.loads(payload)
 
         time.sleep(1)
         s.close()
@@ -232,7 +233,7 @@ class TestCrawler(TestAsServer):
         Send a valid request, disconnect, and wait for an incomming
         connection with the reply
         """
-        print >>sys.stderr, "-"*80, "\ntest: dialback"
+        print >>sys.stderr, time.asctime(),'-', "-"*80, "\ntest: dialback"
         
         # make sure that the OLConnection IS in the crawler_db
         crawler_db = CrawlerDBHandler.getInstance()
@@ -246,14 +247,14 @@ class TestCrawler(TestAsServer):
         try:
             conn, addr = self.listen_socket.accept()
         except socket.timeout:
-            if DEBUG: print >> sys.stderr,"test_crawler: timeout, bad, peer didn't connect to send the crawler reply"
+            if DEBUG: print >> sys.stderr,time.asctime(),'-', "test_crawler: timeout, bad, peer didn't connect to send the crawler reply"
             assert False, "test_crawler: timeout, bad, peer didn't connect to send the crawler reply"
         s = OLConnection(self.my_keypair, "", 0, conn, mylistenport=self.listen_port)
 
         # read reply
         error, payload = self.receive_crawler_reply(s, CRAWLER_DATABASE_QUERY, 42)
         assert error == 0
-        if DEBUG: print >>sys.stderr, cPickle.loads(payload)
+        if DEBUG: print >>sys.stderr, time.asctime(),'-', cPickle.loads(payload)
 
         time.sleep(1)
 
@@ -282,7 +283,7 @@ class TestCrawler(TestAsServer):
         #     n byte: 5...   Reply payload
 
         if DEBUG:
-            print >>sys.stderr, "test_crawler: receive_crawler_reply: waiting for channel",channel_id
+            print >>sys.stderr, time.asctime(),'-', "test_crawler: receive_crawler_reply: waiting for channel",channel_id
 
         parts = []
         while True:
@@ -291,7 +292,7 @@ class TestCrawler(TestAsServer):
                 if response[0] == CRAWLER_REPLY and response[1] == message_id and ord(response[2]) == channel_id:
                     parts.append(response[5:])
                     if DEBUG:
-                        print >>sys.stderr, "test_crawler: received", getMessageName(response[0:2]), "channel", channel_id, "length", sum([len(part) for part in parts]), "parts left", ord(response[3])
+                        print >>sys.stderr, time.asctime(),'-', "test_crawler: received", getMessageName(response[0:2]), "channel", channel_id, "length", sum([len(part) for part in parts]), "parts left", ord(response[3])
 
                     if ord(response[3]):
                         # there are parts left

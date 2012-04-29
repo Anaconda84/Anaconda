@@ -1,3 +1,4 @@
+import time 
 # Written by Arno Bakker, Bram Cohen, Jie Yang, George Milescu
 # see LICENSE.txt for license information
 #
@@ -151,7 +152,7 @@ class SecureOverlay:
             seconds of inactivity.
         """
         if DEBUG:
-            print >> sys.stderr,"secover: connect_dns",dns
+            print >> sys.stderr,time.asctime(),'-', "secover: connect_dns",dns
         # To prevent concurrency problems on sockets the calling thread 
         # delegates to the network thread.
         task = Task(self._connect_dns,dns,callback)
@@ -170,7 +171,7 @@ class SecureOverlay:
             seconds of inactivity.
         """
         if DEBUG:
-            print >> sys.stderr,"secover: connect",show_permid_short(permid), currentThread().getName()
+            print >> sys.stderr,time.asctime(),'-', "secover: connect",show_permid_short(permid), currentThread().getName()
         # To prevent concurrency problems on sockets the calling thread 
         # delegates to the network thread.
         
@@ -178,7 +179,7 @@ class SecureOverlay:
         task = Task(self._connect,permid,dns,callback)
 
         if DEBUG:
-            print >> sys.stderr,"secover: connect",show_permid_short(permid),"currently at",dns
+            print >> sys.stderr,time.asctime(),'-', "secover: connect",show_permid_short(permid),"currently at",dns
         
         self.rawserver.add_task(task.start, 0)
 
@@ -248,7 +249,7 @@ class SecureOverlay:
     def _connect_dns(self,dns,callback):
         try:
             if DEBUG:
-                print >> sys.stderr,"secover: actual connect_dns",dns
+                print >> sys.stderr,time.asctime(),'-', "secover: actual connect_dns",dns
             if dns[0] == self.myip and int(dns[1]) == self.myport:
                 callback(KeyError('IP and port of the target is the same as myself'),dns,None,0)
             iplport = ip_and_port2str(dns[0],dns[1])
@@ -271,7 +272,7 @@ class SecureOverlay:
 
     def _connect(self,expectedpermid,dns,callback):
         if DEBUG:
-            print >> sys.stderr,"secover: actual connect",show_permid_short(expectedpermid), currentThread().getName()
+            print >> sys.stderr,time.asctime(),'-', "secover: actual connect",show_permid_short(expectedpermid), currentThread().getName()
         if expectedpermid == self.permid:
             callback(KeyError('The target permid is the same as my permid'),None,expectedpermid,0)
         try:
@@ -312,7 +313,7 @@ class SecureOverlay:
 
     def _send(self,permid,dns,message,callback):
         if DEBUG:
-            print >> sys.stderr,"secover: actual send",getMessageName(message[0]),\
+            print >> sys.stderr,time.asctime(),'-', "secover: actual send",getMessageName(message[0]),\
                         "to",show_permid_short(permid), currentThread().getName()
         try:
             if dns is None:
@@ -342,12 +343,12 @@ class SecureOverlay:
 
     def _close(self,permid):
         if DEBUG:
-            print >> sys.stderr,"secover: actual close",show_permid_short(permid)
+            print >> sys.stderr,time.asctime(),'-', "secover: actual close",show_permid_short(permid)
         try:
             oc = self.get_oc_by_permid(permid)
             if not oc:
                 if DEBUG:
-                    print >> sys.stderr,"secover: error - actual close, but no connection to peer in admin"
+                    print >> sys.stderr,time.asctime(),'-', "secover: error - actual close, but no connection to peer in admin"
             else:
                 oc.close()
         except Exception,e:
@@ -362,7 +363,7 @@ class SecureOverlay:
     def external_connection_made(self,singsock):
         """ incoming connection (never used) """
         if DEBUG:
-            print >> sys.stderr,"secover: external_connection_made",singsock.get_ip(),singsock.get_port()
+            print >> sys.stderr,time.asctime(),'-', "secover: external_connection_made",singsock.get_ip(),singsock.get_port()
         # self.last_activity = time()
         oc = OverlayConnection(self,singsock,self.rawserver)
         singsock.set_handler(oc)
@@ -370,7 +371,7 @@ class SecureOverlay:
     def connection_flushed(self,singsock):
         """ sockethandler flushes connection """
         if DEBUG:
-            print >> sys.stderr,"secover: connection_flushed",singsock.get_ip(),singsock.get_port()
+            print >> sys.stderr,time.asctime(),'-', "secover: connection_flushed",singsock.get_ip(),singsock.get_port()
     
     #
     # Interface for ServerPortHandler
@@ -380,7 +381,7 @@ class SecureOverlay:
             as an it as overlay connection (used always)
         """
         if DEBUG:
-            print >> sys.stderr,"secover: externally_handshaked_connection_made",\
+            print >> sys.stderr,time.asctime(),'-', "secover: externally_handshaked_connection_made",\
                 singsock.get_ip(),singsock.get_port()
         oc = OverlayConnection(self,singsock,self.rawserver,ext_handshake = True, options = options)
         singsock.set_handler(oc)
@@ -395,12 +396,12 @@ class SecureOverlay:
     def got_auth_connection(self,oc):
         """ authentication of peer via identity protocol succesful """
         if DEBUG:
-            print >> sys.stderr,"secover: got_auth_connection", \
+            print >> sys.stderr,time.asctime(),'-', "secover: got_auth_connection", \
                 show_permid_short(oc.get_auth_permid()),oc.get_ip(),oc.get_auth_listen_port(), currentThread().getName()
 
         if oc.is_locally_initiated() and oc.get_port() != oc.get_auth_listen_port():
             if DEBUG:
-                print >> sys.stderr,"secover: got_auth_connection: closing because auth", \
+                print >> sys.stderr,time.asctime(),'-', "secover: got_auth_connection: closing because auth", \
                     "listen port not as expected",oc.get_port(),oc.get_auth_listen_port()
             self.cleanup_admin_and_callbacks(oc,Exception('closing because auth listen port not as expected'))
             return False
@@ -417,7 +418,7 @@ class SecureOverlay:
             # so if it's not a local connection and we already have one 
             # we have a duplicate, and we close the new one.
             if DEBUG:
-                print >> sys.stderr,"secover: got_auth_connection:", \
+                print >> sys.stderr,time.asctime(),'-', "secover: got_auth_connection:", \
                     "closing because we already have a connection to",iplport
             self.cleanup_admin_and_callbacks(oc,
                      Exception('closing because we already have a connection to peer'))
@@ -430,7 +431,7 @@ class SecureOverlay:
                 hisdns = None
 
             #if DEBUG:
-            #    print >>sys.stderr,"secover: userconnhandler is",self.userconnhandler
+            #    print >>sys.stderr,time.asctime(),'-', "secover: userconnhandler is",self.userconnhandler
             
             if self.userconnhandler is not None:
                 try:
@@ -444,39 +445,39 @@ class SecureOverlay:
     def local_close(self,oc):
         """ our side is closing the connection """
         if DEBUG:
-            print >> sys.stderr,"secover: local_close"
+            print >> sys.stderr,time.asctime(),'-', "secover: local_close"
         self.cleanup_admin_and_callbacks(oc,CloseException('local close',oc.is_auth_done()))
 
     def connection_lost(self,oc):
         """ overlay connection telling us to clear admin """
         if DEBUG:
-            print >> sys.stderr,"secover: connection_lost"
+            print >> sys.stderr,time.asctime(),'-', "secover: connection_lost"
         self.cleanup_admin_and_callbacks(oc,CloseException('connection lost',oc.is_auth_done()))
 
 
     def got_message(self,permid,message,selversion):
         """ received message from authenticated peer, pass to upper layer """
         if DEBUG:
-            print >> sys.stderr,"secover: got_message",getMessageName(message[0]),\
+            print >> sys.stderr,time.asctime(),'-', "secover: got_message",getMessageName(message[0]),\
                             "v"+str(selversion)
         # self.last_activity = time()
         if self.usermsghandler is None:
             if DEBUG:
-                print >> sys.stderr,"secover: User receive callback not set"
+                print >> sys.stderr,time.asctime(),'-', "secover: User receive callback not set"
             return
         try:
             
             #if DEBUG:
-            #    print >>sys.stderr,"secover: usermsghandler is",self.usermsghandler
+            #    print >>sys.stderr,time.asctime(),'-', "secover: usermsghandler is",self.usermsghandler
             
             ret = self.usermsghandler(permid,selversion,message)
             if ret is None:
                 if DEBUG:
-                    print >> sys.stderr,"secover: INTERNAL ERROR:", \
+                    print >> sys.stderr,time.asctime(),'-', "secover: INTERNAL ERROR:", \
                         "User receive callback returned None, not True or False"
                 ret = False
             elif DEBUG:
-                print >> sys.stderr,"secover: message handler returned",ret
+                print >> sys.stderr,time.asctime(),'-', "secover: message handler returned",ret
             return ret
         except:
             # Catch all
@@ -503,7 +504,7 @@ class SecureOverlay:
         # Called by any thread, except NetworkThread
         
         if currentThread().getName().startswith("NetworkThread"):
-            print >>sys.stderr,"secover: get_dns_from_peerdb: called by NetworkThread!"
+            print >>sys.stderr,time.asctime(),'-', "secover: get_dns_from_peerdb: called by NetworkThread!"
             print_stack()
         
         dns = self.dns.get(permid, None)
@@ -521,10 +522,10 @@ class SecureOverlay:
         # Called by OverlayThread
         
         if currentThread().getName().startswith("NetworkThread"):
-            print >>sys.stderr,"secover: add_peer_to_peerdb: called by NetworkThread!"
+            print >>sys.stderr,time.asctime(),'-', "secover: add_peer_to_peerdb: called by NetworkThread!"
             print_stack()
         if DEBUG:
-            print >>sys.stderr,"secover: add_peer_to_peerdb: called by",currentThread().getName()
+            print >>sys.stderr,time.asctime(),'-', "secover: add_peer_to_peerdb: called by",currentThread().getName()
         
         self.dns[permid] = dns    # cache it to avoid querying db later
         now = int(time())
@@ -538,7 +539,7 @@ class SecureOverlay:
         # Called by OverlayThread
         
         if currentThread().getName().startswith("NetworkThread"):
-            print >>sys.stderr,"secover: update_peer_status: called by NetworkThread!"
+            print >>sys.stderr,time.asctime(),'-', "secover: update_peer_status: called by NetworkThread!"
             print_stack()
         
         now = int(time())
@@ -567,7 +568,7 @@ class SecureOverlay:
     #
     def start_connection(self,dns):
         if DEBUG:
-            print >> sys.stderr,"secover: Attempt to connect to",dns
+            print >> sys.stderr,time.asctime(),'-', "secover: Attempt to connect to",dns
         singsock = self.sock_hand.start_connection(dns)
         oc = OverlayConnection(self,singsock,self.rawserver,
                                locally_initiated=True,specified_dns=dns)
@@ -610,7 +611,7 @@ class Task:
 
     def start(self):
         if DEBUG:
-            print >> sys.stderr,"secover: task: start",self.method
+            print >> sys.stderr,time.asctime(),'-', "secover: task: start",self.method
             #print_stack()
         self.method(*self.args,**self.kwargs)
 
@@ -673,7 +674,7 @@ class OverlayConnection:
         dummy_port = singsock.get_port(True)
 
         if DEBUG:
-            print >> sys.stderr,"olconn: data_came_in",singsock.get_ip(),singsock.get_port()
+            print >> sys.stderr,time.asctime(),'-', "olconn: data_came_in",singsock.get_ip(),singsock.get_port()
         self.handler.measurefunc(len(data))
         self.last_use = time()
         while 1:
@@ -690,7 +691,7 @@ class OverlayConnection:
             self.buffer.truncate()
             try:
                 if DEBUG:
-                    print >> sys.stderr,"olconn: Trying to read",self.next_len #,"using",self.next_func
+                    print >> sys.stderr,time.asctime(),'-', "olconn: Trying to read",self.next_len #,"using",self.next_func
                 x = self.next_func(m)
             except:
                 self.next_len, self.next_func = 1, self.read_dead
@@ -699,7 +700,7 @@ class OverlayConnection:
                 raise
             if x is None:
                 if DEBUG:
-                    print >> sys.stderr,"olconn: next_func returned None",self.next_func
+                    print >> sys.stderr,time.asctime(),'-', "olconn: next_func returned None",self.next_func
                 self.close()
                 return
             self.next_len, self.next_func = x
@@ -707,7 +708,7 @@ class OverlayConnection:
     def connection_lost(self,singsock):
         """ kernel or socket handler reports connection lost """
         if DEBUG:
-            print >> sys.stderr,"olconn: connection_lost",singsock.get_ip(),singsock.get_port(),self.state
+            print >> sys.stderr,time.asctime(),'-', "olconn: connection_lost",singsock.get_ip(),singsock.get_port(),self.state
         if self.state != STATE_CLOSED:
             self.state = STATE_CLOSED
             self.handler.connection_lost(self)
@@ -775,12 +776,12 @@ class OverlayConnection:
 
     def cleanup_callbacks(self,exc):
         if DEBUG:
-            print >> sys.stderr,"olconn: cleanup_callbacks: #callbacks is",len(self.cb_queue)
+            print >> sys.stderr,time.asctime(),'-', "olconn: cleanup_callbacks: #callbacks is",len(self.cb_queue)
         try:
             for callback in self.cb_queue:
                 ## Failure connecting
                 if DEBUG:
-                    print >> sys.stderr,"olconn: cleanup_callbacks: callback is",callback
+                    print >> sys.stderr,time.asctime(),'-', "olconn: cleanup_callbacks: callback is",callback
                 callback(exc,self.specified_dns,self.get_auth_permid(),0)
         except Exception,e:
             print_exc()
@@ -818,7 +819,7 @@ class OverlayConnection:
 
     def read_reserved(self, s):
         if DEBUG:
-            print >> sys.stderr,"olconn: Reserved bits:", `s`
+            print >> sys.stderr,time.asctime(),'-', "olconn: Reserved bits:", `s`
         self.set_options(s)
         return 20, self.read_download_id
 
@@ -834,14 +835,14 @@ class OverlayConnection:
         self.sel_proto_ver = select_supported_protoversion(self.low_proto_ver,self.cur_proto_ver)
         if not self.sel_proto_ver:
             if DEBUG:
-                print >> sys.stderr,"olconn: We don't support peer's version of the protocol"
+                print >> sys.stderr,time.asctime(),'-', "olconn: We don't support peer's version of the protocol"
             return None
         elif DEBUG:
-            print >> sys.stderr,"olconn: Selected protocol version",self.sel_proto_ver
+            print >> sys.stderr,time.asctime(),'-', "olconn: Selected protocol version",self.sel_proto_ver
 
         if self.cur_proto_ver <= 2:
             # Arno, 2010-02-04: Kick TorrentSwapper clones, still around 
-            print >>sys.stderr,"olconn: Kicking ancient peer",`self.unauth_peer_id`,self.get_ip()
+            print >>sys.stderr,time.asctime(),'-', "olconn: Kicking ancient peer",`self.unauth_peer_id`,self.get_ip()
             return None
 
         self.state = STATE_AUTH_WAIT
@@ -867,7 +868,7 @@ class OverlayConnection:
                     return None
             else:
                 if DEBUG:
-                    print >> sys.stderr,"olconn: Received message while in illegal state, internal error!"
+                    print >> sys.stderr,time.asctime(),'-', "olconn: Received message while in illegal state, internal error!"
                 return None
         return 4, self.read_len
 
@@ -882,7 +883,7 @@ class OverlayConnection:
 
     def close(self):
         if DEBUG:
-            print >> sys.stderr,"olconn: we close()",self.get_ip(),self.get_port()
+            print >> sys.stderr,time.asctime(),'-', "olconn: we close()",self.get_ip(),self.get_port()
             #print_stack()
         self.state_when_error = self.state
         if self.state != STATE_CLOSED:

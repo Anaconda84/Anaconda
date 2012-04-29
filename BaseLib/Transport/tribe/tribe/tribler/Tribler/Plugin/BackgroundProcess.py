@@ -1,3 +1,4 @@
+import time 
 # Written by Arno Bakker, Diego Rabioli
 # see LICENSE.txt for license information
 #
@@ -126,7 +127,7 @@ class BackgroundApp(BaseApp):
         try:
             # Do common initialization
             BaseApp.OnInitBase(self)
-            print >>sys.stderr,"bg: Awaiting commands"
+            print >>sys.stderr,time.asctime(),'-', "bg: Awaiting commands"
             return True
 
         except Exception,e:
@@ -154,7 +155,7 @@ class BackgroundApp(BaseApp):
         ic = BGInstanceConnection(s,self,self.readlinecallback,self.videoHTTPServer)
         self.singsock2ic[s] = ic
         if DEBUG:
-            print >>sys.stderr,"bg: Plugin connection_made",len(self.singsock2ic),"++++++++++++++++++++++++++++++++++++++++++++++++"
+            print >>sys.stderr,time.asctime(),'-', "bg: Plugin connection_made",len(self.singsock2ic),"++++++++++++++++++++++++++++++++++++++++++++++++"
           
         # Arno: Concurrency problems getting SEARCHURL message to work, 
         # JavaScript can't always read it. TODO  
@@ -162,7 +163,7 @@ class BackgroundApp(BaseApp):
 
     def connection_lost(self,s):
         if DEBUG:
-            print >>sys.stderr,"bg: Plugin: connection_lost ------------------------------------------------" 
+            print >>sys.stderr,time.asctime(),'-', "bg: Plugin: connection_lost ------------------------------------------------" 
 
         ic = self.singsock2ic[s]
         InstanceConnectionHandler.connection_lost(self,s)
@@ -185,7 +186,7 @@ class BackgroundApp(BaseApp):
         
     def i2ithread_delayed_remove_if_not_complete(self,ic):
         if DEBUG:
-            print >>sys.stderr,"bg: i2ithread_delayed_remove_if_not_complete"
+            print >>sys.stderr,time.asctime(),'-', "bg: i2ithread_delayed_remove_if_not_complete"
         wx.CallAfter(self.gui_delayed_remove_if_not_complete,ic)
         
     def gui_delayed_remove_if_not_complete(self,ic):
@@ -206,7 +207,7 @@ class BackgroundApp(BaseApp):
         BaseApp.remove_playing_download(self,d2remove)
         if d2remove in self.dusers:
             if DEBUG:
-                print >>sys.stderr,"bg: remove_playing_download"
+                print >>sys.stderr,time.asctime(),'-', "bg: remove_playing_download"
             if 'streaminfo' in self.dusers[d2remove]:
                 stream = self.dusers[d2remove]['streaminfo']['stream']
                 stream.close() # Close original stream. 
@@ -221,7 +222,7 @@ class BackgroundApp(BaseApp):
         """ Receive command from Plugin """
         
         if DEBUG:
-            print >>sys.stderr,"bg: Got command:",cmd
+            print >>sys.stderr,time.asctime(),'-', "bg: Got command:",cmd
         try:
             # START command
             if cmd.startswith( 'START' ):
@@ -261,7 +262,7 @@ class BackgroundApp(BaseApp):
             raise ValueError("bg: get_torrent_start_download: Too many files found! Giving up")
 
         if DEBUG:
-            print >>sys.stderr,"bg: get_torrent_start_download: Found video file",dlfile
+            print >>sys.stderr,time.asctime(),'-', "bg: get_torrent_start_download: Found video file",dlfile
 
         infohash = tdef.get_infohash()
         oldd = None
@@ -281,9 +282,9 @@ class BackgroundApp(BaseApp):
           
             if DEBUG:
                 if oldd is None:
-                    print >>sys.stderr,"bg: get_torrent_start_download: Starting new Download"
+                    print >>sys.stderr,time.asctime(),'-', "bg: get_torrent_start_download: Starting new Download"
                 else:
-                    print >>sys.stderr,"bg: get_torrent_start_download: Restarting old Download in VOD mode"
+                    print >>sys.stderr,time.asctime(),'-', "bg: get_torrent_start_download: Restarting old Download in VOD mode"
             
             d = self.start_download(tdef,dlfile)
             duser = {'uic':ic}
@@ -334,7 +335,7 @@ class BackgroundApp(BaseApp):
             [topmsg,msg,duser['said_start_playback'],duser['decodeprogress']] = get_status_msgs(ds,self.approxplayerstate,self.appname,duser['said_start_playback'],duser['decodeprogress'],totalhelping,totalspeed)
             info = msg
             #if DEBUG:
-            #    print >>sys.stderr, 'bg: 4INFO: Sending',info
+            #    print >>sys.stderr, time.asctime(),'-', 'bg: 4INFO: Sending',info
             uic.info(info)
             
     def sesscb_vod_event_callback( self, d, event, params ):
@@ -343,8 +344,8 @@ class BackgroundApp(BaseApp):
         
     def gui_vod_event_callback( self, d, event, params ):
         if DEBUG:
-            print >>sys.stderr,"bg: gui_vod_event_callback: Event: ", event
-            print >>sys.stderr,"bg: gui_vod_event_callback: Params: ", params
+            print >>sys.stderr,time.asctime(),'-', "bg: gui_vod_event_callback: Event: ", event
+            print >>sys.stderr,time.asctime(),'-', "bg: gui_vod_event_callback: Params: ", params
         
         if event == VODEVENT_START:
             if params['filename']:
@@ -384,7 +385,7 @@ class BackgroundApp(BaseApp):
         wx.CallAfter(self.videoserver_error_guicallback,e,url)
         
     def videoserver_error_guicallback(self,e,url):
-        print >>sys.stderr,"bg: Video server reported error",str(e)
+        print >>sys.stderr,time.asctime(),'-', "bg: Video server reported error",str(e)
         #    self.show_error(str(e))
         pass
         # ARNOTODO: schedule current Download for removal?
@@ -394,14 +395,14 @@ class BackgroundApp(BaseApp):
         wx.CallAfter(self.videoserver_set_status_guicallback,status)
 
     def videoserver_set_status_guicallback(self,status):
-        print >>sys.stderr,"bg: Video server sets status callback",status
+        print >>sys.stderr,time.asctime(),'-', "bg: Video server sets status callback",status
         # ARNOTODO: Report status to plugin
 
     #
     # reports vod stats collected periodically
     #
     def report_periodic_vod_stats(self,playing_dslist):
-        #print >>sys.stderr, "VOD Stats"
+        #print >>sys.stderr, time.asctime(),'-', "VOD Stats"
         self.counter += 1
         if self.counter%self.interval == 0:
             event_reporter = get_reporter_instance()
@@ -459,7 +460,7 @@ class BGInstanceConnection(InstanceConnection):
         self.videoHTTPServer.set_inputstream(self.cstreaminfo,self.urlpath)
         
         if DEBUG:
-            print >> sys.stderr, "bg: Telling plugin to start playback of",self.urlpath
+            print >> sys.stderr, time.asctime(),'-', "bg: Telling plugin to start playback of",self.urlpath
         
         self.write( 'PLAY '+self.get_video_url()+'\r\n' )
 
@@ -477,13 +478,13 @@ class BGInstanceConnection(InstanceConnection):
 
     def searchurl(self,searchurl):
         
-        print >>sys.stderr,"SENDING SEARCHURL 2 PLUGIN"
+        print >>sys.stderr,time.asctime(),'-', "SENDING SEARCHURL 2 PLUGIN"
         self.write( 'SEARCHURL '+searchurl+'\r\n' )
 
     def shutdown(self):
         # SHUTDOWN Service
         if DEBUG:
-            print >>sys.stderr,'bg: Shutting down connection to Plugin'
+            print >>sys.stderr,time.asctime(),'-', 'bg: Shutting down connection to Plugin'
         if not self.shutteddown:
             self.shutteddown = True
             # Cause HTTP server thread to receive EOF on inputstream
@@ -563,7 +564,7 @@ def run_bgapp(appname,params = None):
     app = BackgroundApp(0, appname, params, single_instance_checker, installdir, I2I_LISTENPORT, BG_LISTENPORT)
     app.MainLoop()
     
-    print >>sys.stderr,"Sleeping seconds to let other threads finish"
+    print >>sys.stderr,time.asctime(),'-', "Sleeping seconds to let other threads finish"
     time.sleep(2)
 
     if not ALLOW_MULTIPLE:

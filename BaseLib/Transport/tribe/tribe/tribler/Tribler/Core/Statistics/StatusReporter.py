@@ -1,3 +1,4 @@
+import time 
 """
 A simple interface to a reporting tool. The basic reporter stores
 events that are periodically, or when flushed, send to a central
@@ -214,7 +215,7 @@ class EventStatusReporter:
 
                 reporter = report_urls[0]
 
-                if DEBUG: print >> sys.stderr, "EventStatusReporter: attempting to report,", len(reports[0]), "bytes to", reporter[2]
+                if DEBUG: print >> sys.stderr, time.asctime(),'-', "EventStatusReporter: attempting to report,", len(reports[0]), "bytes to", reporter[2]
                 try:
                     sock = urllib.urlopen(reporter[2], reports[0])
                     result = sock.read()
@@ -240,7 +241,7 @@ class EventStatusReporter:
                     if result == 0:
                         # remote server is not recording, so don't bother
                         # sending events
-                        if DEBUG: print >> sys.stderr, "EventStatusReporter: received -zero- from the HTTP server. Reporting disabled"
+                        if DEBUG: print >> sys.stderr, time.asctime(),'-', "EventStatusReporter: received -zero- from the HTTP server. Reporting disabled"
                         self._thread_lock.acquire()
                         self._enable_reporting = False
                         self._thread_lock.release()
@@ -253,7 +254,7 @@ class EventStatusReporter:
                         # swarmplayer sessions tend to be short. And the
                         # if there are connection failures I want as few
                         # retries as possible
-                        if DEBUG: print >> sys.stderr, "EventStatusReporter: report successfull. Next report in", result, "seconds"
+                        if DEBUG: print >> sys.stderr, time.asctime(),'-', "EventStatusReporter: report successfull. Next report in", result, "seconds"
                         timeout = result
                 else:
                     self._thread_lock.acquire()
@@ -274,7 +275,7 @@ class EventStatusReporter:
                 # variable is shared between threads
                 if not self._enable_reporting:
                     return True
-                if DEBUG: print >> sys.stderr, "EventStatusReporter: add_event", `key`, `event`
+                if DEBUG: print >> sys.stderr, time.asctime(),'-', "EventStatusReporter: add_event", `key`, `event`
                 self._event.append({"key":key, "timestamp":time(), "event":event})
 
                 # if len(self._event) == 10:

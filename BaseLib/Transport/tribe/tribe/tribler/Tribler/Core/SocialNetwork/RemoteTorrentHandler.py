@@ -1,3 +1,4 @@
+import time 
 # Written by Arno Bakker
 # see LICENSE.txt for license information
 #
@@ -54,14 +55,14 @@ class RemoteTorrentHandler:
         
         self.metadatahandler.send_metadata_request(permid,infohash,caller="rquery")
         if DEBUG:
-            print >>sys.stderr,'rtorrent: download: Requested torrent: %s' % `infohash`
+            print >>sys.stderr,time.asctime(),'-', 'rtorrent: download: Requested torrent: %s' % `infohash`
        
     def metadatahandler_got_torrent(self,infohash,metadata,filename):
         """ Called by MetadataHandler when the requested torrent comes in """
         #Called by overlay thread
 
         if DEBUG:
-            print >>sys.stderr,"rtorrent: got requested torrent from peer, wanted", infohash in self.requestedtorrents, `self.requestedtorrents`
+            print >>sys.stderr,time.asctime(),'-', "rtorrent: got requested torrent from peer, wanted", infohash in self.requestedtorrents, `self.requestedtorrents`
         if infohash not in self.requestedtorrents:
            return
 

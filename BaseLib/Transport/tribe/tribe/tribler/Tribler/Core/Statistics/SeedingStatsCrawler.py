@@ -1,3 +1,4 @@
+import time 
 # Written by Boxun Zhang, Boudewijn Schoon
 # see LICENSE.txt for license information
 
@@ -29,7 +30,7 @@ class SeedingStatsCrawler:
         @param request_callback Call this function one or more times to send the requests: request_callback(message_id, payload)
         """
         if DEBUG: 
-            print >>sys.stderr, "crawler: SeedingStatsDB_update_settings_initiator"
+            print >>sys.stderr, time.asctime(),'-', "crawler: SeedingStatsDB_update_settings_initiator"
         read_query = "SELECT * FROM SeedingStats WHERE crawled = 0"
         write_query = "UPDATE SeedingStats SET crawled = 1 WHERE crawled = 0"
         return request_callback(CRAWLER_SEEDINGSTATS_QUERY, cPickle.dumps([("read", read_query), ("write", write_query)], 2))
@@ -42,7 +43,7 @@ class SeedingStatsCrawler:
         @param request_callback Call this function one or more times to send the requests: request_callback(message_id, payload)
         """
         if DEBUG: 
-            print >>sys.stderr, "crawler: SeedingStatsDB_update_settings_initiator"
+            print >>sys.stderr, time.asctime(),'-', "crawler: SeedingStatsDB_update_settings_initiator"
         
         try:
             sql_update = "UPDATE SeedingStatsSettings SET crawling_interval=%s WHERE crawling_enabled=%s"%(1800, 1)
@@ -66,13 +67,13 @@ class SeedingStatsCrawler:
         'write') and a string (the query)
         """
         if DEBUG:
-            print >> sys.stderr, "crawler: handle_crawler_request", len(message)
+            print >> sys.stderr, time.asctime(),'-', "crawler: handle_crawler_request", len(message)
 
         results = []
         try:
             items = cPickle.loads(message)
             if DEBUG:
-                print >> sys.stderr, "crawler: handle_crawler_request", items
+                print >> sys.stderr, time.asctime(),'-', "crawler: handle_crawler_request", items
 
             for action, query in items:
                 if action == "read":
@@ -88,7 +89,7 @@ class SeedingStatsCrawler:
                     results.append(None)
         except Exception, e:
             if DEBUG:
-                print >> sys.stderr, "crawler: handle_crawler_request", e
+                print >> sys.stderr, time.asctime(),'-', "crawler: handle_crawler_request", e
             results.append(str(e))
             reply_callback(cPickle.dumps(results, 2), 1)
         else:
@@ -109,16 +110,16 @@ class SeedingStatsCrawler:
         """
         if error:
             if DEBUG:
-                print >> sys.stderr, "seedingstatscrawler: handle_crawler_reply"
-                print >> sys.stderr, "seedingstatscrawler: error", error
+                print >> sys.stderr, time.asctime(),'-', "seedingstatscrawler: handle_crawler_reply"
+                print >> sys.stderr, time.asctime(),'-', "seedingstatscrawler: error", error
 
         else:
             try:
                 results = cPickle.loads(message)
 
                 if DEBUG:
-                    print >> sys.stderr, "seedingstatscrawler: handle_crawler_reply"
-                    print >> sys.stderr, "seedingstatscrawler:", results
+                    print >> sys.stderr, time.asctime(),'-', "seedingstatscrawler: handle_crawler_reply"
+                    print >> sys.stderr, time.asctime(),'-', "seedingstatscrawler:", results
 
                 # the first item in the list contains the results from the select query
                 if results[0]:
@@ -149,7 +150,7 @@ class SeedingStatsCrawler:
         @param reply_callback Call this function once to send the reply: reply_callback(payload [, error=123])
         """
         if DEBUG:
-            print >> sys.stderr, "crawler: handle_crawler_SeedingStats_request", message
+            print >> sys.stderr, time.asctime(),'-', "crawler: handle_crawler_SeedingStats_request", message
 
         # execute the sql
         sql_update = cPickle.loads(message)
@@ -173,6 +174,6 @@ class SeedingStatsCrawler:
         @param request_callback Call this function one or more times to send the requests: request_callback(message_id, payload)
         """
         if DEBUG:
-            print >> sys.stderr, "olapps: handle_crawler_SeedingStats_reply"
+            print >> sys.stderr, time.asctime(),'-', "olapps: handle_crawler_SeedingStats_reply"
 
         return True

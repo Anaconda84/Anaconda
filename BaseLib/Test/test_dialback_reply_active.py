@@ -1,3 +1,4 @@
+import time 
 # Written by Arno Bakker
 # see LICENSE.txt for license information
 
@@ -45,15 +46,15 @@ class TestDialbackReplyActive(TestAsServer):
 
     def setUp(self):
         """ override TestAsServer """
-        print >> sys.stderr,"test: Setup"
+        print >> sys.stderr,time.asctime(),'-', "test: Setup"
         self.NLISTENERS=1
         TestAsServer.setUp(self)
 
     def setUpPreSession(self):
         """ override TestAsServer """
-        print >> sys.stderr,"test: Pre Tribler Init"
+        print >> sys.stderr,time.asctime(),'-', "test: Pre Tribler Init"
         TestAsServer.setUpPreSession(self)
-        print >> sys.stderr,"test: Pre Tribler Init: config_path",self.config_path
+        print >> sys.stderr,time.asctime(),'-', "test: Pre Tribler Init: config_path",self.config_path
         # Enable dialback support
         self.config.set_dialback(True)
         self.config.set_buddycast(True) # make sure overlay connections are being made
@@ -68,7 +69,7 @@ class TestDialbackReplyActive(TestAsServer):
         os.makedirs(statsdir)
         
         superpeerfilename = os.path.join(spdir, 'superpeer.txt')
-        print >> sys.stderr,"test: writing",self.NLISTENERS,"superpeers to",superpeerfilename
+        print >> sys.stderr,time.asctime(),'-', "test: writing",self.NLISTENERS,"superpeers to",superpeerfilename
         f = open(superpeerfilename, "w")
 
         self.mylistenport = []
@@ -101,7 +102,7 @@ class TestDialbackReplyActive(TestAsServer):
         for srcfile in srcfiles:
             sfn = os.path.join('..','..',srcfile)
             dfn = os.path.join(self.install_path,srcfile)
-            print >>sys.stderr,"test: copying",sfn,dfn
+            print >>sys.stderr,time.asctime(),'-', "test: copying",sfn,dfn
             shutil.copyfile(sfn,dfn)
 
         """
@@ -120,7 +121,7 @@ class TestDialbackReplyActive(TestAsServer):
 
     def tearDown(self):
         """ override TestAsServer """
-        print >> sys.stderr,"test: *** TEARDOWN"
+        print >> sys.stderr,time.asctime(),'-', "test: *** TEARDOWN"
         TestAsServer.tearDown(self)
 
         for i in range(self.NLISTENERS):
@@ -137,7 +138,7 @@ class TestDialbackReplyActive(TestAsServer):
     # Bad DIALBACK_REQUEST, builds on TestDialbackReply code
     #    
     def singtest_bad_not_bdecodable(self):
-        print >>sys.stderr,"test: *** NOT DECODABLE TEST"
+        print >>sys.stderr,time.asctime(),'-', "test: *** NOT DECODABLE TEST"
         self._test_dreply(self.create_not_bdecodable,False)
 
     def singtest_bad_not_string(self):
@@ -157,13 +158,13 @@ class TestDialbackReplyActive(TestAsServer):
     #
     def _test_dreply(self,gen_dreply,good,diff_ips_test=False):
         for i in range(self.NLISTENERS):
-            print >> sys.stderr,"test: waiting for #",i,"listenport",self.mylistenport[i]
+            print >> sys.stderr,time.asctime(),'-', "test: waiting for #",i,"listenport",self.mylistenport[i]
             conn, addr = self.myss[i].accept()
             s = OLConnection(self.mykeypairs[i],'',0,conn,self.mylistenport[i])
             while True:
                 msg = s.recv()
                 self.assert_(len(msg) > 0)
-                print >> sys.stderr,"test: Received overlay message",getMessageName(msg[0])
+                print >> sys.stderr,time.asctime(),'-', "test: Received overlay message",getMessageName(msg[0])
                 if msg[0] == DIALBACK_REQUEST:
                     break
             self.assert_(msg[0] == DIALBACK_REQUEST)
@@ -174,7 +175,7 @@ class TestDialbackReplyActive(TestAsServer):
             s2.read_handshake_medium_rare(close_ok = True)
             if gen_dreply is not None:
                 resp = gen_dreply(i)
-                print >> sys.stderr,"test: sending DIALBACK_REPLY #",i
+                print >> sys.stderr,time.asctime(),'-', "test: sending DIALBACK_REPLY #",i
                 s2.send(resp)
             time.sleep(2)
             # the other side should always close the 
@@ -182,7 +183,7 @@ class TestDialbackReplyActive(TestAsServer):
             # bad DIALBACK_REPLY message
             msg = s2.recv()
             if len(msg) > 0:
-                print >> sys.stderr,"test: Received unexpected data",getMessageName(msg[0])
+                print >> sys.stderr,time.asctime(),'-', "test: Received unexpected data",getMessageName(msg[0])
             self.assert_(len(msg)==0)
             s2.close()
 
@@ -191,7 +192,7 @@ class TestDialbackReplyActive(TestAsServer):
 
 
         ext_ip = self.session.get_external_ip()
-        print >>sys.stderr,"test: External IP address after test is",ext_ip
+        print >>sys.stderr,time.asctime(),'-', "test: External IP address after test is",ext_ip
         
         if diff_ips_test:
             if self.config.sessconfig['dialback_trust_superpeers'] == 1:

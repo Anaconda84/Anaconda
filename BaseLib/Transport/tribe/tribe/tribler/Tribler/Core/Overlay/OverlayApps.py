@@ -1,3 +1,4 @@
+import time 
 # Written by Arno Bakker
 # see LICENSE.txt for license information
 #
@@ -218,7 +219,7 @@ class OverlayApps:
         """
         for id in ids:
             if DEBUG:
-                print >> sys.stderr,"olapps: Message handler registered for",getMessageName(id)
+                print >> sys.stderr,time.asctime(),'-', "olapps: Message handler registered for",getMessageName(id)
             self.msg_handlers[id] = handler
 
     def register_connection_handler(self, handler):
@@ -229,7 +230,7 @@ class OverlayApps:
         """
         assert handler not in self.connection_handlers, 'This connection_handler is already registered'
         if DEBUG:
-            print >> sys.stderr, "olapps: Connection handler registered for", handler
+            print >> sys.stderr, time.asctime(),'-', "olapps: Connection handler registered for", handler
         self.connection_handlers.append(handler)
 
     def handleMessage(self,permid,selversion,message):
@@ -245,11 +246,11 @@ class OverlayApps:
             id_ = message[0]
         else:
             if DEBUG:
-                print >> sys.stderr, "olapps: No handler found for", getMessageName(message[0:2])
+                print >> sys.stderr, time.asctime(),'-', "olapps: No handler found for", getMessageName(message[0:2])
             return False
 
         if DEBUG:
-            print >> sys.stderr, "olapps: handleMessage", getMessageName(id_), "v" + str(selversion)
+            print >> sys.stderr, time.asctime(),'-', "olapps: handleMessage", getMessageName(id_), "v" + str(selversion)
 
         try:
             if DEBUG:
@@ -258,7 +259,7 @@ class OverlayApps:
                 et = time()
                 diff = et - st
                 if diff > 0:
-                    print >> sys.stderr,"olapps: ",getMessageName(id_),"TOOK %.5f" % diff
+                    print >> sys.stderr,time.asctime(),'-', "olapps: ",getMessageName(id_),"TOOK %.5f" % diff
                 return ret
             else:
                 return self.msg_handlers[id_](permid, selversion, message)
@@ -274,15 +275,15 @@ class OverlayApps:
         """ An overlay-connection was established. Notify interested parties. """
 
         if DEBUG:
-            print >> sys.stderr,"olapps: handleConnection",exc,selversion,locally_initiated,currentThread().getName()
+            print >> sys.stderr,time.asctime(),'-', "olapps: handleConnection",exc,selversion,locally_initiated,currentThread().getName()
 
         for handler in self.connection_handlers:
             try:
                 #if DEBUG:
-                #    print >> sys.stderr,"olapps: calling connection handler:",'%s.%s' % (handler.__module__, handler.__name__)
+                #    print >> sys.stderr,time.asctime(),'-', "olapps: calling connection handler:",'%s.%s' % (handler.__module__, handler.__name__)
                 handler(exc,permid,selversion,locally_initiated)
             except:
-                print >> sys.stderr, 'olapps: Exception during connection handler calling'
+                print >> sys.stderr, time.asctime(),'-', 'olapps: Exception during connection handler calling'
                 print_exc()
     
     def requestAllowed(self, permid, messageType):
@@ -297,7 +298,7 @@ class OverlayApps:
                 word = 'allowed'
             else:
                 word = 'denied'
-            print >> sys.stderr, 'olapps: Request type %s from %s was %s' % (getMessageName(messageType), show_permid_short(permid), word)
+            print >> sys.stderr, time.asctime(),'-', 'olapps: Request type %s from %s was %s' % (getMessageName(messageType), show_permid_short(permid), word)
         return allowed
     
     def setRequestPolicy(self, requestPolicy):

@@ -1,3 +1,4 @@
+import time 
 # Written by Fabian van der Werf and Arno Bakker
 # see LICENSE.txt for license information
 #
@@ -99,7 +100,7 @@ class EmbeddedPlayer4FramePanel(wx.Panel):
         
     def Load(self,url,streaminfo = None):
         if DEBUG:
-            print >>sys.stderr,"embedplay: Load:",url,streaminfo,currentThread().getName()
+            print >>sys.stderr,time.asctime(),'-', "embedplay: Load:",url,streaminfo,currentThread().getName()
         # Arno: hack: disable dragging when not playing from file.
         #if url is None or url.startswith('http:'):
         #if url is not None and url.startswith('http:'):
@@ -129,12 +130,12 @@ class EmbeddedPlayer4FramePanel(wx.Panel):
         one
         """
         if DEBUG:
-            print >>sys.stderr,"embedplay: PlayWhenStopped"
+            print >>sys.stderr,time.asctime(),'-', "embedplay: PlayWhenStopped"
         self.playtimer = DelayTimer(self)
 
     def Play(self, evt=None):
         if DEBUG:
-            print >>sys.stderr,"embedplay: Play pressed"
+            print >>sys.stderr,time.asctime(),'-', "embedplay: Play pressed"
 
         if self.GetState() != MEDIASTATE_PLAYING:
             self.ppbtn.setToggled(False)
@@ -143,7 +144,7 @@ class EmbeddedPlayer4FramePanel(wx.Panel):
     def Pause(self, evt=None):
         """ Toggle between playing and pausing of current item """
         if DEBUG:
-            print >>sys.stderr,"embedplay: Pause pressed"
+            print >>sys.stderr,time.asctime(),'-', "embedplay: Pause pressed"
         
         if self.GetState() == MEDIASTATE_PLAYING:
             self.ppbtn.setToggled(True)
@@ -153,7 +154,7 @@ class EmbeddedPlayer4FramePanel(wx.Panel):
     def PlayPause(self, evt=None):
         """ Toggle between playing and pausing of current item """
         if DEBUG:
-            print >>sys.stderr,"embedplay: PlayPause pressed"
+            print >>sys.stderr,time.asctime(),'-', "embedplay: PlayPause pressed"
         
         if self.GetState() == MEDIASTATE_PLAYING:
             self.ppbtn.setToggled(True)
@@ -166,12 +167,12 @@ class EmbeddedPlayer4FramePanel(wx.Panel):
 
     def Seek(self, evt=None):
         if DEBUG:
-            print >>sys.stderr,"embedplay: Seek"
+            print >>sys.stderr,time.asctime(),'-', "embedplay: Seek"
         
         oldsliderpos = self.slider.GetValue()
-        print >>sys.stderr, 'embedplay: Seek: GetValue returned,',oldsliderpos
+        print >>sys.stderr, time.asctime(),'-', 'embedplay: Seek: GetValue returned,',oldsliderpos
         pos = int(oldsliderpos * 1000.0)
-        print >>sys.stderr, 'embedplay: Seek: newpos',pos
+        print >>sys.stderr, time.asctime(),'-', 'embedplay: Seek: newpos',pos
         
         try:
             if self.GetState() == MEDIASTATE_STOPPED:
@@ -181,7 +182,7 @@ class EmbeddedPlayer4FramePanel(wx.Panel):
         except:
             print_exc()
             if DEBUG:
-                print >> sys.stderr, 'embedplay: could not seek'
+                print >> sys.stderr, time.asctime(),'-', 'embedplay: could not seek'
             self.slider.SetValue(oldsliderpos)
         self.update = True
         
@@ -207,7 +208,7 @@ class EmbeddedPlayer4FramePanel(wx.Panel):
     
     def SetVolume(self, evt = None):
         if DEBUG:
-            print >> sys.stderr, "embedplay: SetVolume:",self.volume.GetValue()
+            print >> sys.stderr, time.asctime(),'-', "embedplay: SetVolume:",self.volume.GetValue()
         self.vlcwrap.sound_set_volume(float(self.volume.GetValue()) / 100)
         # reset mute
         if self.volumeicon.isToggled():
@@ -215,7 +216,7 @@ class EmbeddedPlayer4FramePanel(wx.Panel):
 
     def Stop(self):
         if DEBUG:
-            print >> sys.stderr, "embedplay: Stop"
+            print >> sys.stderr, time.asctime(),'-', "embedplay: Stop"
         self.vlcwrap.stop()
         self.ppbtn.SetLabel(self.utility.lang.get('playprompt'))
         self.slider.SetValue(0)
@@ -226,7 +227,7 @@ class EmbeddedPlayer4FramePanel(wx.Panel):
         """ Returns the state of VLC as summarized by Fabian: 
         MEDIASTATE_PLAYING, MEDIASTATE_PAUSED, MEDIASTATE_STOPPED """
         if DEBUG:
-            print >>sys.stderr,"embedplay: GetState"
+            print >>sys.stderr,time.asctime(),'-', "embedplay: GetState"
             
         status = self.vlcwrap.get_stream_information_status()
         
@@ -340,7 +341,7 @@ class VLCLogoWindow(wx.Panel):
        
         self.Bind(wx.EVT_KEY_UP, self.keyDown)
 
-        print >>sys.stderr,"VLCLogoWindow: logopath is",logopath
+        print >>sys.stderr,time.asctime(),'-', "VLCLogoWindow: logopath is",logopath
 
         if logopath is not None and not animate:
             self.logo = wx.BitmapFromImage(wx.Image(logopath),-1)
@@ -400,13 +401,13 @@ class VLCLogoWindow(wx.Panel):
 
     def set_content_name(self,s):
         if DEBUG:
-            print >>sys.stderr,"VLCWin: set_content_name"
+            print >>sys.stderr,time.asctime(),'-', "VLCWin: set_content_name"
         self.contentname = s
         self.Refresh()
     
     def set_content_image(self,wximg):
         if DEBUG:
-            print >>sys.stderr,"VLCWin: set_content_image"
+            print >>sys.stderr,time.asctime(),'-', "VLCWin: set_content_image"
         if wximg is not None:
             self.contentbm = wx.BitmapFromImage(wximg,-1)
         else:

@@ -1,3 +1,4 @@
+import time 
 # Written by Andrea Reale
 # see LICENSE.txt for license information
 
@@ -73,20 +74,20 @@ class TestChannelsPlusSubtitles(TestChannels):
         Extends channelcast test to channelcast messages enriched with
         metadata (subtitles) informations
         '''
-        print >>sys.stderr,"test: channelcast_subtitles ---------------------------"
+        print >>sys.stderr,time.asctime(),'-', "test: channelcast_subtitles ---------------------------"
         s = OLConnection(self.my_keypair,'localhost',self.hisport)
         chcast = ChannelCastCore(None, s, self.session, None, log = '', dnsindb = None)
         
         #test send standard channelcast
         chdata = {}
-        print >> sys.stderr, "Test Good ChannelCast Plus Subtitles", `chdata`
+        print >> sys.stderr, time.asctime(),'-', "Test Good ChannelCast Plus Subtitles", `chdata`
         msg = CHANNELCAST+bencode(chdata)
         s.send(msg)
         resp = s.recv()
         if len(resp) > 0:
-            print >>sys.stderr,"test: channelcast_subtitles: got",getMessageName(resp[0])
+            print >>sys.stderr,time.asctime(),'-', "test: channelcast_subtitles: got",getMessageName(resp[0])
         self.assert_(resp[0]==CHANNELCAST)
-        print >>sys.stderr, "test: channelcast_subtitles: got msg", `bdecode(resp[1:])`
+        print >>sys.stderr, time.asctime(),'-', "test: channelcast_subtitles: got msg", `bdecode(resp[1:])`
         chdata_rcvd = bdecode(resp[1:])
         self.assertTrue(validChannelCastMsg(chdata_rcvd))
         
@@ -94,7 +95,7 @@ class TestChannelsPlusSubtitles(TestChannels):
             if entry['infohash'] == self.infohash1: #the torrent for which two subtitles exist
                 self.assertTrue('rich_metadata' in entry.keys())
                 richMetadata = entry['rich_metadata']
-                print >> sys.stderr, "test: channelcast_subtitles: richMetadata entry is ", richMetadata
+                print >> sys.stderr, time.asctime(),'-', "test: channelcast_subtitles: richMetadata entry is ", richMetadata
                 self.assertEquals(6, len(richMetadata))
                 self.assertEquals(self.mdto.description, richMetadata[0])
                 self.assertEquals(4, len(richMetadata[2])) #the subtitles mask 4 bytes
@@ -106,7 +107,7 @@ class TestChannelsPlusSubtitles(TestChannels):
                 #also must (in this case) be equal to the subtitles mask
                 self.assertEquals(richMetadata[2], richMetadata[5])
                 
-                print >> sys.stderr, "test: channelcast_subtitles; richMetadata entry is valid and correct"
+                print >> sys.stderr, time.asctime(),'-', "test: channelcast_subtitles; richMetadata entry is valid and correct"
             else:
                 self.assertFalse('rich_metadata' in entry.keys())
                 
@@ -131,7 +132,7 @@ class TestChannelsPlusSubtitles(TestChannels):
         self.subtest_bad_channelcast(chdata)
         
         #Bad 
-        print>>sys.stderr, "End of channelcast_subtitles test ---------------------------"
+        print>>sys.stderr, time.asctime(),'-', "End of channelcast_subtitles test ---------------------------"
     
             
 

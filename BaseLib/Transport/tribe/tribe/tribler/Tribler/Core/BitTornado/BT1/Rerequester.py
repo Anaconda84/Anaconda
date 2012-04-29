@@ -1,3 +1,4 @@
+import time 
 # Written by Bram Cohen
 # modified for multitracker operation by John Hoffman
 # modified for mainline DHT support by Fabian van der Werf
@@ -83,7 +84,7 @@ class Rerequester:
         self.port = port
         
         if DEBUG:
-            print >>sys.stderr,"Rerequest tracker: infohash is",`infohash`,"port is",self.port,"myid",`myid`,"quoted id",quote(myid)
+            print >>sys.stderr,time.asctime(),'-', "Rerequest tracker: infohash is",`infohash`,"port is",self.port,"myid",`myid`,"quoted id",quote(myid)
 
         self.url = ('?info_hash=%s&peer_id=%s&port=%s' %
             (quote(infohash), quote(myid), str(port)))
@@ -246,7 +247,7 @@ class Rerequester:
                 if self.dht:
                     self._dht_rerequest()
                 elif DEBUG_DHT:
-                    print >>sys.stderr,"Rerequester: No DHT support loaded"
+                    print >>sys.stderr,time.asctime(),'-', "Rerequester: No DHT support loaded"
 
                 for t in range(len(self.trackerlist)):
                     for tr in range(len(self.trackerlist[t])):
@@ -254,10 +255,10 @@ class Rerequester:
                         # Arno: no udp support yet
                         if tracker.startswith( 'udp:' ):
                             if DEBUG:
-                                print >>sys.stderr,"Rerequester: Ignoring tracker",tracker
+                                print >>sys.stderr,time.asctime(),'-', "Rerequester: Ignoring tracker",tracker
                             continue
                         #elif DEBUG:
-                        #    print >>sys.stderr,"Rerequester: Trying tracker",tracker
+                        #    print >>sys.stderr,time.asctime(),'-', "Rerequester: Trying tracker",tracker
                         if self.rerequest_single(tracker, s, callback):
                             if not self.last_failed and tr != 0:
                                 del self.trackerlist[t][tr]
@@ -330,8 +331,8 @@ class Rerequester:
             err = None
             try:
                 if DEBUG:
-                    print >>sys.stderr,"Rerequest tracker:"
-                    print >>sys.stderr,t+s
+                    print >>sys.stderr,time.asctime(),'-', "Rerequest tracker:"
+                    print >>sys.stderr,time.asctime(),'-', t+s
                 h = urlopen(t+s)
                 closer[0] = h.close
                 data = h.read()
@@ -346,7 +347,7 @@ class Rerequester:
                     
                     
             #if DEBUG:
-            #    print >>sys.stderr,"rerequest: Got data",data
+            #    print >>sys.stderr,time.asctime(),'-', "rerequest: Got data",data
                     
             try:
                 h.close()
@@ -367,10 +368,10 @@ class Rerequester:
             try:
                 r = bdecode(data, sloppy=1)
                 if DEBUG:
-                    print >>sys.stderr,"Rerequester: Tracker returns:", r
+                    print >>sys.stderr,time.asctime(),'-', "Rerequester: Tracker returns:", r
                 check_peers(r)
                 
-                #print >>sys.stderr,"Rerequester: Tracker returns, post check done"
+                #print >>sys.stderr,time.asctime(),'-', "Rerequester: Tracker returns, post check done"
                 
             except ValueError, e:
                 if DEBUG:
@@ -393,10 +394,10 @@ class Rerequester:
 
             # even if the attempt timed out, go ahead and process data
             def add(self = self, r = r, callback = callback):
-                #print >>sys.stderr,"Rerequester: add: postprocessing",r
+                #print >>sys.stderr,time.asctime(),'-', "Rerequester: add: postprocessing",r
                 self.postrequest(r, callback)
                 
-            #print >>sys.stderr,"Rerequester: _request_single: scheduling processing of returned",r
+            #print >>sys.stderr,time.asctime(),'-', "Rerequester: _request_single: scheduling processing of returned",r
             self.externalsched(add)
         except:
             
@@ -406,29 +407,29 @@ class Rerequester:
 
     def _dht_rerequest(self):
         if DEBUG_DHT:
-            print >>sys.stderr,"Rerequester: _dht_rerequest",`self.infohash`
+            print >>sys.stderr,time.asctime(),'-', "Rerequester: _dht_rerequest",`self.infohash`
         try:
             info_hash_id = Id(self.infohash)
         except (IdError):
-            print >>sys.stderr,"Rerequester: _dht_rerequest: self.info_hash is not a valid identifier"
+            print >>sys.stderr,time.asctime(),'-', "Rerequester: _dht_rerequest: self.info_hash is not a valid identifier"
             return
                 
         if 'dialback' in self.config and self.config['dialback']:
             from Tribler.Core.NATFirewall.DialbackMsgHandler import DialbackMsgHandler
             
             if DialbackMsgHandler.getInstance().isConnectable():
-                print >>sys.stderr,"Rerequester: _dht_rerequest: get_peers AND announce"
+                print >>sys.stderr,time.asctime(),'-', "Rerequester: _dht_rerequest: get_peers AND announce"
                 self.dht.get_peers(info_hash_id, self._dht_got_peers, self.port)
                 return
                 #raul: I added this return so when the peer is NOT connectable
                 # it does a get_peers lookup but it does not announce
-        print >>sys.stderr,"Rerequester: _dht_rerequest: JUST get_peers, DO NOT announce"
+        print >>sys.stderr,time.asctime(),'-', "Rerequester: _dht_rerequest: JUST get_peers, DO NOT announce"
         self.dht.get_peers(info_hash_id, self._dht_got_peers)
 
 
     def _dht_got_peers(self, peers):
         if DEBUG_DHT:
-            print >>sys.stderr,"Rerequester: DHT: Received",len(peers),"peers",currentThread().getName()
+            print >>sys.stderr,time.asctime(),'-', "Rerequester: DHT: Received",len(peers),"peers",currentThread().getName()
         """
         raul: This is quite weird but I leave as it is.
         """
@@ -448,7 +449,7 @@ class Rerequester:
             self.interval = r.get('min interval', self.interval)
             
             if DEBUG:
-                print >> sys.stderr,"Rerequester: announce min is",self.announce_interval,self.interval
+                print >> sys.stderr,time.asctime(),'-', "Rerequester: announce min is",self.announce_interval,self.interval
             
             self.trackerid = r.get('tracker id', self.trackerid)
             self.last = r.get('last', self.last)
@@ -492,11 +493,11 @@ class Rerequester:
                 # Plus use inet_ntop() instead of inet_ntoa(), but former only
                 # supported on UNIX :-( See new ipaddr module in Python 2.7
                 #
-                print >>sys.stderr,"Rerequester: Got IPv6 peer addresses, not yet supported, ignoring."
+                print >>sys.stderr,time.asctime(),'-', "Rerequester: Got IPv6 peer addresses, not yet supported, ignoring."
                 peers = []
             
             if DEBUG:
-                print >>sys.stderr,"Rerequester: postrequest: Got peers",peers
+                print >>sys.stderr,time.asctime(),'-', "Rerequester: postrequest: Got peers",peers
             ps = len(peers) + self.howmany()
             if ps < self.maxpeers:
                 if self.doneflag.isSet():
@@ -512,7 +513,7 @@ class Rerequester:
                 self.connect(peers)    # Encoder.start_connections(peers)
             callback()
         except:
-            print >>sys.stderr,"Rerequester: Error in postrequest"
+            print >>sys.stderr,time.asctime(),'-', "Rerequester: Error in postrequest"
             import traceback
             traceback.print_exc()
 

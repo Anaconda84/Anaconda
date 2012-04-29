@@ -1,3 +1,4 @@
+import time 
 # Written by Freek Zindel, Arno Bakker
 # see LICENSE.txt for license information
 #
@@ -111,7 +112,7 @@ class TorrentFeedThread(Thread):
             bdata = open(filename, 'rb').read()
             torrent_data = bdecode(bdata)
             infohash = sha.sha(bencode(torrent_data['info'])).digest()
-            if DEBUG: print >>sys.stderr,"subscrip:Adding a torrent in my channel: %s" % torrent_data["info"]["name"]
+            if DEBUG: print >>sys.stderr,time.asctime(),'-', "subscrip:Adding a torrent in my channel: %s" % torrent_data["info"]["name"]
             self.save_torrent(infohash, bdata, torrent_data)
 
             # 01/02/10 Boudewijn: we should use the TorrendDef to read
@@ -124,7 +125,7 @@ class TorrentFeedThread(Thread):
             self.channelcast_db.addOwnTorrent(torrentdef)
             return torrentdef.get_infohash()
         except:
-            print >> sys.stderr, "Could not add torrent:", filename
+            print >> sys.stderr, time.asctime(),'-', "Could not add torrent:", filename
             traceback.print_exc()
             return None
 
@@ -151,7 +152,7 @@ class TorrentFeedThread(Thread):
 #        self.lock.release()
     
     def addURL(self, url, dowrite=True, status="active", callback=None):
-        if DEBUG: print >> sys.stderr , "callback", url, callback
+        if DEBUG: print >> sys.stderr , time.asctime(),'-', "callback", url, callback
         def on_torrent_callback(rss_url, infohash, torrent_data):
             # 01/02/10 Boudewijn: we should use the TorrendDef to read
             # the .torrent file.  However, we will also write the
@@ -159,7 +160,7 @@ class TorrentFeedThread(Thread):
             # checking that will take way to much time here.  So we
             # won't for now...
             torrentdef = TorrentDef.load_from_dict(torrent_data)
-            if DEBUG: print >>sys.stderr,"subscrip:Adding a torrent in my channel: %s" % torrentdef.get_name_as_unicode()
+            if DEBUG: print >>sys.stderr,time.asctime(),'-', "subscrip:Adding a torrent in my channel: %s" % torrentdef.get_name_as_unicode()
             self.channelcast_db.addOwnTorrent(torrentdef)
 
         self.lock.acquire()
@@ -186,11 +187,11 @@ class TorrentFeedThread(Thread):
                     if line.startswith(key):
                         url = line[len(key)+1:-2] # remove \r\n
                         if DEBUG:
-                            print >>sys.stderr,"subscrip: Add from file URL",url,"EOU"
+                            print >>sys.stderr,time.asctime(),'-', "subscrip: Add from file URL",url,"EOU"
                         self.addURL(url,dowrite=False,status=key)
             f.close()        
         except:
-            print >>sys.stderr, "rss_client: subscriptions.txt does not yet exist"
+            print >>sys.stderr, time.asctime(),'-', "rss_client: subscriptions.txt does not yet exist"
     
     def writefile(self):
         filename = self.getfilename()
@@ -232,17 +233,17 @@ class TorrentFeedThread(Thread):
     def setURLStatus(self,url,newstatus):
         self.lock.acquire()
         if DEBUG:
-            print >>sys.stderr,"subscrip: setURLStatus",url,newstatus
+            print >>sys.stderr,time.asctime(),'-', "subscrip: setURLStatus",url,newstatus
         newtxt = "active"
         if newstatus == False:
             newtxt = "inactive"
         if DEBUG:
-            print >>sys.stderr,"subscrip: setURLStatus: newstatus set to",url,newtxt
+            print >>sys.stderr,time.asctime(),'-', "subscrip: setURLStatus: newstatus set to",url,newtxt
         if url in self.urls:
             self.urls[url] = newtxt
             self.writefile()
         elif DEBUG:
-            print >>sys.stderr,"subscrip: setURLStatus: unknown URL?",url
+            print >>sys.stderr,time.asctime(),'-', "subscrip: setURLStatus: unknown URL?",url
         self.lock.release()
     
     def deleteURL(self,url):
@@ -288,10 +289,10 @@ class TorrentFeedThread(Thread):
                     try:
                         title, urlopenobj = generator.next()
                         if not urlopenobj:
-                            if DEBUG: print >>sys.stderr,"subscrip:urlopenobj NONE: torrent not found", title
+                            if DEBUG: print >>sys.stderr,time.asctime(),'-', "subscrip:urlopenobj NONE: torrent not found", title
                             continue
                         elif DEBUG:
-                            print >>sys.stderr,"subscrip:urlopenobj : torrent found", title 
+                            print >>sys.stderr,time.asctime(),'-', "subscrip:urlopenobj : torrent found", title 
 
                         bdata = urlopenobj.read()
                         urlopenobj.close()
@@ -304,15 +305,15 @@ class TorrentFeedThread(Thread):
                             if not self.torrent_db.hasTorrent(infohash):
                                 if DEBUG:
                                     if "name" in torrent_data["info"]:
-                                        print >>sys.stderr,"subscrip:Injecting", torrent_data["info"]["name"]
+                                        print >>sys.stderr,time.asctime(),'-', "subscrip:Injecting", torrent_data["info"]["name"]
                                     else:
-                                        print >>sys.stderr,"subscrip:Injecting", title
+                                        print >>sys.stderr,time.asctime(),'-', "subscrip:Injecting", title
                                 self.save_torrent(infohash, bdata, torrent_data, source=rss_url)
                                 if on_torrent_callback:
-                                    if DEBUG: print >> sys.stderr , "ON TORRENT CALLBACK"
+                                    if DEBUG: print >> sys.stderr , time.asctime(),'-', "ON TORRENT CALLBACK"
                                     on_torrent_callback(rss_url, infohash, torrent_data)
                                 if user_callback:
-                                    if DEBUG: print >> sys.stderr , "USER CALLBACK"
+                                    if DEBUG: print >> sys.stderr , time.asctime(),'-', "USER CALLBACK"
                                     user_callback(rss_url, infohash, torrent_data)
 
                                 # perform all non-url-specific callbacks
@@ -323,7 +324,7 @@ class TorrentFeedThread(Thread):
                                 for callback in callbacks:
                                     try:
                                         if DEBUG:
-                                            print >> sys.stderr , "RSS CALLBACK"
+                                            print >> sys.stderr , time.asctime(),'-', "RSS CALLBACK"
                                         callback(rss_url, infohash, torrent_data)
                                     except:
                                         traceback.print_exc()
@@ -334,10 +335,10 @@ class TorrentFeedThread(Thread):
 
                     except ValueError:
                         # the bdecode failed
-                        print >>sys.stderr,"subscrip:Bdecode failed: ", rss_url
+                        print >>sys.stderr,time.asctime(),'-', "subscrip:Bdecode failed: ", rss_url
                     
                     except (ExpatError, HTTPError):
-                        print >>sys.stderr,"subscrip:Invalid RSS: ", rss_url 
+                        print >>sys.stderr,time.asctime(),'-', "subscrip:Invalid RSS: ", rss_url 
 
                     # sleep in between torrent retrievals
                     #time.sleep(self.intertorrentinterval)
@@ -358,7 +359,7 @@ class TorrentFeedThread(Thread):
     def save_torrent(self,infohash,bdata,torrent_data,source=''):
         hexinfohash = binascii.hexlify(infohash)
         if DEBUG:
-            print >>sys.stderr,"subscript: Writing",hexinfohash
+            print >>sys.stderr,time.asctime(),'-', "subscript: Writing",hexinfohash
 
         filename = os.path.join(self.torrent_dir, hexinfohash+'.torrent' )
         f = open(filename,"wb")
@@ -384,7 +385,7 @@ class TorrentFeedThread(Thread):
 
     def shutdown(self):
         if DEBUG:
-            print >>sys.stderr,"subscrip: Shutting down subscriptions module"
+            print >>sys.stderr,time.asctime(),'-', "subscrip: Shutting down subscriptions module"
         self.done.set()
         self.lock.acquire()
         cfeeds = self.feeds[:]
@@ -483,14 +484,14 @@ class TorrentFeedReader:
                 entries.extend([(title, link) for link in links])
 
         if DEBUG:
-            print >>sys.stderr,"subscrip: Parse of RSS returned",len(entries),"previously unseen torrents"
+            print >>sys.stderr,time.asctime(),'-', "subscrip: Parse of RSS returned",len(entries),"previously unseen torrents"
 
         for title,link in entries:
             # print title,link
             try:
                 self.urls_already_seen.add(link)
                 if DEBUG:
-                    print >>sys.stderr,"subscrip: Opening",title,link
+                    print >>sys.stderr,time.asctime(),'-', "subscrip: Opening",title,link
                 html_or_tor = urlOpenTimeout(link,timeout=20)
                 found_torrent = False
                 tor_type = html_or_tor.headers.gettype()
@@ -498,7 +499,7 @@ class TorrentFeedReader:
                     torrent = html_or_tor
                     found_torrent = True
                     if DEBUG:
-                        print >>sys.stderr,"subscrip: torrent1: Yielding",link
+                        print >>sys.stderr,time.asctime(),'-', "subscrip: torrent1: Yielding",link
                     yield title,torrent
                 elif False: # 'html' in tor_type:
                     html = html_or_tor.read()
@@ -513,7 +514,7 @@ class TorrentFeedReader:
                         #print url
                         try:
                             if DEBUG:
-                                print >>sys.stderr,"subscrip: torrent2: Opening",url
+                                print >>sys.stderr,time.asctime(),'-', "subscrip: torrent2: Opening",url
                             torrent = urlOpenTimeout(url)
                             url_type = torrent.headers.gettype()
                             #print url_type
@@ -521,26 +522,26 @@ class TorrentFeedReader:
                                 #print "torrent found:",url
                                 found_torrent = True
                                 if DEBUG:
-                                    print >>sys.stderr,"subscrip: torrent2: Yielding",url
+                                    print >>sys.stderr,time.asctime(),'-', "subscrip: torrent2: Yielding",url
                                 yield title,torrent
                                 break
                             else:
                                 #its not a torrent after all, but just some html link
                                 if DEBUG:
-                                    print >>sys.stderr,"subscrip:%s not a torrent" % url
+                                    print >>sys.stderr,time.asctime(),'-', "subscrip:%s not a torrent" % url
                         except:
                             #url didn't open
                             if DEBUG:
-                                print >>sys.stderr,"subscrip:%s did not open" % url
+                                print >>sys.stderr,time.asctime(),'-', "subscrip:%s did not open" % url
                 if not found_torrent:
                     yield title,None
             except GeneratorExit:
                 if DEBUG:
-                    print >>sys.stderr,"subscrip:GENERATOREXIT"
+                    print >>sys.stderr,time.asctime(),'-', "subscrip:GENERATOREXIT"
                 # the generator is destroyed. we accept this by returning
                 return
             except Exception, e:
-                print >> sys.stderr, "rss_client:", e
+                print >> sys.stderr, time.asctime(),'-', "rss_client:", e
                 yield title,None
 
     def shutdown(self):
@@ -589,7 +590,7 @@ class URLHistory:
     
     def read(self):
         if DEBUG:
-            print >>sys.stderr,"subscrip: Reading cached",self.filename
+            print >>sys.stderr,time.asctime(),'-', "subscrip: Reading cached",self.filename
         try:
             file_handle = open(self.filename, "rb")
         except IOError:
@@ -606,10 +607,10 @@ class URLHistory:
                     timestamp = float(timestamp)
                     if not self.timedout(timestamp, now):
                         if DEBUG:
-                            print >>sys.stderr, "subscrip: Cached url is",url
+                            print >>sys.stderr, time.asctime(),'-', "subscrip: Cached url is",url
                         self.urls[url] = timestamp
                     elif DEBUG:
-                        print >>sys.stderr,"subscrip: Timed out cached url is %s" % url                        
+                        print >>sys.stderr,time.asctime(),'-', "subscrip: Timed out cached url is %s" % url                        
 
             file_handle.close()
         

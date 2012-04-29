@@ -1,3 +1,4 @@
+import time 
 # Written by Bram Cohen and Pawel Garbacki, George Milescu
 # see LICENSE.txt for license information
 
@@ -190,7 +191,7 @@ class PiecePicker:
         if self.helper :
             # The current node is a coordinator
             if DEBUG:
-                print >> sys.stderr,"PiecePicker: proxy_got_have: sending haves to coordinator"
+                print >> sys.stderr,time.asctime(),'-', "PiecePicker: proxy_got_have: sending haves to coordinator"
             
             # Create the piece list - a copy of numhaves for simplicity
             piece_list = self.numhaves
@@ -238,7 +239,7 @@ class PiecePicker:
 
         if self.has[piece]:
             self.has[piece] = 0
-            #print >>sys.stderr,"PiecePicker: Clearing piece",piece
+            #print >>sys.stderr,time.asctime(),'-', "PiecePicker: Clearing piece",piece
             self.numgot -= 1
 
             # undo self._remove_from_interests(piece); ripped from set_priority
@@ -570,13 +571,13 @@ class PiecePicker:
                     if piece is None:
                         # The piece picker failed to return a piece
                         if DEBUG:
-                            print >> sys.stderr,"PiecePicker: next: _next returned no pieces for proxyhave!",
+                            print >> sys.stderr,time.asctime(),'-', "PiecePicker: next: _next returned no pieces for proxyhave!",
                         break
                 
                 if DEBUG:
-                    print >> sys.stderr,"PiecePicker: next: helper None or helper conn, returning", piece
-                    print >> sys.stderr,"PiecePicker: next: haves[", piece, "]=", haves[piece]
-                    print >> sys.stderr,"PiecePicker: next: proxyhave[", piece, "]=", proxyhave[piece]
+                    print >> sys.stderr,time.asctime(),'-', "PiecePicker: next: helper None or helper conn, returning", piece
+                    print >> sys.stderr,time.asctime(),'-', "PiecePicker: next: haves[", piece, "]=", haves[piece]
+                    print >> sys.stderr,time.asctime(),'-', "PiecePicker: next: proxyhave[", piece, "]=", proxyhave[piece]
                 if not haves[piece]:
                     # If the piece was not advertised with a BT HAVE message, send a proxy request for it
                     # Reserve the piece to one of the helpers
@@ -594,19 +595,19 @@ class PiecePicker:
                 piece = self._proxynext(haves, wantfunc, complete_first, helper_con, willrequest = willrequest, connection = connection, proxyhave = None, lookatstarted=True, onlystarted=True)
                 if piece is not None:
                     if DEBUG:
-                        print >> sys.stderr,"PiecePicker: next: helper: continuing already started download for", requested_piece
+                        print >> sys.stderr,time.asctime(),'-', "PiecePicker: next: helper: continuing already started download for", requested_piece
                     return piece
                 
                 # If no already started downloads, look at new coordinator requests
                 requested_piece = self.helper.next_request()
                 if requested_piece is not None:
                     if DEBUG:
-                        print >> sys.stderr,"PiecePicker: next: helper: got request from coordinator for", requested_piece
+                        print >> sys.stderr,time.asctime(),'-', "PiecePicker: next: helper: got request from coordinator for", requested_piece
                     return requested_piece
                 else:
                     # There is no pending requested piece from the coordinator
                     if DEBUG:
-                        print >> sys.stderr,"PiecePicker: next: helper: no piece pending"
+                        print >> sys.stderr,time.asctime(),'-', "PiecePicker: next: helper: no piece pending"
                     return None
     
             # The current node not a helper, neither a coordinator
@@ -616,12 +617,12 @@ class PiecePicker:
             if piece is None:
                 # The piece picker failed to return a piece
                 if DEBUG:
-                    print >> sys.stderr,"PiecePicker: next: _next returned no pieces!",
+                    print >> sys.stderr,time.asctime(),'-', "PiecePicker: next: _next returned no pieces!",
                 break
 
             # We should never get here
             if DEBUG:
-                print >> sys.stderr,"PiecePicker: next: helper: an error occurred. Returning piece",piece
+                print >> sys.stderr,time.asctime(),'-', "PiecePicker: next: helper: an error occurred. Returning piece",piece
             return piece
 
         # Arno, 2008-05-20: 2fast code: if we got capacity to DL something,
@@ -776,24 +777,24 @@ class PiecePicker:
             self._init_interests()    
 
     def print_complete(self):
-        print >>sys.stderr,"pp: self.numpieces",`self.numpieces`
-        print >>sys.stderr,"pp: self.started",`self.started`
-        print >>sys.stderr,"pp: self.totalcount",`self.totalcount`
-        print >>sys.stderr,"pp: self.numhaves",`self.numhaves`
-        print >>sys.stderr,"pp: self.priority",`self.priority`
-        print >>sys.stderr,"pp: self.removed_partials",`self.removed_partials`
-        print >>sys.stderr,"pp: self.crosscount",`self.crosscount`
-        print >>sys.stderr,"pp: self.crosscount2",`self.crosscount2`
-        print >>sys.stderr,"pp: self.has",`self.has`
-        print >>sys.stderr,"pp: self.numgot",`self.numgot`
-        print >>sys.stderr,"pp: self.done",`self.done`
-        print >>sys.stderr,"pp: self.peer_connections",`self.peer_connections`
-        print >>sys.stderr,"pp: self.seed_connections",`self.seed_connections`
-        print >>sys.stderr,"pp: self.seed_time",`self.seed_time`
-        print >>sys.stderr,"pp: self.superseed",`self.superseed`
-        print >>sys.stderr,"pp: self.seeds_connected",`self.seeds_connected`
-        print >>sys.stderr,"pp: self.interests",`self.interests`
-        print >>sys.stderr,"pp: self.level_in_interests",`self.level_in_interests`
-        print >>sys.stderr,"pp: self.pos_in_interests",`self.pos_in_interests`
+        print >>sys.stderr,time.asctime(),'-', "pp: self.numpieces",`self.numpieces`
+        print >>sys.stderr,time.asctime(),'-', "pp: self.started",`self.started`
+        print >>sys.stderr,time.asctime(),'-', "pp: self.totalcount",`self.totalcount`
+        print >>sys.stderr,time.asctime(),'-', "pp: self.numhaves",`self.numhaves`
+        print >>sys.stderr,time.asctime(),'-', "pp: self.priority",`self.priority`
+        print >>sys.stderr,time.asctime(),'-', "pp: self.removed_partials",`self.removed_partials`
+        print >>sys.stderr,time.asctime(),'-', "pp: self.crosscount",`self.crosscount`
+        print >>sys.stderr,time.asctime(),'-', "pp: self.crosscount2",`self.crosscount2`
+        print >>sys.stderr,time.asctime(),'-', "pp: self.has",`self.has`
+        print >>sys.stderr,time.asctime(),'-', "pp: self.numgot",`self.numgot`
+        print >>sys.stderr,time.asctime(),'-', "pp: self.done",`self.done`
+        print >>sys.stderr,time.asctime(),'-', "pp: self.peer_connections",`self.peer_connections`
+        print >>sys.stderr,time.asctime(),'-', "pp: self.seed_connections",`self.seed_connections`
+        print >>sys.stderr,time.asctime(),'-', "pp: self.seed_time",`self.seed_time`
+        print >>sys.stderr,time.asctime(),'-', "pp: self.superseed",`self.superseed`
+        print >>sys.stderr,time.asctime(),'-', "pp: self.seeds_connected",`self.seeds_connected`
+        print >>sys.stderr,time.asctime(),'-', "pp: self.interests",`self.interests`
+        print >>sys.stderr,time.asctime(),'-', "pp: self.level_in_interests",`self.level_in_interests`
+        print >>sys.stderr,time.asctime(),'-', "pp: self.pos_in_interests",`self.pos_in_interests`
         
         

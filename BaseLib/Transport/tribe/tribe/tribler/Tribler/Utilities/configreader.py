@@ -1,3 +1,4 @@
+import time 
 # Written by ABC authors
 # see LICENSE.txt for license information
 
@@ -224,7 +225,7 @@ class ConfigReader(ConfigParser):
             section = self.section
             
         if DEBUG:
-            print >>sys.stderr,"ConfigReader: Read(",param,"type",type,"section",section
+            print >>sys.stderr,time.asctime(),'-', "ConfigReader: Read(",param,"type",type,"section",section
             
         if param is None or param == "":
             return ""
@@ -258,7 +259,7 @@ class ConfigReader(ConfigParser):
 #            sys.stderr.write(data.getvalue())
 
         if DEBUG:
-            print >>sys.stderr,"ConfigReader: Read",param,type,section,"got",value
+            print >>sys.stderr,time.asctime(),'-', "ConfigReader: Read",param,type,section,"got",value
 
         value = self.StringToValue(value, type)
            

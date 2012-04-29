@@ -1,3 +1,4 @@
+import time 
 # written by Arno Bakker, Yuan Yuan
 # Modified by Raul Jimenez to integrate KTH DHT
 # see LICENSE.txt for license information
@@ -14,7 +15,7 @@ class mainlineDHTChecker:
     def __init__(self):
 
         if DEBUG:
-            print >>sys.stderr,'mainlineDHTChecker: initialization'
+            print >>sys.stderr,time.asctime(),'-', 'mainlineDHTChecker: initialization'
         if mainlineDHTChecker.__single:
             raise RuntimeError, "mainlineDHTChecker is Singleton"
         mainlineDHTChecker.__single = self
@@ -33,19 +34,19 @@ class mainlineDHTChecker:
         
     def lookup(self,infohash):
         if DEBUG:
-            print >>sys.stderr,"mainlineDHTChecker: Lookup",`infohash`
+            print >>sys.stderr,time.asctime(),'-', "mainlineDHTChecker: Lookup",`infohash`
 
         if self.dht is not None:
             func = lambda p:self.got_peers_callback(infohash,p)
             self.dht.getPeers(infohash,func)
         elif DEBUG:
-            print >>sys.stderr,"mainlineDHTChecker: No lookup, no DHT support loaded"
+            print >>sys.stderr,time.asctime(),'-', "mainlineDHTChecker: No lookup, no DHT support loaded"
 
         
     def got_peers_callback(self,infohash,peers):
         """ Called by network thread """
         if DEBUG:
-            print >>sys.stderr,"mainlineDHTChecker: Got",len(peers),"peers for torrent",`infohash`,currentThread().getName()
+            print >>sys.stderr,time.asctime(),'-', "mainlineDHTChecker: Got",len(peers),"peers for torrent",`infohash`,currentThread().getName()
             
         alive = len(peers) > 0
         if alive:

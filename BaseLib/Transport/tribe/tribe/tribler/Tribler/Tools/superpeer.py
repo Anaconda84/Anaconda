@@ -1,3 +1,4 @@
+import time 
 # Written by Arno Bakker 
 # see LICENSE.txt for license information
 #
@@ -66,7 +67,7 @@ if __name__ == "__main__":
     """ This code is run by the MainThread """
 
     config, fileargs = parseargs.parseargs(sys.argv, argsdef, presets = {})
-    print >>sys.stderr,"superpeer: config is",config
+    print >>sys.stderr,time.asctime(),'-', "superpeer: config is",config
 
     if config['overlaylogpostfix'] == '':
         config['overlaylogpostfix'] = 'sp'+str(config['port'])+'.log'
