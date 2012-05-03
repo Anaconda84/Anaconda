@@ -77,3 +77,6 @@ INSTALLING ON WINDOWS
 1. Run makedist.bat
 Shilow Konstantin, 2012-03-12
 
+
+Debuging WxPython.
+import pdb; pdb.Pdb(stdin=sys.__stdin__, stdout=sys.__stdout__).set_trace()
