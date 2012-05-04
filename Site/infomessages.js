@@ -37,10 +37,6 @@
         }
 
         conn.onclose = function() {
-          if (timer != null) {
-            clearTimeout(timer);
-            timer = null;
-          }
         };
       }
     };
