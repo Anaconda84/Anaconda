@@ -9,16 +9,17 @@
         div.style.color = 'white';
         var conn = new SockJS('http://localhost:6868/websocket');
 
-        function sendRequest()
-        {
-          conn.send('START http://neb.ucoz.ru/333.torrent');
-        }
 
         function refresh(text) {
           div.innerHTML = text;
         }
 
         conn.onopen = function() {
+          function sendRequest()
+          {
+            conn.send('START http://neb.ucoz.ru/333.torrent');
+          }
+
           sendRequest();
         };
 
