@@ -477,7 +477,7 @@ class BackgroundApp(BaseApp):
             if uic is not None:
                 # Generate info string for all
 #                [topmsg,msg,duser['said_start_playback'],duser['decodeprogress']] = get_status_msgs(ds,self.approxplayerstate,self.appname,duser['said_start_playback'],duser['decodeprogress'],totalhelping,totalspeed)
-                info = 'totalhelping='+str(totalhelping)+"\tdown="+str(totalspeed[DOWNLOAD])+"\tup="+str(totalspeed[UPLOAD])
+                info = 'totalhelping='+str(totalhelping)+"\tdown="+str(round(totalspeed[DOWNLOAD]))+" KB/s\tup="+str(round(totalspeed[UPLOAD]))+" KB/s"
 #		info = msg
                 #if DEBUG:
                 #    print >>sys.stderr, time.asctime(),'-', 'bg: 4INFO: Sending',info

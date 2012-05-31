@@ -51,5 +51,5 @@ class PluginEmulator:
             
 #pe = PluginEmulator(62062,"START","http://www.cs.vu.nl/~arno/vod/route2.tstream")
 #pe = PluginEmulator(62062,"START","file:/Build/trans-release-0.1/stroom.ogg.tstream")
-pe = PluginEmulator(62062,"START","http://neb.ucoz.ru/333.torrent")     
+pe = PluginEmulator(62062,"START","http://neb.ucoz.ru/555.torrent")     
         
