@@ -1,0 +1,5 @@
+50c50,51
+<         def write(self, text, alert=sys._MessageBox, fname=sys.executable + '.log'):
+---
+> #        def write(self, text, alert=sys._MessageBox, fname=sys.executable + '.log'):
+>         def write(self, text, alert=sys._MessageBox, fname=tempfile.tempdir + '/SwarmEngine.log'):

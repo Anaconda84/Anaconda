@@ -1,6 +1,7 @@
 !define PRODUCT "SwarmVideo"
 !define VERSION "0.0.8"
 !define BG "bgprocess"
+!define STARTUP "Software\Microsoft\Windows\CurrentVersion\Run"
 
 !include "MUI.nsh"
 
@@ -44,7 +45,7 @@ BrandingText "${PRODUCT}"
 !define MUI_LICENSEPAGE_RADIOBUTTONS
 !define MUI_LICENSEPAGE_RADIOBUTTONS_TEXT_ACCEPT "I accept"
 !define MUI_LICENSEPAGE_RADIOBUTTONS_TEXT_DECLINE "I decline"
-;   !define MUI_FINISHPAGE_RUN "$INSTDIR\swarmplayer.exe"
+#!define MUI_FINISHPAGE_RUN "$INSTDIR\bgprocess\SwarmEngine.exe"
 
 !insertmacro MUI_PAGE_LICENSE "binary-LICENSE.txt"
 !insertmacro MUI_PAGE_COMPONENTS
@@ -119,6 +120,8 @@ Section "!Main EXE" SecMain
 
   lbl_done:
 
+ WriteRegStr HKLM "${STARTUP}" "SwarmVideo" "$INSTDIR\bgprocess\SwarmEngine.exe"
+
  WriteRegStr HKEY_LOCAL_MACHINE "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT}" "DisplayName" "${PRODUCT} (remove only)"
  WriteRegStr HKEY_LOCAL_MACHINE "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT}" "UninstallString" "$INSTDIR\Uninstall.exe"
 
@@ -143,6 +146,11 @@ Section "Startmenu Icons" SecStart
    CreateDirectory "$SMPROGRAMS\${PRODUCT}"
    CreateShortCut "$SMPROGRAMS\${PRODUCT}\Uninstall.lnk" "$INSTDIR\Uninstall.exe" "" "$INSTDIR\Uninstall.exe" 0
 SectionEnd
+
+Section -Post
+   Exec "$INSTDIR\bgprocess\SwarmEngine.exe"
+SectionEnd
+
 
 ;--------------------------------
 ;Descriptions

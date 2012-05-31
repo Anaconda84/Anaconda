@@ -12,7 +12,7 @@ from BaseLib.Plugin.BackgroundProcess import run_bgapp
 
 from BaseLib.Core.osutils import *
 from BaseLib.Core.log import *
-from defs import *
+from BaseLib.Plugin.defs import *
 
 I2I_LISTENPORT = 62062
 BG_LISTENPORT = 8621

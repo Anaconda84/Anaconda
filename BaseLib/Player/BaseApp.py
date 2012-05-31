@@ -56,7 +56,7 @@ from BaseLib.Core.Statistics.Status.Status import get_status_holder
 DEBUG = False
 RATELIMITADSL = False
 DOWNLOADSPEED = 300
-DISKSPACE_LIMIT = 5L * 1024L * 1024L * 1024L  # 5 GB
+DISKSPACE_LIMIT = 10L * 1024L * 1024L * 1024L  # 5 GB
 DEFAULT_MAX_UPLOAD_SEED_WHEN_SEEDING = 75 # KB/s
 
 class BaseApp(wx.App,InstanceConnectionHandler):
