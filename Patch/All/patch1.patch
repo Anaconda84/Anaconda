@@ -1,5 +1,20 @@
-50c50,51
-<         def write(self, text, alert=sys._MessageBox, fname=sys.executable + '.log'):
----
-> #        def write(self, text, alert=sys._MessageBox, fname=sys.executable + '.log'):
->         def write(self, text, alert=sys._MessageBox, fname=tempfile.tempdir + '/SwarmEngine.log'):
+*** C:\Python27\Lib\site-packages\py2exe\boot_common.py.old	2008-06-25 01:32:42.000000000 +0400
+--- C:\Python27\Lib\site-packages\py2exe\boot_common.py	2012-05-31 14:07:56.616874100 +0400
+***************
+*** 47,53 ****
+          softspace = 0
+          _file = None
+          _error = None
+!         def write(self, text, alert=sys._MessageBox, fname=sys.executable + '.log'):
+              if self._file is None and self._error is None:
+                  try:
+                      self._file = open(fname, 'a')
+--- 47,54 ----
+          softspace = 0
+          _file = None
+          _error = None
+! #        def write(self, text, alert=sys._MessageBox, fname=sys.executable + '.log'):
+!         def write(self, text, alert=sys._MessageBox, fname=tempfile.tempdir + '/SwarmEngine.log'):
+              if self._file is None and self._error is None:
+                  try:
+                      self._file = open(fname, 'a')
