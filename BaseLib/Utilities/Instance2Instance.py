@@ -212,6 +212,11 @@ class InstanceConnection:
                 rflag = False
                 
         self.remain = self.remain + data
+        idx = self.remain.find('<policy-file-request/>') 
+        if  idx == 0:
+            data='<cross-domain-policy><allow-access-from domain="*" to-ports="*"/></cross-domain-policy>\x00'
+            self.singsock.write(data)
+	    print >>sys.stderr,time.asctime(),'-', "i2is: ic: data_came_in send crossdomain.xml response ", data
     
     def write(self,data):
         if self.singsock is not None:

@@ -17,11 +17,10 @@ class Ports():
     pass
 
 class WsServer(Thread):
-    def __init__(self,i2iport, httpport, ws_serverport):
+    def __init__(self,i2iport, ws_serverport):
         Thread.__init__(self)
         self.setName('WsServer')
 	Ports.i2iport = i2iport
-	Ports.httpport = httpport
 	Ports.ws_serverport = ws_serverport
 
     def run(self):

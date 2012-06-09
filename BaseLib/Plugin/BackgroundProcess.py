@@ -114,13 +114,17 @@ class BackgroundApp(BaseApp):
     def __init__(self, logdir, appname, appversion, params, single_instance_checker, installdir, i2iport, sport, httpport, ws_serverport):
 	# Running WebSocket server SockJS Tornado
         Router = SockJSRouter(WsConnection, '/websocket')
-    	ws_serv = WsServer(i2iport, httpport,ws_serverport)
+    	ws_serv = WsServer(i2iport,ws_serverport)
     	ws_serv.start()
 
 
         # Almost generic HTTP server
         self.videoHTTPServer = VideoHTTPServer(httpport)
         self.videoHTTPServer.register(self.videoservthread_error_callback,self.videoservthread_set_status_callback)
+
+        # HTTP server for crossdomain.xml response
+#        self.crossdomainHTTPServer = CrossdomainHTTPServer(843)
+
         
         BaseApp.__init__(self, logdir, appname, appversion, params, single_instance_checker, installdir, i2iport, sport)
         self.httpport = httpport
@@ -221,7 +225,7 @@ class BackgroundApp(BaseApp):
         self.singsock2ic[s] = ic
         if DEBUG:
             print >>sys.stderr,time.asctime(),'-', "bg: Plugin connection_made",len(self.singsock2ic),"++++++++++++++++++++++++++++++++++++++++++++++++"
-          
+  
         # Arno: Concurrency problems getting SEARCHURL message to work, 
         # JavaScript can't always read it. TODO  
         ##ic.searchurl(self.searchurl)
@@ -319,7 +323,6 @@ class BackgroundApp(BaseApp):
         
     def gui_readlinecallback(self,ic,cmd):
         """ Receive command from Plugin """
-        
         if DEBUG:
             print >>sys.stderr,time.asctime(),'-', "bg: Got command:",cmd
         try:
