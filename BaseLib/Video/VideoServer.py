@@ -230,11 +230,23 @@ class SimpleServer(BaseHTTPServer.BaseHTTPRequestHandler):
                 DEBUG = DEBUGWEBUI
             else:
                 DEBUG = DEBUGCONTENT
+
+	    if self.path.startswith("/crossdomain.xml"):
+		print >>sys.stderr,time.asctime(),'-', "videoserv: do_GET: Get request",self.path,' !!!!!!'
+		self.send_response(200)
+                self.send_header("Content-type", "text/html")
+                self.end_headers()
+		#self.wfile.write('<cross-domain-policy><allow-http-request-headers-from domain="*" headers="*"/></cross-domain-policy>')
+		self.wfile.write("<html><head><title>Title goes here.</title></head>")
+                self.wfile.write('<body><cross-domain-policy><allow-access-from domain="*" /><allow-http-request-headers-from domain="*" headers="*"/></cross-domain-policy>')
+                self.wfile.write("</body></html>")
+		return
             
             if DEBUG:
                 print >>sys.stderr,time.asctime(),'-', "videoserv: do_GET: Got request",self.path,self.headers.getheader('range'),currentThread().getName()
                 #print >>sys.stderr,time.asctime(),'-', "videoserv: do_GET: Range",self.headers.getrawheader('Range'),currentThread().getName()
                 
+
             # 1. Get streaminfo for the data we should return in response
             nbytes2send = None
             nbyteswritten= 0
