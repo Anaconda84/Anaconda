@@ -7,6 +7,7 @@ import sys
 import time
 import socket
 import BaseHTTPServer
+import re
 from SocketServer import ThreadingMixIn
 from threading import RLock,Thread,currentThread
 from traceback import print_exc,print_stack
@@ -112,7 +113,6 @@ class VideoHTTPServer(ThreadingMixIn,BaseHTTPServer.HTTPServer):
 
         streaminfo = None
         # First check mappers, without locking, assuming video stream URL paths won't match mappers
-
         for mapper in self.mappers:
             streaminfo = mapper.get(urlpath)
             # print >>sys.stderr,time.asctime(),'-', "videoserv: get_inputstream: Got streaminfo",`streaminfo`,"from",`mapper`
@@ -133,6 +133,10 @@ class VideoHTTPServer(ThreadingMixIn,BaseHTTPServer.HTTPServer):
         if streaminfo is not None and 'lock' in streaminfo:
             if DEBUGLOCK:
                 print >>sys.stderr,time.asctime(),'-', "vs: acq_input: stream: lock",urlpath,currentThread().getName()
+
+#	    if streaminfo['lock']._RLock__count > 0:
+#		import pdb; pdb.Pdb(stdin=sys.__stdin__, stdout=sys.__stdout__).set_trace()
+#	        streaminfo['lock'].release()
             streaminfo['lock'].acquire()
         return streaminfo
 
@@ -226,11 +230,19 @@ class SimpleServer(BaseHTTPServer.BaseHTTPRequestHandler):
         Called by a separate thread for each request.
         """
         global DEBUG
+	print >>sys.stderr,time.asctime(),'-', "videoserv: do_GET: -----------------",self.path
         try:
             if self.path.startswith("/webUI"):
                 DEBUG = DEBUGWEBUI
             else:
                 DEBUG = DEBUGCONTENT
+	    self.range = None
+
+            if re.search(ur".+\?Range=\d+.*", self.path):
+		result = re.finditer(ur"(.+)\?Range=(\d+).*", self.path)
+		for match in result :
+		    self.path = match.groups()[0]
+		    self.range = match.groups()[1]
 
 	    if self.path.startswith("/crossdomain.xml"):
 		print >>sys.stderr,time.asctime(),'-', "videoserv: do_GET: Get request",self.path,' !!!!!!'
@@ -252,8 +264,15 @@ class SimpleServer(BaseHTTPServer.BaseHTTPRequestHandler):
             nbytes2send = None
             nbyteswritten= 0
             try:
+		print >>sys.stderr,time.asctime(),'-', "videoserv: do_GET: aaaaaaaaaa"
+#   	        if self.range != 'none':
+#	            import pdb; pdb.Pdb(stdin=sys.__stdin__, stdout=sys.__stdout__).set_trace()
+#		    self.server.release_inputstream(self.path)
+
                 streaminfo = self.server.acquire_inputstream(self.path)
+		print >>sys.stderr,time.asctime(),'-', "videoserv: do_GET: bbbbbbbbbbbb"
             except:
+		print >>sys.stderr,time.asctime(),'-', "videoserv: do_GET: ccccccccc"
                 streaminfo = None
             print >>sys.stderr,time.asctime(),'-', "videoserv: do_GET: Got streaminfo",`streaminfo`
             
@@ -263,6 +282,7 @@ class SimpleServer(BaseHTTPServer.BaseHTTPRequestHandler):
                 
             try:
                 if streaminfo is None or ('statuscode' in streaminfo and streaminfo['statuscode'] != 200):
+		    print >>sys.stderr,time.asctime(),'-', "videoserv: do_GET: 111111111"
                     # 2. Send error response
                     if streaminfo is None:
                         streaminfo = {'statuscode':500,'statusmsg':"Internal Server Error, couldn't find resource"}
@@ -280,6 +300,7 @@ class SimpleServer(BaseHTTPServer.BaseHTTPRequestHandler):
                         self.wfile.write(streaminfo['statusmsg'])
                     return
                 else:
+		    print >>sys.stderr,time.asctime(),'-', "videoserv: do_GET: 22222222222"
                     # 2. Prepare to send stream
                     mimetype = streaminfo['mimetype']
                     stream = streaminfo['stream']
@@ -310,7 +331,14 @@ class SimpleServer(BaseHTTPServer.BaseHTTPRequestHandler):
                 else:
                     lastbyte = None # to avoid print error below
     
-                range = self.headers.getheader('range')
+		if self.range is None:
+		    range = self.headers.getheader('range')
+		else:
+		    range = 'bytes='+self.range + '-'
+#		    import pdb; pdb.Pdb(stdin=sys.__stdin__, stdout=sys.__stdout__).set_trace()
+
+		print >>sys.stderr,time.asctime(),'-', "videoserv: do_GET: range=",range
+
                 if self.RANGE_REQUESTS_ENABLED and length and range:
                     # Handle RANGE query
                     bad = False
@@ -398,11 +426,7 @@ class SimpleServer(BaseHTTPServer.BaseHTTPRequestHandler):
                     self.send_header("Keep-Alive", "timeout=15, max=100")
                     
                 # 5. Send headers
-		if mimetype == 'video/x-webm':
-		    self.send_header("Content-Type", 'video/webm')
-		    print >>sys.stderr,time.asctime(),'-', "Replace Content-Type: ",mimetype," to Content-Type: video/webm"
-		else:
-                    self.send_header("Content-Type", mimetype)
+                self.send_header("Content-Type", mimetype)
                 self.send_header("Accept-Ranges", "bytes")
 
 
