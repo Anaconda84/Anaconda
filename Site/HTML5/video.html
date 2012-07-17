@@ -1,0 +1,137 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+</head>
+  <link href="http://vjs.zencdn.net/c/video-js.css" rel="stylesheet">
+  <script src="http://vjs.zencdn.net/c/video.js"></script>
+  <script src="http://cdn.sockjs.org/sockjs-0.3.2.min.js"></script>
+<body>
+
+  <h4>
+  <table width="1px" border="0" cellspacing="0" cellpadding="0" align="">
+  <tbody>
+    <tr>
+       <td>
+         <video id="video" class="video-js vjs-default-skin" controls
+         preload="auto" width="640" height="264" poster="my_video_poster.png"
+         data-setup="{}">
+         </video>
+       </td>
+    </tr>
+    <tr>
+       <td bgcolor="#FFFF99" align="center"><font color="#000080"><b><div id='output'>Film name.</div></b></font></td>
+    </tr>
+  </tbody>
+  </table>
+  </h4>
+  <div id='torrent' style="display: none;">%torrent%</div> 
+
+
+  <script>
+    function refresh(text) {
+	document.getElementById('output').innerHTML = text;
+    }
+
+    var is_webm_support = supports_webm_video();
+    _V_("video").ready(function()
+    {
+          var first = true;
+          var myPlayer = this;
+          var hide_play_message = false;
+	  myPlayer.addEvent("play", function()
+  	  {
+	    if(first == true)
+	    {
+	      first = false;
+	      var conn = new SockJS('http://localhost:6868/websocket');
+
+              function sendRequest()
+	      {
+	  	var torrent = document.getElementById('torrent').innerHTML;
+		var webm_mp4 = torrent.split(/::/);
+		if(is_webm_support)
+		{
+		  alert(webm_mp4[0]);
+          	  conn.send('START '+webm_mp4[0]);
+		}
+		else
+		{
+		  alert(webm_mp4[1]);
+          	  conn.send('START '+webm_mp4[1]);
+		}
+              };
+
+
+              conn.onopen = function() {
+                sendRequest();
+              };
+
+              conn.onmessage = function(e) {
+                if( (myArray = /^PLAY\s(.+)/.exec(e.data)) != null)
+                {
+		     if(is_webm_support)
+		     {
+		        myPlayer.src({ type: "video/webm", src: myArray[1] });
+                     }
+		     else
+		     {
+		        myPlayer.src({ type: "video/mp4", src: myArray[1] });
+                     }
+                     myPlayer.play();
+                }
+                else
+                { 
+	             if(hide_play_message == false) { refresh(e.data); }
+                }
+              };
+
+              conn.onclose = function() {
+		refresh('');
+              };
+            }
+	    else
+	    {
+	      if(hide_play_message == false) refresh('Playing ...');
+	    }
+	  });
+
+	  myPlayer.addEvent("loadstart", function()
+	  {
+	    hide_play_message = true;
+            refresh('Prepare to start ...');
+	  });
+
+	  myPlayer.addEvent("loadeddata", function()
+	  {
+	    hide_play_message = false;
+	    refresh('Playing ...');
+	  });
+
+	  myPlayer.addEvent("pause", function()
+	  {
+	    refresh('Pause ...');
+	  });
+
+	  myPlayer.addEvent("ended", function()
+	  {
+	    refresh('Ended !!!');
+	  });
+
+          //myPlayer.src({ type: "video/webm", src: "http://107.22.233.233/KKK1.webm" });
+          // EXAMPLE: Start playing the video.
+          //myPlayer.play();
+    });
+
+    function supports_video() {
+      return !!document.createElement('video').canPlayType;
+    }
+
+    function supports_webm_video() {
+      if (!supports_video()) { return false; }
+      var v = document.createElement("video");
+      return v.canPlayType('video/webm; codecs="vp8, vorbis"');
+    }
+
+</script>  
+</body>
+</html>

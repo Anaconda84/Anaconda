@@ -6,6 +6,7 @@ import time
 import sys
 import time
 import socket
+import re
 import BaseHTTPServer
 from SocketServer import ThreadingMixIn
 from threading import RLock,Thread,currentThread
@@ -15,6 +16,8 @@ from cStringIO import StringIO
 
 import os
 import BaseLib.Core.osutils
+import httplib
+from urlparse import urlparse
 
 # NOTE: DEBUG is set dynamically depending from DEBUGWEBUI and DEBUGCONTENT
 DEBUG = True
@@ -241,6 +244,30 @@ class SimpleServer(BaseHTTPServer.BaseHTTPRequestHandler):
 		self.wfile.write("<html><head><title>Title goes here.</title></head>")
                 self.wfile.write('<body><cross-domain-policy><allow-access-from domain="*" /><allow-http-request-headers-from domain="*" headers="*"/></cross-domain-policy>')
                 self.wfile.write("</body></html>")
+		return
+
+	    if re.search(ur"/get_video\?url=.+\&torrent=.+", self.path):
+		print >>sys.stderr,time.asctime(),'-', "videoserv: do_GET: Get request",self.path,' !!!!!!'
+  	        result = re.finditer(ur"/get_video\?url=(.+)\&torrent=(.+)", self.path)
+                for match in result:
+                    site = match.groups()[0]
+                    torrent = match.groups()[1]
+
+		scheme, netloc, path_site, params, query, fragment = urlparse(site)
+		#print netloc, path
+		
+                conn = httplib.HTTPConnection(netloc)
+		conn.request("GET", path_site)
+		r1 = conn.getresponse()
+		data = r1.read()
+		data = data.replace('%torrent%', torrent)
+		conn.close()
+		
+		self.send_response(200)
+                self.send_header("Content-type", "text/html")
+                self.end_headers()
+		#self.wfile.write('<cross-domain-policy><allow-http-request-headers-from domain="*" headers="*"/></cross-domain-policy>')
+		self.wfile.write(data)
 		return
             
             if DEBUG:
