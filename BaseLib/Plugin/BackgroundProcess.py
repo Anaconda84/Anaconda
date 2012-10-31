@@ -737,8 +737,11 @@ class BGInstanceConnection(InstanceConnection):
         
         #self.urlpath = URLPATH_CONTENT_PREFIX+'/'+infohash2urlpath(infohash)+'/'+str(random.random())
         self.urlpath = URLPATH_CONTENT_PREFIX+'/'+infohash2urlpath(infohash)+'/'+str(random.random())+'.mp4'
+        # for http seeding
+	self.urlpath1 = URLPATH_CONTENT_PREFIX+'/'+infohash2urlpath(infohash)
 
         self.videoHTTPServer.set_inputstream(self.cstreaminfo,self.urlpath)
+	self.videoHTTPServer.set_inputstream(self.cstreaminfo,self.urlpath1)
         
         if DEBUG:
             print >> sys.stderr, time.asctime(),'-', "bg: Telling plugin to start playback of",self.urlpath

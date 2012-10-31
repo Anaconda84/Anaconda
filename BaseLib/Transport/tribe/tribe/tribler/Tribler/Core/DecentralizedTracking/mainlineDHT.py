@@ -30,8 +30,6 @@ def init(*args, **kws):
             print >>sys.stderr,time.asctime(),'-', 'dht: DHT running'
 
 def control():
-    import pdb
-    pdb.set_trace()
 
 def deinit():
     global dht
