@@ -97,6 +97,7 @@ from BaseLib.WebUI.WebUI import WebIFPathMapper
 from BaseLib.Core.ClosedSwarm.ClosedSwarm import InvalidPOAException
 
 from BaseLib.Plugin.WsServer import *
+from BaseLib.Plugin.BtHTTPServer import *
 from sockjs.tornado import SockJSConnection, SockJSRouter, proto
 from BaseLib.Plugin.defs import *
 
@@ -111,7 +112,7 @@ IDLE_BEFORE_SELFKILL = 60.0 # Number of seconds
 
 class BackgroundApp(BaseApp):
 
-    def __init__(self, logdir, appname, appversion, params, single_instance_checker, installdir, i2iport, sport, httpport, ws_serverport):
+    def __init__(self, logdir, appname, appversion, params, single_instance_checker, installdir, i2iport, sport, httpport, ws_serverport, bt_port):
 	# Running WebSocket server SockJS Tornado
         Router = SockJSRouter(WsConnection, '/websocket')
     	ws_serv = WsServer(i2iport,ws_serverport)
@@ -121,6 +122,10 @@ class BackgroundApp(BaseApp):
         # Almost generic HTTP server
         self.videoHTTPServer = VideoHTTPServer(httpport)
         self.videoHTTPServer.register(self.videoservthread_error_callback,self.videoservthread_set_status_callback)
+
+	# Running BitTorrent HTTP server
+    	bt_serv = BtServer(bt_port)
+    	bt_serv.start()
 
         # HTTP server for crossdomain.xml response
 #        self.crossdomainHTTPServer = CrossdomainHTTPServer(843)
@@ -737,11 +742,8 @@ class BGInstanceConnection(InstanceConnection):
         
         #self.urlpath = URLPATH_CONTENT_PREFIX+'/'+infohash2urlpath(infohash)+'/'+str(random.random())
         self.urlpath = URLPATH_CONTENT_PREFIX+'/'+infohash2urlpath(infohash)+'/'+str(random.random())+'.mp4'
-        # for http seeding
-	self.urlpath1 = URLPATH_CONTENT_PREFIX+'/'+infohash2urlpath(infohash)
 
         self.videoHTTPServer.set_inputstream(self.cstreaminfo,self.urlpath)
-	self.videoHTTPServer.set_inputstream(self.cstreaminfo,self.urlpath1)
         
         if DEBUG:
             print >> sys.stderr, time.asctime(),'-', "bg: Telling plugin to start playback of",self.urlpath
@@ -912,7 +914,7 @@ class AtBitrateStream:
 # Main Program Start Here
 #
 ##############################################################
-def run_bgapp(appname,appversion,i2iport,sessport,httpport,ws_serverport, params = None,killonidle=False):
+def run_bgapp(appname,appversion,i2iport,sessport,httpport,ws_serverport,bt_port, params = None,killonidle=False):
     """ Set sys.argv[1] to "--nopause" to inform the Core that the player
     doesn't support VODEVENT_PAUSE, e.g. the SwarmTransport.
     """ 
@@ -964,7 +966,7 @@ def run_bgapp(appname,appversion,i2iport,sessport,httpport,ws_serverport, params
         os.makedirs(logdir)
 
     # Launch first single instance
-    app = BackgroundApp(logdir, appname, appversion, params, single_instance_checker, installdir, i2iport, sessport, httpport, ws_serverport)
+    app = BackgroundApp(logdir, appname, appversion, params, single_instance_checker, installdir, i2iport, sessport, httpport, ws_serverport, bt_port)
     s = app.s
     # Enable P2P-Next ULANC logging.
     if PHONEHOME: 
