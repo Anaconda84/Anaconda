@@ -5,6 +5,8 @@ import os
 import time
 import sys
 import string
+from threading import Thread, Event
+from BaseLib.Core.osutils import *
 
 max_size=2**16
 DEBUG = True
@@ -15,11 +17,31 @@ def bytestr2int(b):
     else:
         return int(b)
 
+class BtPorts():
+    pass
+
+class BtServer(Thread):
+    def __init__(self, bt_port):
+        Thread.__init__(self)
+        self.setName('BtServer')
+	BtPorts.PORT = bt_port
+
+    def run(self):
+	application = tornado.web.Application([ (r"/(.+)", MainHandler), ])
+        application.listen(BtPorts.PORT)
+        print >>sys.stderr,time.asctime(),'-', "Starting BtHTTPServer am port", BtPorts.PORT
+	print 'Listening on 0.0.0.0:',BtPorts.PORT
+        tornado.ioloop.IOLoop.instance().start()
+
 class MainHandler(tornado.web.RequestHandler):
     def get(self, filename):
         if filename == 'favicon.ico':
            self.write('')
            return
+
+	state_dir = get_appstate_dir()
+	# filename = os.path.join(state_dir, '.SwarmVideo', 'downloads', filename)
+	print >>sys.stderr,time.asctime(),'-', "BtHTTPSErver: filename=", filename
 
 	with open(filename,'rb') as f:
             nbytes2send = None
@@ -90,7 +112,7 @@ class MainHandler(tornado.web.RequestHandler):
                 self.set_status(200)
 
             if DEBUG:
-                print >>sys.stderr,time.asctime(),'-', "videoserv: do_GET: final range",firstbyte,lastbyte,nbytes2send
+                print >>sys.stderr,time.asctime(),'-', "BtHTTPSErver: do_GET: final range",firstbyte,lastbyte,nbytes2send
 
             try:
                 f.seek(firstbyte)
@@ -124,11 +146,12 @@ class MainHandler(tornado.web.RequestHandler):
 	        self.write(s)
         f.close()
 
-application = tornado.web.Application([ (r"/(.+)", MainHandler), ])
+#application = tornado.web.Application([ (r"/(.+)", MainHandler), ])
 
 if __name__ == "__main__":
     PORT = 8888
+    application = tornado.web.Application([ (r"/(.+)", MainHandler), ])
     application.listen(PORT)
-    print >>sys.stderr,time.asctime(),'-', "Starting BtHTTPServer am port", PORT
+    print "Starting BtHTTPServer am port", PORT
     tornado.ioloop.IOLoop.instance().start()
 

@@ -33,17 +33,21 @@ class BtServer(Thread):
 	print 'Listening on 0.0.0.0:',BtPorts.PORT
         tornado.ioloop.IOLoop.instance().start()
 
+
 class MainHandler(tornado.web.RequestHandler):
+    CHUNK_SIZE = 512000         # 0.5 MB
+    @tornado.web.asynchronous  # не закрывать сокет когда отработает эта функция (закрывать self.finish())
     def get(self, filename):
         if filename == 'favicon.ico':
            self.write('')
            return
 
 	state_dir = get_appstate_dir()
-	# filename = os.path.join(state_dir, '.SwarmVideo', 'downloads', filename)
+	filename = os.path.join(state_dir, '.SwarmVideo', 'downloads', filename)
 	print >>sys.stderr,time.asctime(),'-', "BtHTTPSErver: filename=", filename
 
-	with open(filename,'rb') as f:
+	self._fd = open(filename, "rb")
+	if self._fd:
             nbytes2send = None
             nbyteswritten= 0
             length = os.path.getsize(filename)
@@ -115,7 +119,7 @@ class MainHandler(tornado.web.RequestHandler):
                 print >>sys.stderr,time.asctime(),'-', "BtHTTPSErver: do_GET: final range",firstbyte,lastbyte,nbytes2send
 
             try:
-                f.seek(firstbyte)
+                self._fd.seek(firstbyte)
             except:
                 print_exc()
 
@@ -139,12 +143,19 @@ class MainHandler(tornado.web.RequestHandler):
             else:
                 self.set_header('Transfer-Encoding', 'chunked')
 
-    	    while True:
-                s=f.read(max_size)
-        	if not s: break
-		# print len(s),'bytes.'
-	        self.write(s)
-        f.close()
+	    self.flush()  # отправляем заголовки
+
+	    self.write_more()
+
+    def write_more(self):
+        data = self._fd.read(self.CHUNK_SIZE)
+        if not data:  # если весь файл отправлен...
+            self.finish()  # сбрасываем буфер и закрываем сокет
+            self._fd.close()  # закрываем файл
+            return
+        self.write(data)
+        # зацикливаемся - вызываем write_more только когда данные полностью уйдут клиенту
+        self.flush(callback=self.write_more)
 
 #application = tornado.web.Application([ (r"/(.+)", MainHandler), ])
 
