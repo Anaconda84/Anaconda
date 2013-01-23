@@ -1,0 +1,14 @@
+<table border=1>
+ {% for str in list %}
+ <tr>
+   <td> 
+      <a href="#" onclick=init('{{ str.url }}','{{ str.torrent }}');><img src="{{ str.poster }}"></a>
+   </td>
+   <td> 
+      {{ str.name }}<BR>
+      {{ str.description }}<BR>
+   </td>
+
+ </tr>
+ {% endfor %}
+</table>

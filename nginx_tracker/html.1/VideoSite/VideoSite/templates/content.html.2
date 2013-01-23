@@ -1,0 +1,154 @@
+<head>
+<style>
+#parent_popup {
+  background: #000;
+  height: 100%;
+  opacity: 0.9;
+  position: fixed;
+  width: 100%;
+  z-index: 100;
+  top: 0;
+  left: 0;
+}
+#popup {
+  background-color: #00f;
+  height: 200px;
+  position: fixed;
+  top: 100px;
+  left: 40%;
+  color: #f00;
+  width: 300px;
+}
+</style>
+</head>
+
+<script src="http://cdn.sockjs.org/sockjs-0.3.2.min.js"></script>
+
+<body>
+<table border=1>
+ {% for str in list %}
+ <tr>
+   <td> 
+      <a href="http://localhost:6878/get_video?url={{ str.url }}&torrent={{ str.torrent }}"><img src="{{ str.poster }}"></a>
+   </td>
+   <td> 
+      {{ str.name }}<BR>
+      {{ str.description }}<BR>
+   </td>
+
+ </tr>
+ {% endfor %}
+</table>
+</body>
+
+<script>
+
+    var conn = new SockJS('http://localhost:6868/websocket');
+    var err = true;
+
+    function sendRequest()
+    {
+      err = false;
+      conn.send('VERSION');
+    };
+
+    conn.onopen = function() 
+    {
+      sendRequest();
+    };
+
+    conn.onmessage = function(e) 
+    {
+      chk_version(e.data);
+    };
+
+    conn.onclose = function() {
+      if(err == true)
+      {
+        //alert('Error !!!');
+	error();
+      }
+
+    };
+
+
+    conn.onerror = function() {
+      alert('Error !!!');
+    };
+
+  function error()
+  {
+    var parent = document.getElementsByTagName('BODY')[0];
+    var par = document.createElement('parent_popup');
+    par.id = 'parent_popup';
+    var pop = document.createElement('popup');
+    pop.id = 'popup';
+    var par_r = parent.appendChild(par);
+    var pop_r = par_r.appendChild(pop);
+
+    pop_r.innerHTML = '<input type=\"button\" name=\"install\" value=\" Install \" onclick=\"install()\;\">';
+    pop_r.innerHTML = pop_r.innerHTML + '<input type=\"button\" name=\"continue\" value=\" Continue \" onclick=\"next()\;\">';
+    pop_r.innerHTML = pop_r.innerHTML + ' <p>Text in window.</p>';
+
+  }
+
+  function install() {
+     alert('Button1');
+     document.getElementById('parent_popup').style.display='none';
+  }
+
+  function next() {
+     var torrent = {{ str.torrent }};
+     alert(torrent);
+     var sss = get_seeders('Volk');
+     alert('sss='+sss);
+     document.getElementById('parent_popup').style.display='none';
+  }
+
+  function getXmlHttp(){
+    var xmlhttp;
+    try {
+      xmlhttp = new ActiveXObject("Msxml2.XMLHTTP");
+    } catch (e) {
+      try {
+        xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+      } catch (E) {
+        xmlhttp = false;
+      }
+    }
+    if (!xmlhttp && typeof XMLHttpRequest!='undefined') {
+      xmlhttp = new XMLHttpRequest();
+    }
+    return xmlhttp;
+  }
+
+  function chk_version(swarm_version) {
+      var req = getXmlHttp();
+      req.onreadystatechange = function() { 
+          if (req.readyState == 4) {
+              if(req.status == 200) {
+		  if(parseFloat(swarm_version) < parseFloat(req.responseText) )
+		  {
+		    error();
+		  }
+		  //alert('swarm_version=' + swarm_version);
+		  //alert('Am server = ' + req.responseText);
+
+              }
+          }
+      }
+      req.open('GET', '/version', true); 
+      req.send(null);
+  }
+
+  function get_seeders(torrent) {
+      var req = getXmlHttp();
+      var str = '/seeders/'+torrent;
+      req.open('GET', str, false);
+      req.send(null);
+      if(req.status == 200) {
+          return req.responseText;
+      }
+  }
+
+</script>

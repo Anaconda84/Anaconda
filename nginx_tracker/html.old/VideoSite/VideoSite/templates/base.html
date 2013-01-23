@@ -1,0 +1,22 @@
+{% load staticfiles %}
+<html lang="ru">
+<head>
+  <title>{% block title %}Заголовок{% endblock %}</title>
+  <link rel="stylesheet" href="{% static 'styles.css' %}" type="text/css" />
+
+  <link href="http://vjs.zencdn.net/c/video-js.css" rel="stylesheet">
+  <script src="http://vjs.zencdn.net/c/video.js"></script>
+  <script src="http://cdn.sockjs.org/sockjs-0.3.2.min.js"></script>
+
+</head>
+
+<frameset rows="10%,85%,5%">
+
+   <frame src="head.html">
+   <frame src="/static/menu.html">
+   <frame src="foot.html">
+    
+</frameset>
+
+
+</html>
