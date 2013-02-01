@@ -1,8 +1,0 @@
-import sqlite3
-conn = sqlite3.connect('tracker.db')
-c = conn.cursor()
-
-c.execute("SELECT info_hash FROM peers")
-allentries=c.fetchall()
-
-print sqlite3.Binary(allentries)

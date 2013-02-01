@@ -1,6 +1,7 @@
-!define PRODUCT "SwarmPlugin"
-!define VERSION "1.1.0"
+!define PRODUCT "SwarmVideo"
+!define VERSION "0.0.8"
 !define BG "bgprocess"
+!define STARTUP "Software\Microsoft\Windows\CurrentVersion\Run"
 
 !include "MUI.nsh"
 
@@ -44,7 +45,7 @@ BrandingText "${PRODUCT}"
 !define MUI_LICENSEPAGE_RADIOBUTTONS
 !define MUI_LICENSEPAGE_RADIOBUTTONS_TEXT_ACCEPT "I accept"
 !define MUI_LICENSEPAGE_RADIOBUTTONS_TEXT_DECLINE "I decline"
-;   !define MUI_FINISHPAGE_RUN "$INSTDIR\swarmplayer.exe"
+#!define MUI_FINISHPAGE_RUN "$INSTDIR\bgprocess\SwarmEngine.exe"
 
 !insertmacro MUI_PAGE_LICENSE "binary-LICENSE.txt"
 !insertmacro MUI_PAGE_COMPONENTS
@@ -77,61 +78,63 @@ Section "!Main EXE" SecMain
  SetOutPath "$INSTDIR"
  File *.txt
   ; TODO : add checkbox for IE and Fx
- File activex\axvlc.dll
- File mozilla\npvlc.dll
- File *.dll
- File activex\axvlc.dll.manifest
- File mozilla\npvlc.dll.manifest
- File *.dll.manifest
+; File activex\axvlc.dll
+; File mozilla\npvlc.dll
+; File *.dll
+; File activex\axvlc.dll.manifest
+; File mozilla\npvlc.dll.manifest
+; File *.dll.manifest
 
  File /r bgprocess
 
- File /r plugins
- File /r locale
- File /r osdmenu
- File /r http
+; File /r plugins
+; File /r locale
+; File /r osdmenu
+; File /r http
 
  WriteRegStr HKLM "Software\${PRODUCT}" "BGProcessPath" "$INSTDIR\bgprocess\SwarmEngine.exe"
  WriteRegStr HKLM "Software\${PRODUCT}" "InstallDir" "$INSTDIR"
 
  ; Register IE Plug-in
- RegDLL "$INSTDIR\axvlc.dll"
+; RegDLL "$INSTDIR\axvlc.dll"
 
  ; Register Firefox Plug-in
  !define MozillaPlugin "Software\MozillaPlugins\@P2P-Next.org/swarmplugin,version=${VERSION}"
- WriteRegStr HKLM ${MozillaPlugin} "Description" "SwarmPlugin for Mozilla Firefox"
- WriteRegStr HKLM ${MozillaPlugin} "Path" "$INSTDIR\npvlc.dll"
- WriteRegStr HKLM ${MozillaPlugin} "Product" "SwarmPlugin P2P Multimedia Plug-in"
- WriteRegStr HKLM ${MozillaPlugin} "Vendor" "P2P-Next"
- WriteRegStr HKLM ${MozillaPlugin} "Version" "${VERSION}"
+; WriteRegStr HKLM ${MozillaPlugin} "Description" "SwarmPlugin for Mozilla Firefox"
+; WriteRegStr HKLM ${MozillaPlugin} "Path" "$INSTDIR\npvlc.dll"
+; WriteRegStr HKLM ${MozillaPlugin} "Product" "SwarmPlugin P2P Multimedia Plug-in"
+; WriteRegStr HKLM ${MozillaPlugin} "Vendor" "P2P-Next"
+; WriteRegStr HKLM ${MozillaPlugin} "Version" "${VERSION}"
 
 ; Vista Registration
   ; Vista detection
-  ReadRegStr $R0 HKLM "SOFTWARE\Microsoft\Windows NT\CurrentVersion" CurrentVersion
-  StrCpy $R1 $R0 3
-  StrCmp $R1 '6.0' lbl_vista lbl_done
+;  ReadRegStr $R0 HKLM "SOFTWARE\Microsoft\Windows NT\CurrentVersion" CurrentVersion
+;  StrCpy $R1 $R0 3
+;  StrCmp $R1 '6.0' lbl_vista lbl_done
 
   ; TODO : look at that
-  lbl_vista:
-  WriteRegStr HKLM "Software\RegisteredApplications" "${PRODUCT}" "Software\Clients\Media\${PRODUCT}\Capabilities"
-  WriteRegStr HKLM "Software\Clients\Media\${PRODUCT}\Capabilities" "ApplicationName" "${PRODUCT} media player"
-  WriteRegStr HKLM "Software\Clients\Media\${PRODUCT}\Capabilities" "ApplicationDescription" "${PRODUCT} - Torrent videostreaming browser plugin"
+;  lbl_vista:
+;  WriteRegStr HKLM "Software\RegisteredApplications" "${PRODUCT}" "Software\Clients\Media\${PRODUCT}\Capabilities"
+;  WriteRegStr HKLM "Software\Clients\Media\${PRODUCT}\Capabilities" "ApplicationName" "${PRODUCT} media player"
+;  WriteRegStr HKLM "Software\Clients\Media\${PRODUCT}\Capabilities" "ApplicationDescription" "${PRODUCT} - Torrent videostreaming browser plugin"
 
-  lbl_done:
+;  lbl_done:
 
- WriteRegStr HKEY_LOCAL_MACHINE "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT}" "DisplayName" "${PRODUCT} (remove only)"
+ WriteRegStr HKLM "${STARTUP}" "SwarmVideo" "$INSTDIR\bgprocess\SwarmEngine.exe"
+
+ WriteRegStr HKEY_LOCAL_MACHINE "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT}" "DisplayName" "${PRODUCT}"
  WriteRegStr HKEY_LOCAL_MACHINE "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT}" "UninstallString" "$INSTDIR\Uninstall.exe"
 
 ; Now writing to KHEY_LOCAL_MACHINE only -- remove references to uninstall from current user
- DeleteRegKey HKEY_CURRENT_USER "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT}"
+; DeleteRegKey HKEY_CURRENT_USER "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT}"
 ; Remove old error log if present
- Delete "$INSTDIR\swarmplayer.exe.log"
+; Delete "$INSTDIR\swarmplayer.exe.log"
 
  WriteUninstaller "$INSTDIR\Uninstall.exe"
 
 
   ; Add an application to the firewall exception list - All Networks - All IP Version - Enabled
-  SimpleFC::AddApplication "SwarmEngine" "$INSTDIR\bgprocess\SwarmEngine.exe" 0 2 "" 1
+;  SimpleFC::AddApplication "SwarmEngine" "$INSTDIR\bgprocess\SwarmEngine.exe" 0 2 "" 1
 
   ; Pop $0 ; return error(1)/success(0)
  
@@ -143,6 +146,11 @@ Section "Startmenu Icons" SecStart
    CreateDirectory "$SMPROGRAMS\${PRODUCT}"
    CreateShortCut "$SMPROGRAMS\${PRODUCT}\Uninstall.lnk" "$INSTDIR\Uninstall.exe" "" "$INSTDIR\Uninstall.exe" 0
 SectionEnd
+
+Section -Post
+   Exec "$INSTDIR\bgprocess\SwarmEngine.exe"
+SectionEnd
+
 
 ;--------------------------------
 ;Descriptions
@@ -157,8 +165,9 @@ SectionEnd
 
 Section "Uninstall"
 
- UnRegDLL "$INSTDIR\axvlc.dll"
- DeleteRegKey HKEY_LOCAL_MACHINE "Software\MozillaPlugins\@P2P-Next.org/swarmplugin,version=${VERSION}"
+ ExecWait "taskkill /F /IM SwarmEngine.exe"
+ ;UnRegDLL "$INSTDIR\axvlc.dll"
+; DeleteRegKey HKEY_LOCAL_MACHINE "Software\MozillaPlugins\@P2P-Next.org/swarmplugin,version=${VERSION}"
  RMDir /r "$INSTDIR"
 
  SetShellVarContext all
@@ -166,13 +175,13 @@ Section "Uninstall"
  RMDir /r "$SMPROGRAMS\${PRODUCT}"
  
 
- DeleteRegKey HKEY_LOCAL_MACHINE "Software\Clients\Media\${PRODUCT}"
+ ;DeleteRegKey HKEY_LOCAL_MACHINE "Software\Clients\Media\${PRODUCT}"
  DeleteRegKey HKEY_LOCAL_MACHINE "SOFTWARE\${PRODUCT}"
  DeleteRegKey HKEY_LOCAL_MACHINE "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT}"
 
-
+ DeleteRegValue HKEY_LOCAL_MACHINE "${STARTUP}" "${PRODUCT}"
  ; Remove an application from the firewall exception list
- SimpleFC::RemoveApplication "$INSTDIR\bgprocess\SwarmEngine.exe"
+; SimpleFC::RemoveApplication "$INSTDIR\bgprocess\SwarmEngine.exe"
 
  ; Pop $0 ; return error(1)/success(0)
 
@@ -183,7 +192,7 @@ SectionEnd
 ;Functions Section
 
 Function .onInit
-  System::Call 'kernel32::CreateMutexA(i 0, i 0, t "SwarmPlugin") i .r1 ?e' 
+  System::Call 'kernel32::CreateMutexA(i 0, i 0, t "SwarmVideo") i .r1 ?e' 
 
   Pop $R0 
 

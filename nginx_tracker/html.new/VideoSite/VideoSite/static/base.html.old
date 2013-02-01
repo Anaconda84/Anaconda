@@ -1,6 +1,0 @@
-{% extends "base.tmpl" %}
-
-{% block title %}Video site.{% endblock %}
-
-{% block head %}{% include 'head.html' %}{% endblock %}
-

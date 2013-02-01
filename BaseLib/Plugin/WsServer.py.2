@@ -1,0 +1,144 @@
+import time 
+# -*- coding: utf-8 -*-
+
+from threading import Thread, Event
+
+import tornado.ioloop
+import tornado.web
+import sys
+import socket
+import urlparse
+import time
+import datetime
+
+from defs import *
+from sockjs.tornado import SockJSConnection, SockJSRouter, proto
+import asyncore, socket
+
+class Ports():
+    pass
+
+class WsServer(Thread):
+    def __init__(self,i2iport, ws_serverport):
+        Thread.__init__(self)
+        self.setName('WsServer')
+	Ports.i2iport = i2iport
+	Ports.ws_serverport = ws_serverport
+
+    def run(self):
+        import logging
+        logging.getLogger().setLevel(logging.DEBUG)
+	Router = SockJSRouter(WsConnection, '/websocket')
+        
+        # Create application
+        app = tornado.web.Application(Router.urls)
+        app.listen(Ports.ws_serverport)
+
+	print >>sys.stderr,time.asctime(),'-', "WsServer: Listening on 0.0.0.0:",Ports.ws_serverport
+        print 'Listening on 0.0.0.0:',Ports.ws_serverport
+
+        tornado.ioloop.IOLoop.instance().start()
+
+
+# Out broadcast connection
+class WsConnection(SockJSConnection, asyncore.dispatcher):
+    clients = set()
+
+    def on_open(self, info):
+        print >>sys.stderr,time.asctime(),'-', 'WsServer: Client connected.'
+        self.clients.add(self)
+        self.cmd = ''
+        self.param = ''
+        #tornado.ioloop.IOLoop.instance().add_callback(self.message)
+
+    def on_message(self, msg):
+	print >>sys.stderr,time.asctime(),'-', 'WsServer: Received message: ',msg
+        print >>sys.stderr,time.asctime(),'-', 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\n'
+        c = http_client('107.22.233.233', '/static/base.html')
+        asyncore.loop()
+	print >>sys.stderr,time.asctime(),'-', 'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\n'
+
+        if msg.startswith( 'START' ):
+            torrenturl = msg.partition( ' ' )[2].strip()
+            if torrenturl is None:
+                raise ValueError('bg: Unformatted START command')
+	    print >>sys.stderr, time.asctime(),'-', "WsServer: Receive START command from WS to Swarm - ",torrenturl,'   localhost:',Ports.i2iport,"\n"
+            self.cmd = 'START'
+            self.param = torrenturl
+	    print >>sys.stderr, time.asctime(),'-', "---------- ",self.cmd,",",self.param,"\n"
+
+        if msg.startswith( 'VERSION' ):
+	    print >>sys.stderr, time.asctime(),'-', "WsServer: Receive VERSION command from WS to Swarm - localhost: ",Ports.i2iport,"\n"
+	    self.cmd = msg   
+
+
+    def on_close(self):
+        print >>sys.stderr,time.asctime(),'-', "WsServer: Client disconnected.\n"
+        self.clients.remove(self)
+	self.s.close()
+	ws_serv.stop()
+#########################################
+    def __init__(self, host, path):
+	print >>sys.stderr,time.asctime(),'-', "Init !!!!!!!!!!!\n"
+        asyncore.dispatcher.__init__(self)
+	print >>sys.stderr,time.asctime(),'-', "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n"
+        self.create_socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.connect( (host, 8080) )
+        self.buffer = 'GET %s HTTP/1.0\r\n\r\n' % path
+        self.host = host
+
+    def handle_connect(self):
+        pass
+
+    def handle_close(self):
+        self.close()
+
+    def handle_read(self):
+        print 'Received: '+self.host
+        rcv=self.recv(8192)
+        #print '\"'+rcv+'\"'
+
+    def writable(self):
+        return (len(self.buffer) > 0)
+
+    def handle_write(self):
+        print 'Send: '+self.buffer
+        sent = self.send(self.buffer)
+        self.buffer = self.buffer[sent:]
+##############################################
+
+
+    def message(self):
+        print >>sys.stderr,time.asctime(),'-', "11111111111111111111111111111111111111."
+        self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.s.connect(('127.0.0.1',Ports.i2iport))
+        print >>sys.stderr,time.asctime(),'-', "WSServer: Connected from to SwarmVideo server."
+       
+	while True:
+	  #print >>sys.stderr, time.asctime(),'-', "WsServer: self.cmd = (",self.cmd,")\n"
+          if self.cmd == 'START':
+	    print >>sys.stderr, time.asctime(),'-', "WsServer: Receive START command: ",self.cmd,"\n"
+            msg = self.cmd+' '+self.param+'\r\n'
+            self.s.send(msg)
+        
+            while True:
+                data = self.s.recv(1024)
+                print >>sys.stderr,time.asctime(),'-', "WSServer: Got BG command",data
+	        self.send(data)
+                if len(data) == 0:
+                    print >>sys.stderr,time.asctime(),'-', "WSServer: BG closes IC"
+                    return
+                elif data.startswith("PLAY"):
+                   break
+
+          if self.cmd == 'VERSION':
+	    #print >>sys.stderr, time.asctime(),'-', "WsServer: Receive VERSION command: ",self.cmd,"\n"
+            self.send(VERSION)
+
+          #self.cmd = ''
+
+	print >>sys.stderr,time.asctime(),'-', "WSServer: Disconnected from to SwarmVideo server."
+
+if __name__ == "__main__":
+    ws_serv = WsServer(62062,6878)
+    ws_serv.start()

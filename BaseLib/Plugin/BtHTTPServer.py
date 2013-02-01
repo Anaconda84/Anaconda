@@ -38,6 +38,7 @@ class MainHandler(tornado.web.RequestHandler):
     CHUNK_SIZE = 512000         # 0.5 MB
     @tornado.web.asynchronous  # не закрывать сокет когда отработает эта функция (закрывать self.finish())
     def get(self, filename):
+      try:
         if filename == 'favicon.ico':
            self.write('')
            return
@@ -146,6 +147,11 @@ class MainHandler(tornado.web.RequestHandler):
 	    self.flush()  # отправляем заголовки
 
 	    self.write_more()
+      except:
+	print >>sys.stderr,time.asctime(),'-', 'WsServer:',sys.exc_info()
+        self.finish()  # сбрасываем буфер и закрываем сокет
+        self._fd.close()  # закрываем файл
+	    
 
     def write_more(self):
         data = self._fd.read(self.CHUNK_SIZE)

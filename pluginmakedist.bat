@@ -57,7 +57,7 @@ mkdir dist\installdir\bgprocess\%LIBRARYNAME%\Core
 
 REM Arno: Move py2exe results to installdir
 move dist\*.* dist\installdir\bgprocess
-copy %LIBRARYNAME%\Images\SwarmPluginIcon.ico dist\installdir\bgprocess\%LIBRARYNAME%\Images
+copy %LIBRARYNAME%\Images\SwarmVideoIcon.ico dist\installdir\bgprocess\%LIBRARYNAME%\Images
 
 xcopy vlc4plugin\* dist\installdir /E /I
 
@@ -88,19 +88,8 @@ copy reset*.bat dist\installdir
 
 cd dist\installdir
 
-REM Arno: Win7 gives popup if SwarmEngine is not signed
-"C:\Program Files\Microsoft Platform SDK for Windows Server 2003 R2\Bin\signtool.exe" sign /f c:\build\certs\swarmplayerprivatekey.pfx /p "" /d "SwarmPlugin for Internet Explorer and Firefox" /du "http://www.pds.ewi.tudelft.nl/code.html" /t "http://timestamp.verisign.com/scripts/timestamp.dll" bgprocess\SwarmEngine.exe
 
 
 :makeinstaller
 %NSIS% swarmplugin.nsi
 
-move SwarmPlugin_*.exe ..
-cd ..
-REM Diego : sign SwarmPlugin*.exe
-"C:\Program Files\Microsoft Platform SDK for Windows Server 2003 R2\Bin\signtool.exe" sign /f c:\build\certs\swarmplayerprivatekey.pfx /p "" /d "SwarmPlugin for Internet Explorer and Firefox" /du "http://www.pds.ewi.tudelft.nl/code.html" /t "http://timestamp.verisign.com/scripts/timestamp.dll" "SwarmPlugin_*.exe"
-REM Arno: build .cab file. 
-"C:\Program Files\Microsoft Platform SDK for Windows Server 2003 R2\Bin\CabArc.Exe" -s 6144 n SwarmPlugin.cab ..\%LIBRARYNAME%\Plugin\Build\Win32\SwarmPlugin.inf
-REM Arno : sign SwarmPlugin*.cab
-"C:\Program Files\Microsoft Platform SDK for Windows Server 2003 R2\Bin\signtool.exe" sign /f c:\build\certs\swarmplayerprivatekey.pfx /p "" /d "SwarmPlugin for Internet Explorer and Firefox" /du "http://www.pds.ewi.tudelft.nl/code.html" /t "http://timestamp.verisign.com/scripts/timestamp.dll" "SwarmPlugin*.cab"
-cd ..
