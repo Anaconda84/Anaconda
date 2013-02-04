@@ -59,7 +59,7 @@ class WsConnection(SockJSConnection):
             torrenturl = msg.partition( ' ' )[2].strip()
             if torrenturl is None:
                 raise ValueError('bg: Unformatted START command')
-	    print >>sys.stderr, time.asctime(),'-', "WsServer: Receive START command from WS to Video server - ",torrenturl,'   localhost:',Ports.i2iport,"\n"
+	    print >>sys.stderr, time.asctime(),'-', "WsServer: Receive START command from WS to Video server - ",torrenturl,'   localhost:',Ports.i2iport
             self.cmd = 'START'
             self.param = torrenturl
             if self.cmd == 'START':
@@ -77,12 +77,12 @@ class WsConnection(SockJSConnection):
                    break
 
         if msg.startswith( 'VERSION' ):
-	    print >>sys.stderr, time.asctime(),'-', "WsServer: Receive VERSION command from WS to Swarm - localhost: ",Ports.i2iport,"\n"
+	    print >>sys.stderr, time.asctime(),'-', "WsServer: Receive VERSION command from WS to Swarm - localhost: ",Ports.i2iport
             self.send(VERSION)
 
 
     def on_close(self):
-        print >>sys.stderr,time.asctime(),'-', "WsServer: Client disconnected.\n"
+        print >>sys.stderr,time.asctime(),'-', "WsServer: Client disconnected."
         self.clients.remove(self)
 	if self.s:
 	    self.s.close()

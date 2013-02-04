@@ -9,10 +9,10 @@ from VideoApp.utils import *
 
 def video(request):
     list = VideoBaza.objects.all()
-    return render_to_response('content.html', {'list':list})
+    return render_to_response('base.html', {'list':list})
 
 def version(request):
-    return HttpResponse("0.9")
+    return HttpResponse("0.8")
 
 def seeders(request, torrent):
     resp = get_seeders(request, torrent)

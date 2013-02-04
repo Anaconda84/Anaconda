@@ -34,7 +34,7 @@
       conn.onmessage = function(e) 
       {
         chk_version(e.data);
-        window.location.href = 'http://localhost:6878/get_video?url='+url+'&torrent='+torrent;
+	window.location.href = 'http://localhost:6878/get_video?url='+url+'&torrent='+torrent;
       };
 
       conn.onclose = function() {
@@ -89,8 +89,8 @@
      ip = sss.split(",");
      alert('ip='+ip[0]);
      if(document.getElementById('parent_popup') != null) { document.getElementById('parent_popup').style.display='none'; }
-     //document.location.href = '/static/player.html?ip='+sss+'&webm='+webm_name;
-     window.open('/static/player.html?ip='+sss+'&webm='+webm_name, "Player");
+     document.location.href = '/static/player.html?ip='+sss+'&webm='+webm_name;
+     //window.open('/static/player.html?ip='+sss+'&webm='+webm_name, "Player");
   }
 
 
@@ -112,22 +112,20 @@
   }
 
   function chk_version(swarm_version) {
-      var req = getXmlHttp();
-      req.onreadystatechange = function() { 
-          if (req.readyState == 4) {
-              if(req.status == 200) {
-		  if(parseFloat(swarm_version) < parseFloat(req.responseText) )
-		  {
-		    error();
-		  }
-		  //alert('swarm_version=' + swarm_version);
-		  //alert('Am server = ' + req.responseText);
 
-              }
-          }
-      }
-      req.open('GET', '/version', true); 
+      var req = getXmlHttp();
+      var str = '/version';
+      req.open('GET', str, false);
       req.send(null);
+      if(req.status == 200) {
+	  alert('swarm_version=' + swarm_version);
+	  alert('Am server = ' + req.responseText);
+
+	  if(parseFloat(swarm_version) < parseFloat(req.responseText) )
+	  {
+	    error();
+	  }
+      }
   }
 
   function get_seeders(torrent) {

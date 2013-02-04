@@ -1,6 +1,7 @@
 <!DOCTYPE HTML>
 <html>
 <head>
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
 </head>
   <link href="http://vjs.zencdn.net/c/video-js.css" rel="stylesheet">
   <script src="http://vjs.zencdn.net/c/video.js"></script>
