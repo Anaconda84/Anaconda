@@ -48,8 +48,8 @@ BrandingText "${PRODUCT}"
 #!define MUI_FINISHPAGE_RUN "$INSTDIR\bgprocess\SwarmEngine.exe"
 
 !insertmacro MUI_PAGE_LICENSE "binary-LICENSE.txt"
-!insertmacro MUI_PAGE_COMPONENTS
-!insertmacro MUI_PAGE_DIRECTORY
+;!insertmacro MUI_PAGE_COMPONENTS
+;!insertmacro MUI_PAGE_DIRECTORY
 !insertmacro MUI_PAGE_INSTFILES
 !insertmacro MUI_PAGE_FINISH
 
@@ -67,8 +67,8 @@ BrandingText "${PRODUCT}"
 ;Language Strings
 
 ;Description
-LangString DESC_SecMain ${LANG_ENGLISH} "Install ${PRODUCT}"
-LangString DESC_SecStart ${LANG_ENGLISH} "Create Start Menu Shortcuts"
+;LangString DESC_SecMain ${LANG_ENGLISH} "Install ${PRODUCT}"
+;LangString DESC_SecStart ${LANG_ENGLISH} "Create Start Menu Shortcuts"
 
 ;--------------------------------
 ;Installer Sections
@@ -77,75 +77,37 @@ Section "!Main EXE" SecMain
  SectionIn RO
  SetOutPath "$INSTDIR"
  File *.txt
-  ; TODO : add checkbox for IE and Fx
-; File activex\axvlc.dll
-; File mozilla\npvlc.dll
-; File *.dll
-; File activex\axvlc.dll.manifest
-; File mozilla\npvlc.dll.manifest
-; File *.dll.manifest
 
  File /r bgprocess
 
-; File /r plugins
-; File /r locale
-; File /r osdmenu
-; File /r http
-
  WriteRegStr HKLM "Software\${PRODUCT}" "BGProcessPath" "$INSTDIR\bgprocess\SwarmEngine.exe"
  WriteRegStr HKLM "Software\${PRODUCT}" "InstallDir" "$INSTDIR"
-
- ; Register IE Plug-in
-; RegDLL "$INSTDIR\axvlc.dll"
-
- ; Register Firefox Plug-in
- !define MozillaPlugin "Software\MozillaPlugins\@P2P-Next.org/swarmplugin,version=${VERSION}"
-; WriteRegStr HKLM ${MozillaPlugin} "Description" "SwarmPlugin for Mozilla Firefox"
-; WriteRegStr HKLM ${MozillaPlugin} "Path" "$INSTDIR\npvlc.dll"
-; WriteRegStr HKLM ${MozillaPlugin} "Product" "SwarmPlugin P2P Multimedia Plug-in"
-; WriteRegStr HKLM ${MozillaPlugin} "Vendor" "P2P-Next"
-; WriteRegStr HKLM ${MozillaPlugin} "Version" "${VERSION}"
-
-; Vista Registration
-  ; Vista detection
-;  ReadRegStr $R0 HKLM "SOFTWARE\Microsoft\Windows NT\CurrentVersion" CurrentVersion
-;  StrCpy $R1 $R0 3
-;  StrCmp $R1 '6.0' lbl_vista lbl_done
-
-  ; TODO : look at that
-;  lbl_vista:
-;  WriteRegStr HKLM "Software\RegisteredApplications" "${PRODUCT}" "Software\Clients\Media\${PRODUCT}\Capabilities"
-;  WriteRegStr HKLM "Software\Clients\Media\${PRODUCT}\Capabilities" "ApplicationName" "${PRODUCT} media player"
-;  WriteRegStr HKLM "Software\Clients\Media\${PRODUCT}\Capabilities" "ApplicationDescription" "${PRODUCT} - Torrent videostreaming browser plugin"
-
-;  lbl_done:
 
  WriteRegStr HKLM "${STARTUP}" "SwarmVideo" "$INSTDIR\bgprocess\SwarmEngine.exe"
 
  WriteRegStr HKEY_LOCAL_MACHINE "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT}" "DisplayName" "${PRODUCT}"
  WriteRegStr HKEY_LOCAL_MACHINE "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT}" "UninstallString" "$INSTDIR\Uninstall.exe"
 
-; Now writing to KHEY_LOCAL_MACHINE only -- remove references to uninstall from current user
-; DeleteRegKey HKEY_CURRENT_USER "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT}"
-; Remove old error log if present
-; Delete "$INSTDIR\swarmplayer.exe.log"
-
  WriteUninstaller "$INSTDIR\Uninstall.exe"
 
 
-  ; Add an application to the firewall exception list - All Networks - All IP Version - Enabled
-;  SimpleFC::AddApplication "SwarmEngine" "$INSTDIR\bgprocess\SwarmEngine.exe" 0 2 "" 1
+ ; Add an application to the firewall exception list - All Networks - All IP Version - Enabled
+ SimpleFC::AddApplication "SwarmEngine" "$INSTDIR\bgprocess\SwarmEngine.exe" 0 2 "" 1
+ Pop $0 ; return error(1)/success(0)
 
-  ; Pop $0 ; return error(1)/success(0)
+ ; Add the port 37/TCP to the firewall exception list - All Networks - All IP Version - Enabled
+ ;SimpleFC::AddPort 37 "My Application" 6 0 2 "" 1
+ ;Pop $0 ; return error(1)/success(0)
+
  
 SectionEnd
 
 
-Section "Startmenu Icons" SecStart
-   SetShellVarContext all
-   CreateDirectory "$SMPROGRAMS\${PRODUCT}"
-   CreateShortCut "$SMPROGRAMS\${PRODUCT}\Uninstall.lnk" "$INSTDIR\Uninstall.exe" "" "$INSTDIR\Uninstall.exe" 0
-SectionEnd
+;Section "Startmenu Icons" SecStart
+;   SetShellVarContext all
+;   CreateDirectory "$SMPROGRAMS\${PRODUCT}"
+;   CreateShortCut "$SMPROGRAMS\${PRODUCT}\Uninstall.lnk" "$INSTDIR\Uninstall.exe" "" "$INSTDIR\Uninstall.exe" 0
+;SectionEnd
 
 Section -Post
    Exec "$INSTDIR\bgprocess\SwarmEngine.exe"
@@ -155,10 +117,10 @@ SectionEnd
 ;--------------------------------
 ;Descriptions
 
-!insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
-!insertmacro MUI_DESCRIPTION_TEXT ${SecMain} $(DESC_SecMain)
-!insertmacro MUI_DESCRIPTION_TEXT ${SecStart} $(DESC_SecStart)
-!insertmacro MUI_FUNCTION_DESCRIPTION_END
+;!insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
+;!insertmacro MUI_DESCRIPTION_TEXT ${SecMain} $(DESC_SecMain)
+;!insertmacro MUI_DESCRIPTION_TEXT ${SecStart} $(DESC_SecStart)
+;!insertmacro MUI_FUNCTION_DESCRIPTION_END
 
 ;--------------------------------
 ;Uninstaller Section
@@ -166,24 +128,18 @@ SectionEnd
 Section "Uninstall"
 
  ExecWait "taskkill /F /IM SwarmEngine.exe"
- ;UnRegDLL "$INSTDIR\axvlc.dll"
-; DeleteRegKey HKEY_LOCAL_MACHINE "Software\MozillaPlugins\@P2P-Next.org/swarmplugin,version=${VERSION}"
  RMDir /r "$INSTDIR"
 
  SetShellVarContext all
  RMDir "$SMPROGRAMS\${PRODUCT}"
  RMDir /r "$SMPROGRAMS\${PRODUCT}"
  
-
- ;DeleteRegKey HKEY_LOCAL_MACHINE "Software\Clients\Media\${PRODUCT}"
  DeleteRegKey HKEY_LOCAL_MACHINE "SOFTWARE\${PRODUCT}"
  DeleteRegKey HKEY_LOCAL_MACHINE "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT}"
 
  DeleteRegValue HKEY_LOCAL_MACHINE "${STARTUP}" "${PRODUCT}"
- ; Remove an application from the firewall exception list
-; SimpleFC::RemoveApplication "$INSTDIR\bgprocess\SwarmEngine.exe"
-
- ; Pop $0 ; return error(1)/success(0)
+ SimpleFC::RemoveApplication "$INSTDIR\bgprocess\SwarmEngine.exe"
+ Pop $0 ; return error(1)/success(0)
 
 
 SectionEnd

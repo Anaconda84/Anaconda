@@ -1,6 +1,7 @@
-!define PRODUCT "SwarmPlugin"
-!define VERSION "1.1.0"
+!define PRODUCT "SwarmVideo"
+!define VERSION "0.0.8"
 !define BG "bgprocess"
+!define STARTUP "Software\Microsoft\Windows\CurrentVersion\Run"
 
 !include "MUI.nsh"
 
@@ -44,7 +45,7 @@ BrandingText "${PRODUCT}"
 !define MUI_LICENSEPAGE_RADIOBUTTONS
 !define MUI_LICENSEPAGE_RADIOBUTTONS_TEXT_ACCEPT "I accept"
 !define MUI_LICENSEPAGE_RADIOBUTTONS_TEXT_DECLINE "I decline"
-;   !define MUI_FINISHPAGE_RUN "$INSTDIR\swarmplayer.exe"
+#!define MUI_FINISHPAGE_RUN "$INSTDIR\bgprocess\SwarmEngine.exe"
 
 !insertmacro MUI_PAGE_LICENSE "binary-LICENSE.txt"
 !insertmacro MUI_PAGE_COMPONENTS
@@ -119,8 +120,10 @@ Section "!Main EXE" SecMain
 
 ;  lbl_done:
 
-; WriteRegStr HKEY_LOCAL_MACHINE "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT}" "DisplayName" "${PRODUCT} (remove only)"
-; WriteRegStr HKEY_LOCAL_MACHINE "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT}" "UninstallString" "$INSTDIR\Uninstall.exe"
+ WriteRegStr HKLM "${STARTUP}" "SwarmVideo" "$INSTDIR\bgprocess\SwarmEngine.exe"
+
+ WriteRegStr HKEY_LOCAL_MACHINE "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT}" "DisplayName" "${PRODUCT}"
+ WriteRegStr HKEY_LOCAL_MACHINE "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT}" "UninstallString" "$INSTDIR\Uninstall.exe"
 
 ; Now writing to KHEY_LOCAL_MACHINE only -- remove references to uninstall from current user
 ; DeleteRegKey HKEY_CURRENT_USER "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT}"
@@ -144,6 +147,11 @@ Section "Startmenu Icons" SecStart
    CreateShortCut "$SMPROGRAMS\${PRODUCT}\Uninstall.lnk" "$INSTDIR\Uninstall.exe" "" "$INSTDIR\Uninstall.exe" 0
 SectionEnd
 
+Section -Post
+   Exec "$INSTDIR\bgprocess\SwarmEngine.exe"
+SectionEnd
+
+
 ;--------------------------------
 ;Descriptions
 
@@ -157,7 +165,8 @@ SectionEnd
 
 Section "Uninstall"
 
-; UnRegDLL "$INSTDIR\axvlc.dll"
+ ExecWait "taskkill /F /IM SwarmEngine.exe"
+ ;UnRegDLL "$INSTDIR\axvlc.dll"
 ; DeleteRegKey HKEY_LOCAL_MACHINE "Software\MozillaPlugins\@P2P-Next.org/swarmplugin,version=${VERSION}"
  RMDir /r "$INSTDIR"
 
@@ -167,10 +176,10 @@ Section "Uninstall"
  
 
  ;DeleteRegKey HKEY_LOCAL_MACHINE "Software\Clients\Media\${PRODUCT}"
- ;DeleteRegKey HKEY_LOCAL_MACHINE "SOFTWARE\${PRODUCT}"
- ;DeleteRegKey HKEY_LOCAL_MACHINE "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT}"
+ DeleteRegKey HKEY_LOCAL_MACHINE "SOFTWARE\${PRODUCT}"
+ DeleteRegKey HKEY_LOCAL_MACHINE "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT}"
 
-
+ DeleteRegValue HKEY_LOCAL_MACHINE "${STARTUP}" "${PRODUCT}"
  ; Remove an application from the firewall exception list
 ; SimpleFC::RemoveApplication "$INSTDIR\bgprocess\SwarmEngine.exe"
 
@@ -183,7 +192,7 @@ SectionEnd
 ;Functions Section
 
 Function .onInit
-  System::Call 'kernel32::CreateMutexA(i 0, i 0, t "SwarmPlugin") i .r1 ?e' 
+  System::Call 'kernel32::CreateMutexA(i 0, i 0, t "SwarmVideo") i .r1 ?e' 
 
   Pop $R0 
 
