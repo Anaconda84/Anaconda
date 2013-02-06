@@ -46,6 +46,7 @@ class WsConnection(SockJSConnection):
 
     def on_open(self, info):
         print >>sys.stderr,time.asctime(),'-', 'WsServer: Client connected.'
+	self.s = ''
         self.clients.add(self)
 
     def on_message(self, msg):
@@ -72,9 +73,10 @@ class WsConnection(SockJSConnection):
 	        self.send(data)
                 if len(data) == 0:
                     print >>sys.stderr,time.asctime(),'-', "WSServer: BG closes IC"
-                    return
+                    break
                 elif data.startswith("PLAY"):
-                   break
+		    print >>sys.stderr,time.asctime(),'-', "WSServer: BG send PLAY command."
+                    break
 
         if msg.startswith( 'VERSION' ):
 	    print >>sys.stderr, time.asctime(),'-', "WsServer: Receive VERSION command from WS to Swarm - localhost: ",Ports.i2iport
