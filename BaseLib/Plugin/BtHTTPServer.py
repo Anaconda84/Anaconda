@@ -148,9 +148,9 @@ class MainHandler(tornado.web.RequestHandler):
 
 	    self.write_more()
       except:
-	print >>sys.stderr,time.asctime(),'-', 'WsServer:',sys.exc_info()
-        self.finish()  # сбрасываем буфер и закрываем сокет
-        self._fd.close()  # закрываем файл
+	print >>sys.stderr,time.asctime(),'-', 'WsServer except info:',sys.exc_info()
+        #self.finish()  # сбрасываем буфер и закрываем сокет
+        #self._fd.close()  # закрываем файл
 	    
 
     def write_more(self):
