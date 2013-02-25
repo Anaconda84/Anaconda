@@ -6,10 +6,12 @@ import time
 import sys
 import string
 from threading import Thread, Event
-from BaseLib.Core.osutils import *
+#from BaseLib.Core.osutils import *
+from multiprocessing import Process
 
 max_size=2**16
 DEBUG = True
+PORT = 8888
 
 def bytestr2int(b):
     if b == "":
@@ -17,21 +19,33 @@ def bytestr2int(b):
     else:
         return int(b)
 
-class BtPorts():
-    pass
 
-class BtServer(Thread):
-    def __init__(self, bt_port):
-        Thread.__init__(self)
-        self.setName('BtServer')
-	BtPorts.PORT = bt_port
+loop = tornado.ioloop.IOLoop.instance()
 
-    def run(self):
-	application = tornado.web.Application([ (r"/(.+)", MainHandler), ])
-        application.listen(BtPorts.PORT)
-        print >>sys.stderr,time.asctime(),'-', "Starting BtHTTPServer am port", BtPorts.PORT
-	print 'Listening on 0.0.0.0:',BtPorts.PORT
-        tornado.ioloop.IOLoop.instance().start()
+#def serveHTTP(q):
+def serveHTTP():
+    application = tornado.web.Application([ (r"/(.+)", MainHandler), ])
+    application.listen(PORT)
+    print 'Listening on 0.0.0.0:', PORT
+    log('Listening on 0.0.0.0: 8888')
+    #tornado.ioloop.IOLoop.instance().start()
+
+    #loop.add_callback(period_run(q))
+    loop.start()
+
+def period_run(q):
+    signal = q.get()
+    print 'Receive signal =', signal
+    log('Receive signal ='+ signal)
+    if signal == 'stop':                           
+       print 'Stopping server.'
+       log('Stopping server.')
+       loop.stop()
+
+def log(msg):
+    f = open("c:/Tmp/out.log", 'a')
+    f .write(msg+'\n')
+    f.close()
 
 
 class MainHandler(tornado.web.RequestHandler):
@@ -43,9 +57,11 @@ class MainHandler(tornado.web.RequestHandler):
            self.write('')
            return
 
-	state_dir = get_appstate_dir()
-	filename = os.path.join(state_dir, '.SwarmVideo', 'downloads', filename)
-	print >>sys.stderr,time.asctime(),'-', "BtHTTPSErver: filename=", filename
+	#state_dir = get_appstate_dir()
+	#filename = os.path.join(state_dir, '.SwarmVideo', 'downloads', filename)
+	filename = os.path.join('c:/Tmp', filename)
+	print "BtHTTPSErver: filename=", filename
+	log("BtHTTPSErver: filename="+ filename)
 
 	self._fd = open(filename, "rb")
 	if self._fd:
@@ -117,7 +133,7 @@ class MainHandler(tornado.web.RequestHandler):
                 self.set_status(200)
 
             if DEBUG:
-                print >>sys.stderr,time.asctime(),'-', "BtHTTPSErver: do_GET: final range",firstbyte,lastbyte,nbytes2send
+                print "BtHTTPSErver: do_GET: final range",firstbyte,lastbyte,nbytes2send
 
             try:
                 self._fd.seek(firstbyte)
@@ -131,7 +147,7 @@ class MainHandler(tornado.web.RequestHandler):
 	    if content_type: 
 	        if content_type == 'video/x-webm':
 	    	    self.set_header('Content-Type', 'video/webm')
-	    	    print >>sys.stderr,time.asctime(),'-', "Replace Content-Type: ",content_type," to Content-Type: video/webm"
+	    	    print "Replace Content-Type: ",content_type," to Content-Type: video/webm"
 	        else:
                     self.set_header('Content-Type', content_type)
 	    else:
@@ -148,7 +164,7 @@ class MainHandler(tornado.web.RequestHandler):
 
 	    self.write_more()
       except:
-	print >>sys.stderr,time.asctime(),'-', 'WsServer except info:',sys.exc_info()
+	print 'WsServer except info:',sys.exc_info()
         #self.finish()  # сбрасываем буфер и закрываем сокет
         #self._fd.close()  # закрываем файл
 	    
@@ -166,9 +182,16 @@ class MainHandler(tornado.web.RequestHandler):
 #application = tornado.web.Application([ (r"/(.+)", MainHandler), ])
 
 if __name__ == "__main__":
-    PORT = 8888
-    application = tornado.web.Application([ (r"/(.+)", MainHandler), ])
-    application.listen(PORT)
-    print "Starting BtHTTPServer am port", PORT
-    tornado.ioloop.IOLoop.instance().start()
+    #PORT = 8888
+    #application = tornado.web.Application([ (r"/(.+)", MainHandler), ])
+    #application.listen(PORT)
+    #print "Starting BtHTTPServer am port", PORT
+    #tornado.ioloop.IOLoop.instance().start()
+    #bt_serv = BtServer(8888)
+    #bt_serv.start()
+
+    p = Process(target=serveHTTP)
+    p.start()
+    p.join()
+
 

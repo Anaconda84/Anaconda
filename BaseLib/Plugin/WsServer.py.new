@@ -15,6 +15,28 @@ from defs import *
 from sockjs.tornado import SockJSConnection, SockJSRouter, proto
 import asyncore, socket
 
+def proxy(host, port, cmd):
+#def proxy():
+#    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+#    s.connect((host,port))
+#    print >>sys.stderr,time.asctime(),'-', "WSServer: Connected from to SwarmVideo server."
+
+#    s.send(cmd)
+        
+#    while True:
+#       data = s.recv(1024)
+#       print >>sys.stderr,time.asctime(),'-', "WSServer: Got BG command",data
+#       WsConnection.send(data)
+#       if len(data) == 0:
+#           print >>sys.stderr,time.asctime(),'-', "WSServer: BG closes IC"
+#           break
+#       elif data.startswith("PLAY"):
+#           print >>sys.stderr,time.asctime(),'-', "WSServer: BG send PLAY command."
+#           break
+    while True:
+	print >>sys.stderr,time.asctime(),'-', '11111111111111111'
+	time.sleep(1)
+
 class Ports():
     pass
 
@@ -37,6 +59,10 @@ class WsServer(Thread):
 	print >>sys.stderr,time.asctime(),'-', "WsServer: Listening on 0.0.0.0:",Ports.ws_serverport
         print 'Listening on 0.0.0.0:',Ports.ws_serverport
 
+	#tornado.ioloop.IOLoop.instance().add_callback(self.async_callback(proxy('127.0.0.1', Ports.i2iport, '')))
+        #tornado.ioloop.IOLoop.instance().add_callback(lambda: proxy())
+	#tornado.ioloop.IOLoop.instance().add_callback(lambda: 'a=1' )
+	#tornado.ioloop.IOLoop.instance().add_callback('a=1')
         tornado.ioloop.IOLoop.instance().start()
 
 
@@ -53,10 +79,6 @@ class WsConnection(SockJSConnection):
 	print >>sys.stderr,time.asctime(),'-', 'WsServer: Received message: ',msg
 
         if msg.startswith( 'START' ):
-            self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            self.s.connect(('127.0.0.1',Ports.i2iport))
-            print >>sys.stderr,time.asctime(),'-', "WSServer: Connected from to SwarmVideo server."
-
             torrenturl = msg.partition( ' ' )[2].strip()
             if torrenturl is None:
                 raise ValueError('bg: Unformatted START command')
@@ -64,19 +86,12 @@ class WsConnection(SockJSConnection):
             self.cmd = 'START'
             self.param = torrenturl
             if self.cmd == 'START':
-              msg = self.cmd+' '+self.param+'\r\n'
-              self.s.send(msg)
-        
+	      msg = self.cmd+' '+self.param+'\r\n'
+              #tornado.ioloop.IOLoop.instance().add_callback(proxy('127.0.0.1', Ports.i2iport, msg))
               while True:
-                data = self.s.recv(1024)
-                print >>sys.stderr,time.asctime(),'-', "WSServer: Got BG command",data
-	        self.send(data)
-                if len(data) == 0:
-                    print >>sys.stderr,time.asctime(),'-', "WSServer: BG closes IC"
-                    break
-                elif data.startswith("PLAY"):
-		    print >>sys.stderr,time.asctime(),'-', "WSServer: BG send PLAY command."
-                    break
+		print >>sys.stderr,time.asctime(),'-', 'aaaaaaaaaaaaa'
+		time.sleep(1)
+
 
         if msg.startswith( 'VERSION' ):
 	    print >>sys.stderr, time.asctime(),'-', "WsServer: Receive VERSION command from WS to Swarm - localhost: ",Ports.i2iport

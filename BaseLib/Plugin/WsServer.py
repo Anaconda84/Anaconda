@@ -13,7 +13,41 @@ import datetime
 
 from defs import *
 from sockjs.tornado import SockJSConnection, SockJSRouter, proto
-import asyncore, socket
+#import asyncore, socket
+
+
+#def proxy(host, port, cmd, wsobj):
+#    proxy = Proxy(host, port, cmd, wsobj)
+#    proxy.start()
+
+class Proxy(Thread):
+    def __init__(self, host, port, cmd, wsobj):
+        Thread.__init__(self)
+        self.setName('Proxy')
+	self.host = host
+	self.port = port
+	self.cmd = cmd
+	self.wsobj = wsobj
+
+    def run(self):
+    	self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    	self.s.connect((self.host,self.port))
+    	print >>sys.stderr,time.asctime(),'-', "WSServer: Connected from Proxy to VideoServer."
+
+    	self.s.send(self.cmd)
+        
+	self.proceed = True
+    	while self.proceed:
+       	   data = self.s.recv(1024)
+           print >>sys.stderr,time.asctime(),'-', "WSServer: Received:",data
+	   self.wsobj.send(data)
+           if len(data) == 0:
+               print >>sys.stderr,time.asctime(),'-', "WSServer: Closed Proxy to VideoServer connection."
+               break
+           elif data.startswith("PLAY"):
+               print >>sys.stderr,time.asctime(),'-', "WSServer: Received PLAY command."
+               #break
+        print >>sys.stderr,time.asctime(),'-', "WSServer: Exit !!!!"
 
 class Ports():
     pass
@@ -40,7 +74,7 @@ class WsServer(Thread):
         tornado.ioloop.IOLoop.instance().start()
 
 
-# Out broadcast connection
+# Out unicast connection
 class WsConnection(SockJSConnection):
     clients = set()
 
@@ -53,10 +87,6 @@ class WsConnection(SockJSConnection):
 	print >>sys.stderr,time.asctime(),'-', 'WsServer: Received message: ',msg
 
         if msg.startswith( 'START' ):
-            self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            self.s.connect(('127.0.0.1',Ports.i2iport))
-            print >>sys.stderr,time.asctime(),'-', "WSServer: Connected from to SwarmVideo server."
-
             torrenturl = msg.partition( ' ' )[2].strip()
             if torrenturl is None:
                 raise ValueError('bg: Unformatted START command')
@@ -64,19 +94,10 @@ class WsConnection(SockJSConnection):
             self.cmd = 'START'
             self.param = torrenturl
             if self.cmd == 'START':
-              msg = self.cmd+' '+self.param+'\r\n'
-              self.s.send(msg)
-        
-              while True:
-                data = self.s.recv(1024)
-                print >>sys.stderr,time.asctime(),'-', "WSServer: Got BG command",data
-	        self.send(data)
-                if len(data) == 0:
-                    print >>sys.stderr,time.asctime(),'-', "WSServer: BG closes IC"
-                    break
-                elif data.startswith("PLAY"):
-		    print >>sys.stderr,time.asctime(),'-', "WSServer: BG send PLAY command."
-                    break
+	      msg = self.cmd+' '+self.param+'\r\n'
+              #tornado.ioloop.IOLoop.instance().add_callback(proxy('127.0.0.1', Ports.i2iport, msg, self))
+              self.proxy = Proxy('127.0.0.1', Ports.i2iport, msg, self)
+              self.proxy.start()
 
         if msg.startswith( 'VERSION' ):
 	    print >>sys.stderr, time.asctime(),'-', "WsServer: Receive VERSION command from WS to Swarm - localhost: ",Ports.i2iport
@@ -86,8 +107,9 @@ class WsConnection(SockJSConnection):
     def on_close(self):
         print >>sys.stderr,time.asctime(),'-', "WsServer: Client disconnected."
         self.clients.remove(self)
-	if self.s:
-	    self.s.close()
+	if self.proxy.s:
+	    self.proxy.s.close()
+	self.proxy.proceed = False
 
 if __name__ == "__main__":
     ws_serv = WsServer(62062,6878)

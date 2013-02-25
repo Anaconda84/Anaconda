@@ -59,6 +59,7 @@ from cStringIO import StringIO
 from base64 import b64encode, encodestring, decodestring
 from traceback import print_exc,print_stack
 from threading import Thread,currentThread,Lock,Event
+from multiprocessing import Process, Queue
 
 if sys.platform == "win32":
     try:
@@ -118,19 +119,15 @@ class BackgroundApp(BaseApp):
     	ws_serv = WsServer(i2iport,ws_serverport)
     	ws_serv.start()
 
-
         # Almost generic HTTP server
         self.videoHTTPServer = VideoHTTPServer(httpport)
         self.videoHTTPServer.register(self.videoservthread_error_callback,self.videoservthread_set_status_callback)
 
-	# Running BitTorrent HTTP server
-    	bt_serv = BtServer(bt_port)
-    	bt_serv.start()
+        # Running BitTorrent HTTP server
+        self.q = Queue()
+        self.p = Process(target=serveHTTP, args=(self.q,))
+        self.p.start()
 
-        # HTTP server for crossdomain.xml response
-#        self.crossdomainHTTPServer = CrossdomainHTTPServer(843)
-
-        
         BaseApp.__init__(self, logdir, appname, appversion, params, single_instance_checker, installdir, i2iport, sport)
         self.httpport = httpport
         
@@ -908,16 +905,16 @@ class AtBitrateStream:
         self.done = True
         # DO NOT close original stream
 
-
 ##############################################################
 #
 # Main Program Start Here
 #
 ##############################################################
 def run_bgapp(appname,appversion,i2iport,sessport,httpport,ws_serverport,bt_port, params = None,killonidle=False):
-    """ Set sys.argv[1] to "--nopause" to inform the Core that the player
-    doesn't support VODEVENT_PAUSE, e.g. the SwarmTransport.
-    """ 
+  """ Set sys.argv[1] to "--nopause" to inform the Core that the player
+  doesn't support VODEVENT_PAUSE, e.g. the SwarmTransport.
+  """
+  try: 
     if params is None:
         params = [""]
     
@@ -981,11 +978,14 @@ def run_bgapp(appname,appversion,i2iport,sessport,httpport,ws_serverport,bt_port
         reporter.stop()
 
     print >>sys.stderr,time.asctime(),'-', "Sleeping seconds to let other threads finish"
-    time.sleep(2)
+    time.sleep(2)                         
 
     if not ALLOW_MULTIPLE:
         del single_instance_checker
         
+  finally:
+    app.q.put('stop')
+    print >>sys.stderr,time.asctime(),'-', "bg: Sending stopping signal to BtHTTPServer."
+    app.p.join()
     # Ultimate catchall for hanging popen2's and what not
     os._exit(0)
-

@@ -7,9 +7,12 @@ import sys
 import string
 from threading import Thread, Event
 from BaseLib.Core.osutils import *
+from multiprocessing import Process
+from BaseLib.Plugin.BackgroundProcess import *
 
 max_size=2**16
 DEBUG = True
+PORT = 8888
 
 def bytestr2int(b):
     if b == "":
@@ -17,22 +20,25 @@ def bytestr2int(b):
     else:
         return int(b)
 
-class BtPorts():
-    pass
 
-class BtServer(Thread):
-    def __init__(self, bt_port):
-        Thread.__init__(self)
-        self.setName('BtServer')
-	BtPorts.PORT = bt_port
+loop = tornado.ioloop.IOLoop.instance()
 
-    def run(self):
-	application = tornado.web.Application([ (r"/(.+)", MainHandler), ])
-        application.listen(BtPorts.PORT)
-        print >>sys.stderr,time.asctime(),'-', "Starting BtHTTPServer am port", BtPorts.PORT
-	print 'Listening on 0.0.0.0:',BtPorts.PORT
-        tornado.ioloop.IOLoop.instance().start()
+def serveHTTP():
+    application = tornado.web.Application([ (r"/(.+)", MainHandler), ])
+    application.listen(PORT)
+    print 'Listening on 0.0.0.0:', PORT
+    #tornado.ioloop.IOLoop.instance().start()
 
+    period_cbk = tornado.ioloop.PeriodicCallback(period_run, 1000, loop)
+    period_cbk.start()
+    loop.start()
+
+def period_run():
+    signal = q.get()
+    print 'receive signal =', signal
+    if signal == 'stop':
+       print 'Stopping server.'
+       loop.stop()
 
 class MainHandler(tornado.web.RequestHandler):
     CHUNK_SIZE = 512000         # 0.5 MB
@@ -45,6 +51,7 @@ class MainHandler(tornado.web.RequestHandler):
 
 	state_dir = get_appstate_dir()
 	filename = os.path.join(state_dir, '.SwarmVideo', 'downloads', filename)
+	#filename = os.path.join('c:/Tmp', filename)
 	print >>sys.stderr,time.asctime(),'-', "BtHTTPSErver: filename=", filename
 
 	self._fd = open(filename, "rb")
@@ -166,9 +173,16 @@ class MainHandler(tornado.web.RequestHandler):
 #application = tornado.web.Application([ (r"/(.+)", MainHandler), ])
 
 if __name__ == "__main__":
-    PORT = 8888
-    application = tornado.web.Application([ (r"/(.+)", MainHandler), ])
-    application.listen(PORT)
-    print "Starting BtHTTPServer am port", PORT
-    tornado.ioloop.IOLoop.instance().start()
+    #PORT = 8888
+    #application = tornado.web.Application([ (r"/(.+)", MainHandler), ])
+    #application.listen(PORT)
+    #print "Starting BtHTTPServer am port", PORT
+    #tornado.ioloop.IOLoop.instance().start()
+    #bt_serv = BtServer(8888)
+    #bt_serv.start()
+
+    p = Process(target=serveHTTP)
+    p.start()
+    p.join()
+
 

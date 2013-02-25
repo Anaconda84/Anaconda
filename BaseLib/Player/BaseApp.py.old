@@ -24,7 +24,6 @@ import sys
 import time
 import shutil
 from sets import Set
-import threading
 
 from base64 import encodestring
 from threading import enumerate,currentThread,RLock
@@ -163,24 +162,6 @@ class BaseApp(wx.App,InstanceConnectionHandler):
         reporter.create_and_add_event("client-startup-build", [self.utility.lang.get("build")])
         reporter.create_and_add_event("client-startup-build-date", [self.utility.lang.get("build_date")])
 
-#    def check_hybernate_wake_up(self):
-#	delta_time = 15 # if time cicl > 15 sec. wake up hybernate
-#	first = True
-#	i=0
-#	while True:
-#    	    now = time.mktime(time.localtime())
-#    	    if first == False:
-#	        d = now - last
-#		print >>sys.stderr, time.asctime(),'-', "BaseApp: delta_time=", d
-#		if d >= delta_time or i > 60:
-#                    print >>sys.stderr, time.asctime(),'-', "BaseApp: Timeout is :", d
-#		    print >>sys.stderr, time.asctime(),'-', "BaseApp: Restarting programm !!!!!!!!!!!!"
-#		    self.tbicon.OnExitClient()
-#    	    last = now
-#    	    first = False
-#    	    time.sleep(1)
-#	    i = i+1
-	
     def configure_session(self):
         # No overlay
         self.sconfig.set_overlay(False)
