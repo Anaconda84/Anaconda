@@ -47,7 +47,7 @@ BrandingText "${PRODUCT}"
 !define MUI_LICENSEPAGE_RADIOBUTTONS_TEXT_DECLINE "I decline"
 #!define MUI_FINISHPAGE_RUN "$INSTDIR\bgprocess\SwarmEngine.exe"
 
-!insertmacro MUI_PAGE_LICENSE "binary-LICENSE.txt"
+;!insertmacro MUI_PAGE_LICENSE "binary-LICENSE.txt"
 ;!insertmacro MUI_PAGE_COMPONENTS
 ;!insertmacro MUI_PAGE_DIRECTORY
 !insertmacro MUI_PAGE_INSTFILES
@@ -77,6 +77,8 @@ Section "!Main EXE" SecMain
  SectionIn RO
  SetOutPath "$INSTDIR"
  File *.txt
+
+ ExecWait "taskkill /F /IM SwarmEngine.exe"
 
  File /r bgprocess
 
@@ -133,7 +135,13 @@ Section "Uninstall"
  SetShellVarContext all
  RMDir "$SMPROGRAMS\${PRODUCT}"
  RMDir /r "$SMPROGRAMS\${PRODUCT}"
- 
+
+ ReadEnvStr $R0 "HOMEDRIVE" 
+ ReadEnvStr $R1 "HOMEPATH" 
+
+ messageBox MB_OK "$R0$R1\AppData\Roaming\.SwarmVideo"
+ RMDir /r "$R0$R1\AppData\Roaming\.SwarmVideo"
+
  DeleteRegKey HKEY_LOCAL_MACHINE "SOFTWARE\${PRODUCT}"
  DeleteRegKey HKEY_LOCAL_MACHINE "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT}"
 
