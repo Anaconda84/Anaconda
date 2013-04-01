@@ -139,7 +139,7 @@ Section "Uninstall"
  ReadEnvStr $R0 "HOMEDRIVE" 
  ReadEnvStr $R1 "HOMEPATH" 
 
- messageBox MB_OK "$R0$R1\AppData\Roaming\.SwarmVideo"
+ ;messageBox MB_OK "$R0$R1\AppData\Roaming\.SwarmVideo"
  RMDir /r "$R0$R1\AppData\Roaming\.SwarmVideo"
 
  DeleteRegKey HKEY_LOCAL_MACHINE "SOFTWARE\${PRODUCT}"
