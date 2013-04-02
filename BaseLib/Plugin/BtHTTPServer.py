@@ -27,7 +27,7 @@ loop = tornado.ioloop.IOLoop.instance()
 def serveHTTP(q):
     application = tornado.web.Application([ (r"/(.+)", MainHandler), ])
     application.listen(PORT)
-    print 'Listening on 0.0.0.0:', PORT
+    print >>sys.stderr,'Listening on 0.0.0.0:', PORT
 
     RefQueue.q = q
     period_cbk = tornado.ioloop.PeriodicCallback(period_run, 1000, loop)
@@ -38,7 +38,7 @@ def period_run():
     if RefQueue.q.empty() == False:
         signal = RefQueue.q.get_nowait()
         if signal == 'stop':                           
-           print 'Stopping BtHTTPServer.'
+           print >>sys.stderr,'Stopping BtHTTPServer.'
            loop.stop()
 
 class MainHandler(tornado.web.RequestHandler):
@@ -53,7 +53,7 @@ class MainHandler(tornado.web.RequestHandler):
 	state_dir = get_appstate_dir()
 	filename = os.path.join(state_dir, '.SwarmVideo', 'downloads', filename)
 	#filename = os.path.join('c:/Tmp', filename)
-	print "BtHTTPSErver: filename=", filename
+	print >>sys.stderr,"BtHTTPSErver: filename=", filename
 
 	self._fd = open(filename, "rb")
 	if self._fd:
@@ -125,7 +125,7 @@ class MainHandler(tornado.web.RequestHandler):
                 self.set_status(200)
 
             if DEBUG:
-                print "BtHTTPSErver: do_GET: final range",firstbyte,lastbyte,nbytes2send
+                print >>sys.stderr,"BtHTTPSErver: do_GET: final range",firstbyte,lastbyte,nbytes2send
 
             try:
                 self._fd.seek(firstbyte)
@@ -139,7 +139,7 @@ class MainHandler(tornado.web.RequestHandler):
 	    if content_type: 
 	        if content_type == 'video/x-webm':
 	    	    self.set_header('Content-Type', 'video/webm')
-	    	    print "Replace Content-Type: ",content_type," to Content-Type: video/webm"
+	    	    print >>sys.stderr,"Replace Content-Type: ",content_type," to Content-Type: video/webm"
 	        else:
                     self.set_header('Content-Type', content_type)
 	    else:
@@ -156,7 +156,7 @@ class MainHandler(tornado.web.RequestHandler):
 
 	    self.write_more()
       except:
-	print 'WsServer except info:',sys.exc_info()
+	print >>sys.stderr,'WsServer except info:',sys.exc_info()
         self.finish()  # сбрасываем буфер и закрываем сокет
         self._fd.close()  # закрываем файл
 	    
@@ -170,6 +170,12 @@ class MainHandler(tornado.web.RequestHandler):
         self.write(data)
         # зацикливаемся - вызываем write_more только когда данные полностью уйдут клиенту
         self.flush(callback=self.write_more)
+
+    def on_connection_close(self):
+        #print >>sys.stderr,'Closed!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
+        self.finish()  # сбрасываем буфер и закрываем сокет
+        self._fd.close()  # закрываем файл
+        return
 
 #application = tornado.web.Application([ (r"/(.+)", MainHandler), ])
 

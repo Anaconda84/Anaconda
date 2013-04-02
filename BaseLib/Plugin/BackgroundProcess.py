@@ -59,7 +59,8 @@ from cStringIO import StringIO
 from base64 import b64encode, encodestring, decodestring
 from traceback import print_exc,print_stack
 from threading import Thread,currentThread,Lock,Event
-from multiprocessing import Process, Queue
+#from multiprocessing import Process, Queue
+import multiprocessing
 
 if sys.platform == "win32":
     try:
@@ -101,6 +102,8 @@ from BaseLib.Plugin.WsServer import *
 from BaseLib.Plugin.BtHTTPServer import *
 from sockjs.tornado import SockJSConnection, SockJSRouter, proto
 from BaseLib.Plugin.defs import *
+
+multiprocessing.freeze_support()
 
 DEBUG = True
 PHONEHOME = True

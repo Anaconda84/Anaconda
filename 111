@@ -1,0 +1,1381 @@
+
+C:\Prog\Anaconda>REM @echo off 
+
+C:\Prog\Anaconda>set LIBRARYNAME=BaseLib 
+
+C:\Prog\Anaconda>set PYTHONHOME=c:\Python27 
+
+C:\Prog\Anaconda>REM Arno: Add . to find our core (py 2.5) 
+
+C:\Prog\Anaconda>set PYTHONPATH=.;c:\Python27 
+
+C:\Prog\Anaconda>echo PYTHONPATH SET TO .;c:\Python27 
+PYTHONPATH SET TO .;c:\Python27
+
+C:\Prog\Anaconda>set NSIS="c:\Program Files\NSIS\makensis.exe" 
+
+C:\Prog\Anaconda>REM ----- Check for Python and essential site-packages 
+
+C:\Prog\Anaconda>IF NOT EXIST c:\Python27\python.exe (
+echo .  
+ echo Could not locate Python in c:\Python27.  
+ echo Please modify this script or install python [www.python.org]  
+ exit /b 
+) 
+
+C:\Prog\Anaconda>IF NOT EXIST c:\Python27\Lib\site-packages\wx-*-unicode (
+echo .  
+ echo Could not locate wxPython in c:\Python27\Lib\site-packages.  
+ echo Please modify this script or install wxPython [www.wxpython.org]  
+ exit /b 
+) 
+
+C:\Prog\Anaconda>IF NOT EXIST c:\Python27\Lib\site-packages\py2exe (
+echo .  
+ echo Could not locate py2exe in c:\Python27\Lib\site-packages.  
+ echo Please modify this script or install wxPython [www.py2exe.org]  
+ exit /b 
+) 
+
+C:\Prog\Anaconda>REM ----- Check for NSIS installer 
+
+C:\Prog\Anaconda>IF NOT EXIST "c:\Program Files\NSIS\makensis.exe" (
+echo .  
+ echo Could not locate the NSIS installer at "c:\Program Files\NSIS\makensis.exe".  
+ echo Please modify this script or install NSIS [nsis.sf.net]  
+ exit /b 
+) 
+
+C:\Prog\Anaconda>REM ----- Clean up 
+
+C:\Prog\Anaconda>call clean.bat 
+
+C:\Prog\Anaconda>rmdir /S /Q build 
+
+C:\Prog\Anaconda>rmdir /S /Q dist 
+
+C:\Prog\Anaconda>del /S /Q *.pyc 
+
+C:\Prog\Anaconda>REM ----- Build 
+
+C:\Prog\Anaconda>REM Arno: When adding files here, make sure tribler.nsi actually 
+
+C:\Prog\Anaconda>REM packs them in the installer .EXE 
+
+C:\Prog\Anaconda>REM Diego: building the deepest dir we get all of them. 
+
+C:\Prog\Anaconda>mkdir dist\installdir\bgprocess\BaseLib\Images 
+
+C:\Prog\Anaconda>mkdir dist\installdir\bgprocess\BaseLib\Core 
+
+C:\Prog\Anaconda>c:\Python27\python.exe -O BaseLib\Plugin\Build\Win32\setupBGexe.py py2exe 
+running py2exe
+creating C:\Prog\Anaconda\build
+creating C:\Prog\Anaconda\build\bdist.win32
+creating C:\Prog\Anaconda\build\bdist.win32\winexe
+creating C:\Prog\Anaconda\build\bdist.win32\winexe\collect-2.7
+creating C:\Prog\Anaconda\build\bdist.win32\winexe\bundle-2.7
+creating C:\Prog\Anaconda\build\bdist.win32\winexe\temp
+*** searching for required modules ***
+*** parsing results ***
+creating python loader for extension 'win32pdh' (c:\Python27\lib\site-packages\win32\win32pdh.pyd -> win32pdh.pyd)
+creating python loader for extension '_ctypes' (c:\Python27\DLLs\_ctypes.pyd -> _ctypes.pyd)
+creating python loader for extension 'select' (c:\Python27\DLLs\select.pyd -> select.pyd)
+creating python loader for extension 'unicodedata' (c:\Python27\DLLs\unicodedata.pyd -> unicodedata.pyd)
+creating python loader for extension 'win32event' (c:\Python27\lib\site-packages\win32\win32event.pyd -> win32event.pyd)
+creating python loader for extension 'wx._controls_' (c:\Python27\lib\site-packages\wx-2.8-msw-unicode\wx\_controls_.pyd -> wx._controls_.pyd)
+creating python loader for extension 'apsw' (c:\Python27\lib\site-packages\apsw.pyd -> apsw.pyd)
+creating python loader for extension 'win32evtlog' (c:\Python27\lib\site-packages\win32\win32evtlog.pyd -> win32evtlog.pyd)
+creating python loader for extension 'win32wnet' (c:\Python27\lib\site-packages\win32\win32wnet.pyd -> win32wnet.pyd)
+creating python loader for extension 'win32file' (c:\Python27\lib\site-packages\win32\win32file.pyd -> win32file.pyd)
+creating python loader for extension 'win32ui' (c:\Python27\lib\site-packages\Pythonwin\win32ui.pyd -> win32ui.pyd)
+creating python loader for extension 'wx._windows_' (c:\Python27\lib\site-packages\wx-2.8-msw-unicode\wx\_windows_.pyd -> wx._windows_.pyd)
+creating python loader for extension '_hashlib' (c:\Python27\DLLs\_hashlib.pyd -> _hashlib.pyd)
+creating python loader for extension 'bz2' (c:\Python27\DLLs\bz2.pyd -> bz2.pyd)
+creating python loader for extension '_ssl' (c:\Python27\DLLs\_ssl.pyd -> _ssl.pyd)
+creating python loader for extension '_sqlite3' (c:\Python27\DLLs\_sqlite3.pyd -> _sqlite3.pyd)
+creating python loader for extension 'wx._core_' (c:\Python27\lib\site-packages\wx-2.8-msw-unicode\wx\_core_.pyd -> wx._core_.pyd)
+creating python loader for extension 'wx._misc_' (c:\Python27\lib\site-packages\wx-2.8-msw-unicode\wx\_misc_.pyd -> wx._misc_.pyd)
+creating python loader for extension 'M2Crypto.__m2crypto' (c:\Python27\lib\site-packages\M2Crypto\__m2crypto.pyd -> M2Crypto.__m2crypto.pyd)
+creating python loader for extension '_win32sysloader' (c:\Python27\lib\site-packages\win32\_win32sysloader.pyd -> _win32sysloader.pyd)
+creating python loader for extension 'wx._gdi_' (c:\Python27\lib\site-packages\wx-2.8-msw-unicode\wx\_gdi_.pyd -> wx._gdi_.pyd)
+creating python loader for extension 'pyexpat' (c:\Python27\DLLs\pyexpat.pyd -> pyexpat.pyd)
+creating python loader for extension '_multiprocessing' (c:\Python27\DLLs\_multiprocessing.pyd -> _multiprocessing.pyd)
+creating python loader for extension 'win32api' (c:\Python27\lib\site-packages\win32\win32api.pyd -> win32api.pyd)
+creating python loader for extension '_socket' (c:\Python27\DLLs\_socket.pyd -> _socket.pyd)
+*** finding dlls needed ***
+*** create binaries ***
+*** byte compile python files ***
+writing byte-compilation script 'c:\users\kos\appdata\local\temp\tmprtb2vt.py'
+c:\Python27\python.exe c:\users\kos\appdata\local\temp\tmprtb2vt.py
+byte-compiling C:\Prog\Anaconda\BaseLib\Category\Category.py to BaseLib\Category\Category.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Category\FamilyFilter.py to BaseLib\Category\FamilyFilter.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Category\__init__.py to BaseLib\Category\__init__.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Category\init_category.py to BaseLib\Category\init_category.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\API.py to BaseLib\Core\API.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\APIImplementation\DownloadImpl.py to BaseLib\Core\APIImplementation\DownloadImpl.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\APIImplementation\DownloadRuntimeConfig.py to BaseLib\Core\APIImplementation\DownloadRuntimeConfig.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\APIImplementation\LaunchManyCore.py to BaseLib\Core\APIImplementation\LaunchManyCore.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\APIImplementation\SessionRuntimeConfig.py to BaseLib\Core\APIImplementation\SessionRuntimeConfig.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\APIImplementation\SingleDownload.py to BaseLib\Core\APIImplementation\SingleDownload.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\APIImplementation\ThreadPool.py to BaseLib\Core\APIImplementation\ThreadPool.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\APIImplementation\UserCallbackHandler.py to BaseLib\Core\APIImplementation\UserCallbackHandler.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\APIImplementation\__init__.py to BaseLib\Core\APIImplementation\__init__.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\APIImplementation\maketorrent.py to BaseLib\Core\APIImplementation\maketorrent.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\APIImplementation\makeurl.py to BaseLib\Core\APIImplementation\makeurl.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\APIImplementation\miscutils.py to BaseLib\Core\APIImplementation\miscutils.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\Base.py to BaseLib\Core\Base.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\BitTornado\BT1\Choker.py to BaseLib\Core\BitTornado\BT1\Choker.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\BitTornado\BT1\Connecter.py to BaseLib\Core\BitTornado\BT1\Connecter.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\BitTornado\BT1\Downloader.py to BaseLib\Core\BitTornado\BT1\Downloader.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\BitTornado\BT1\DownloaderFeedback.py to BaseLib\Core\BitTornado\BT1\DownloaderFeedback.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\BitTornado\BT1\Encrypter.py to BaseLib\Core\BitTornado\BT1\Encrypter.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\BitTornado\BT1\FileSelector.py to BaseLib\Core\BitTornado\BT1\FileSelector.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\BitTornado\BT1\Filter.py to BaseLib\Core\BitTornado\BT1\Filter.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\BitTornado\BT1\GetRightHTTPDownloader.py to BaseLib\Core\BitTornado\BT1\GetRightHTTPDownloader.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\BitTornado\BT1\HoffmanHTTPDownloader.py to BaseLib\Core\BitTornado\BT1\HoffmanHTTPDownloader.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\BitTornado\BT1\MessageID.py to BaseLib\Core\BitTornado\BT1\MessageID.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\BitTornado\BT1\NatCheck.py to BaseLib\Core\BitTornado\BT1\NatCheck.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\BitTornado\BT1\PiecePicker.py to BaseLib\Core\BitTornado\BT1\PiecePicker.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\BitTornado\BT1\Rerequester.py to BaseLib\Core\BitTornado\BT1\Rerequester.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\BitTornado\BT1\Statistics.py to BaseLib\Core\BitTornado\BT1\Statistics.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\BitTornado\BT1\Storage.py to BaseLib\Core\BitTornado\BT1\Storage.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\BitTornado\BT1\StorageWrapper.py to BaseLib\Core\BitTornado\BT1\StorageWrapper.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\BitTornado\BT1\T2T.py to BaseLib\Core\BitTornado\BT1\T2T.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\BitTornado\BT1\Uploader.py to BaseLib\Core\BitTornado\BT1\Uploader.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\BitTornado\BT1\__init__.py to BaseLib\Core\BitTornado\BT1\__init__.pyc
+skipping byte-compilation of C:\Prog\Anaconda\BaseLib\Core\BitTornado\BT1\__init__.py to BaseLib\Core\BitTornado\BT1\__init__.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\BitTornado\BT1\btformats.py to BaseLib\Core\BitTornado\BT1\btformats.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\BitTornado\BT1\convert.py to BaseLib\Core\BitTornado\BT1\convert.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\BitTornado\BT1\track.py to BaseLib\Core\BitTornado\BT1\track.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\BitTornado\CurrentRateMeasure.py to BaseLib\Core\BitTornado\CurrentRateMeasure.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\BitTornado\HTTPHandler.py to BaseLib\Core\BitTornado\HTTPHandler.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\BitTornado\RateLimiter.py to BaseLib\Core\BitTornado\RateLimiter.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\BitTornado\RateMeasure.py to BaseLib\Core\BitTornado\RateMeasure.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\BitTornado\RawServer.py to BaseLib\Core\BitTornado\RawServer.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\BitTornado\ServerPortHandler.py to BaseLib\Core\BitTornado\ServerPortHandler.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\BitTornado\SocketHandler.py to BaseLib\Core\BitTornado\SocketHandler.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\BitTornado\__init__.py to BaseLib\Core\BitTornado\__init__.pyc
+skipping byte-compilation of C:\Prog\Anaconda\BaseLib\Core\BitTornado\__init__.py to BaseLib\Core\BitTornado\__init__.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\BitTornado\bencode.py to BaseLib\Core\BitTornado\bencode.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\BitTornado\bitfield.py to BaseLib\Core\BitTornado\bitfield.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\BitTornado\clock.py to BaseLib\Core\BitTornado\clock.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\BitTornado\download_bt1.py to BaseLib\Core\BitTornado\download_bt1.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\BitTornado\iprangeparse.py to BaseLib\Core\BitTornado\iprangeparse.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\BitTornado\natpunch.py to BaseLib\Core\BitTornado\natpunch.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\BitTornado\parseargs.py to BaseLib\Core\BitTornado\parseargs.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\BitTornado\parsedir.py to BaseLib\Core\BitTornado\parsedir.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\BitTornado\piecebuffer.py to BaseLib\Core\BitTornado\piecebuffer.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\BitTornado\selectpoll.py to BaseLib\Core\BitTornado\selectpoll.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\BitTornado\subnetparse.py to BaseLib\Core\BitTornado\subnetparse.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\BitTornado\torrentlistparse.py to BaseLib\Core\BitTornado\torrentlistparse.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\BitTornado\zurllib.py to BaseLib\Core\BitTornado\zurllib.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\BuddyCast\TorrentCollecting.py to BaseLib\Core\BuddyCast\TorrentCollecting.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\BuddyCast\__init__.py to BaseLib\Core\BuddyCast\__init__.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\BuddyCast\bartercast.py to BaseLib\Core\BuddyCast\bartercast.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\BuddyCast\buddycast.py to BaseLib\Core\BuddyCast\buddycast.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\BuddyCast\channelcast.py to BaseLib\Core\BuddyCast\channelcast.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\BuddyCast\moderationcast_util.py to BaseLib\Core\BuddyCast\moderationcast_util.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\BuddyCast\similarity.py to BaseLib\Core\BuddyCast\similarity.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\BuddyCast\votecast.py to BaseLib\Core\BuddyCast\votecast.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\CacheDB\CacheDBHandler.py to BaseLib\Core\CacheDB\CacheDBHandler.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\CacheDB\MetadataDBHandler.py to BaseLib\Core\CacheDB\MetadataDBHandler.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\CacheDB\Notifier.py to BaseLib\Core\CacheDB\Notifier.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\CacheDB\SqliteCacheDBHandler.py to BaseLib\Core\CacheDB\SqliteCacheDBHandler.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\CacheDB\SqliteFriendshipStatsCacheDB.py to BaseLib\Core\CacheDB\SqliteFriendshipStatsCacheDB.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\CacheDB\SqliteSeedingStatsCacheDB.py to BaseLib\Core\CacheDB\SqliteSeedingStatsCacheDB.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\CacheDB\SqliteVideoPlaybackStatsCacheDB.py to BaseLib\Core\CacheDB\SqliteVideoPlaybackStatsCacheDB.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\CacheDB\__init__.py to BaseLib\Core\CacheDB\__init__.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\CacheDB\cachedb.py to BaseLib\Core\CacheDB\cachedb.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\CacheDB\maxflow.py to BaseLib\Core\CacheDB\maxflow.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\CacheDB\sqlitecachedb.py to BaseLib\Core\CacheDB\sqlitecachedb.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\ClosedSwarm\ClosedSwarm.py to BaseLib\Core\ClosedSwarm\ClosedSwarm.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\ClosedSwarm\PaymentIntegration.py to BaseLib\Core\ClosedSwarm\PaymentIntegration.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\ClosedSwarm\__init__.py to BaseLib\Core\ClosedSwarm\__init__.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\DecentralizedTracking\MagnetLink\MagnetLink.py to BaseLib\Core\DecentralizedTracking\MagnetLink\MagnetLink.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\DecentralizedTracking\MagnetLink\MiniBitTorrent.py to BaseLib\Core\DecentralizedTracking\MagnetLink\MiniBitTorrent.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\DecentralizedTracking\MagnetLink\__init__.py to BaseLib\Core\DecentralizedTracking\MagnetLink\__init__.pyc
+skipping byte-compilation of C:\Prog\Anaconda\BaseLib\Core\DecentralizedTracking\MagnetLink\__init__.py to BaseLib\Core\DecentralizedTracking\MagnetLink\__init__.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\DecentralizedTracking\__init__.py to BaseLib\Core\DecentralizedTracking\__init__.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\DecentralizedTracking\kadtracker\__init__.py to BaseLib\Core\DecentralizedTracking\kadtracker\__init__.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\DecentralizedTracking\kadtracker\bencode.py to BaseLib\Core\DecentralizedTracking\kadtracker\bencode.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\DecentralizedTracking\kadtracker\controller.py to BaseLib\Core\DecentralizedTracking\kadtracker\controller.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\DecentralizedTracking\kadtracker\floodbarrier.py to BaseLib\Core\DecentralizedTracking\kadtracker\floodbarrier.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\DecentralizedTracking\kadtracker\identifier.py to BaseLib\Core\DecentralizedTracking\kadtracker\identifier.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\DecentralizedTracking\kadtracker\kadtracker.py to BaseLib\Core\DecentralizedTracking\kadtracker\kadtracker.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\DecentralizedTracking\kadtracker\logging_conf.py to BaseLib\Core\DecentralizedTracking\kadtracker\logging_conf.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\DecentralizedTracking\kadtracker\lookup_manager.py to BaseLib\Core\DecentralizedTracking\kadtracker\lookup_manager.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\DecentralizedTracking\kadtracker\message.py to BaseLib\Core\DecentralizedTracking\kadtracker\message.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\DecentralizedTracking\kadtracker\minitwisted.py to BaseLib\Core\DecentralizedTracking\kadtracker\minitwisted.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\DecentralizedTracking\kadtracker\node.py to BaseLib\Core\DecentralizedTracking\kadtracker\node.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\DecentralizedTracking\kadtracker\querier.py to BaseLib\Core\DecentralizedTracking\kadtracker\querier.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\DecentralizedTracking\kadtracker\responder.py to BaseLib\Core\DecentralizedTracking\kadtracker\responder.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\DecentralizedTracking\kadtracker\routing_manager.py to BaseLib\Core\DecentralizedTracking\kadtracker\routing_manager.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\DecentralizedTracking\kadtracker\routing_table.py to BaseLib\Core\DecentralizedTracking\kadtracker\routing_table.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\DecentralizedTracking\kadtracker\rpc_manager.py to BaseLib\Core\DecentralizedTracking\kadtracker\rpc_manager.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\DecentralizedTracking\kadtracker\test_const.py to BaseLib\Core\DecentralizedTracking\kadtracker\test_const.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\DecentralizedTracking\kadtracker\token_manager.py to BaseLib\Core\DecentralizedTracking\kadtracker\token_manager.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\DecentralizedTracking\kadtracker\tracker.py to BaseLib\Core\DecentralizedTracking\kadtracker\tracker.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\DecentralizedTracking\kadtracker\utils.py to BaseLib\Core\DecentralizedTracking\kadtracker\utils.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\DecentralizedTracking\mainlineDHT.py to BaseLib\Core\DecentralizedTracking\mainlineDHT.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\DecentralizedTracking\mainlineDHTChecker.py to BaseLib\Core\DecentralizedTracking\mainlineDHTChecker.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\DecentralizedTracking\repex.py to BaseLib\Core\DecentralizedTracking\repex.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\DecentralizedTracking\ut_pex.py to BaseLib\Core\DecentralizedTracking\ut_pex.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\Download.py to BaseLib\Core\Download.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\DownloadConfig.py to BaseLib\Core\DownloadConfig.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\DownloadState.py to BaseLib\Core\DownloadState.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\LiveSourceAuthConfig.py to BaseLib\Core\LiveSourceAuthConfig.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\Merkle\__init__.py to BaseLib\Core\Merkle\__init__.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\Merkle\merkle.py to BaseLib\Core\Merkle\merkle.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\Multicast\Multicast.py to BaseLib\Core\Multicast\Multicast.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\Multicast\__init__.py to BaseLib\Core\Multicast\__init__.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\NATFirewall\ConnectionCheck.py to BaseLib\Core\NATFirewall\ConnectionCheck.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\NATFirewall\DialbackMsgHandler.py to BaseLib\Core\NATFirewall\DialbackMsgHandler.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\NATFirewall\NatCheck.py to BaseLib\Core\NATFirewall\NatCheck.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\NATFirewall\NatCheckMsgHandler.py to BaseLib\Core\NATFirewall\NatCheckMsgHandler.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\NATFirewall\NatTraversal.py to BaseLib\Core\NATFirewall\NatTraversal.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\NATFirewall\ReturnConnHandler.py to BaseLib\Core\NATFirewall\ReturnConnHandler.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\NATFirewall\TimeoutCheck.py to BaseLib\Core\NATFirewall\TimeoutCheck.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\NATFirewall\TimeoutFinder.py to BaseLib\Core\NATFirewall\TimeoutFinder.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\NATFirewall\UDPPuncture.py to BaseLib\Core\NATFirewall\UDPPuncture.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\NATFirewall\UPnPThread.py to BaseLib\Core\NATFirewall\UPnPThread.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\NATFirewall\__init__.py to BaseLib\Core\NATFirewall\__init__.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\NATFirewall\guessip.py to BaseLib\Core\NATFirewall\guessip.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\NATFirewall\upnp.py to BaseLib\Core\NATFirewall\upnp.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\Overlay\MetadataHandler.py to BaseLib\Core\Overlay\MetadataHandler.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\Overlay\OverlayApps.py to BaseLib\Core\Overlay\OverlayApps.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\Overlay\OverlayThreadingBridge.py to BaseLib\Core\Overlay\OverlayThreadingBridge.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\Overlay\SecureOverlay.py to BaseLib\Core\Overlay\SecureOverlay.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\Overlay\__init__.py to BaseLib\Core\Overlay\__init__.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\Overlay\permid.py to BaseLib\Core\Overlay\permid.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\ProxyService\Coordinator.py to BaseLib\Core\ProxyService\Coordinator.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\ProxyService\CoordinatorMessageHandler.py to BaseLib\Core\ProxyService\CoordinatorMessageHandler.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\ProxyService\Helper.py to BaseLib\Core\ProxyService\Helper.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\ProxyService\HelperMessageHandler.py to BaseLib\Core\ProxyService\HelperMessageHandler.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\ProxyService\ProxyServiceUtil.py to BaseLib\Core\ProxyService\ProxyServiceUtil.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\ProxyService\RatePredictor.py to BaseLib\Core\ProxyService\RatePredictor.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\ProxyService\__init__.py to BaseLib\Core\ProxyService\__init__.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\RequestPolicy.py to BaseLib\Core\RequestPolicy.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\Search\KeywordSearch.py to BaseLib\Core\Search\KeywordSearch.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\Search\SearchManager.py to BaseLib\Core\Search\SearchManager.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\Search\__init__.py to BaseLib\Core\Search\__init__.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\Session.py to BaseLib\Core\Session.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\SessionConfig.py to BaseLib\Core\SessionConfig.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\SocialNetwork\FriendshipMsgHandler.py to BaseLib\Core\SocialNetwork\FriendshipMsgHandler.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\SocialNetwork\OverlapMsgHandler.py to BaseLib\Core\SocialNetwork\OverlapMsgHandler.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\SocialNetwork\RemoteQueryMsgHandler.py to BaseLib\Core\SocialNetwork\RemoteQueryMsgHandler.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\SocialNetwork\RemoteTorrentHandler.py to BaseLib\Core\SocialNetwork\RemoteTorrentHandler.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\SocialNetwork\SocialNetworkMsgHandler.py to BaseLib\Core\SocialNetwork\SocialNetworkMsgHandler.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\SocialNetwork\__init__.py to BaseLib\Core\SocialNetwork\__init__.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\Statistics\ChannelCrawler.py to BaseLib\Core\Statistics\ChannelCrawler.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\Statistics\Crawler.py to BaseLib\Core\Statistics\Crawler.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\Statistics\DatabaseCrawler.py to BaseLib\Core\Statistics\DatabaseCrawler.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\Statistics\FriendshipCrawler.py to BaseLib\Core\Statistics\FriendshipCrawler.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\Statistics\Logger.py to BaseLib\Core\Statistics\Logger.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\Statistics\PunctureCrawler.py to BaseLib\Core\Statistics\PunctureCrawler.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\Statistics\RepexCrawler.py to BaseLib\Core\Statistics\RepexCrawler.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\Statistics\SeedingStatsCrawler.py to BaseLib\Core\Statistics\SeedingStatsCrawler.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\Statistics\Status\LivingLabReporter.py to BaseLib\Core\Statistics\Status\LivingLabReporter.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\Statistics\Status\Status.py to BaseLib\Core\Statistics\Status\Status.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\Statistics\Status\XmlPrinter.py to BaseLib\Core\Statistics\Status\XmlPrinter.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\Statistics\Status\__init__.py to BaseLib\Core\Statistics\Status\__init__.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\Statistics\VideoPlaybackCrawler.py to BaseLib\Core\Statistics\VideoPlaybackCrawler.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\Statistics\__init__.py to BaseLib\Core\Statistics\__init__.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\Subtitles\MetadataDomainObjects\Languages.py to BaseLib\Core\Subtitles\MetadataDomainObjects\Languages.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\Subtitles\MetadataDomainObjects\MetadataDTO.py to BaseLib\Core\Subtitles\MetadataDomainObjects\MetadataDTO.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\Subtitles\MetadataDomainObjects\MetadataExceptions.py to BaseLib\Core\Subtitles\MetadataDomainObjects\MetadataExceptions.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\Subtitles\MetadataDomainObjects\SubtitleInfo.py to BaseLib\Core\Subtitles\MetadataDomainObjects\SubtitleInfo.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\Subtitles\MetadataDomainObjects\__init__.py to BaseLib\Core\Subtitles\MetadataDomainObjects\__init__.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\Subtitles\PeerHaveManager.py to BaseLib\Core\Subtitles\PeerHaveManager.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\Subtitles\RichMetadataInterceptor.py to BaseLib\Core\Subtitles\RichMetadataInterceptor.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\Subtitles\SubtitleHandler\DiskManager.py to BaseLib\Core\Subtitles\SubtitleHandler\DiskManager.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\Subtitles\SubtitleHandler\SimpleTokenBucket.py to BaseLib\Core\Subtitles\SubtitleHandler\SimpleTokenBucket.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\Subtitles\SubtitleHandler\SubsMessageHandler.py to BaseLib\Core\Subtitles\SubtitleHandler\SubsMessageHandler.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\Subtitles\SubtitleHandler\__init__.py to BaseLib\Core\Subtitles\SubtitleHandler\__init__.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\Subtitles\SubtitlesHandler.py to BaseLib\Core\Subtitles\SubtitlesHandler.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\Subtitles\SubtitlesSupport.py to BaseLib\Core\Subtitles\SubtitlesSupport.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\Subtitles\__init__.py to BaseLib\Core\Subtitles\__init__.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\TorrentDef.py to BaseLib\Core\TorrentDef.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\Utilities\Crypto.py to BaseLib\Core\Utilities\Crypto.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\Utilities\__init__.py to BaseLib\Core\Utilities\__init__.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\Utilities\timeouturlopen.py to BaseLib\Core\Utilities\timeouturlopen.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\Utilities\unicode.py to BaseLib\Core\Utilities\unicode.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\Utilities\utilities.py to BaseLib\Core\Utilities\utilities.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\Utilities\win32regchecker.py to BaseLib\Core\Utilities\win32regchecker.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\Video\LiveSourceAuth.py to BaseLib\Core\Video\LiveSourceAuth.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\Video\MovieTransport.py to BaseLib\Core\Video\MovieTransport.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\Video\PiecePickerSVC.py to BaseLib\Core\Video\PiecePickerSVC.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\Video\PiecePickerStreaming.py to BaseLib\Core\Video\PiecePickerStreaming.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\Video\SVCTransporter.py to BaseLib\Core\Video\SVCTransporter.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\Video\SVCVideoStatus.py to BaseLib\Core\Video\SVCVideoStatus.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\Video\VideoOnDemand.py to BaseLib\Core\Video\VideoOnDemand.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\Video\VideoSource.py to BaseLib\Core\Video\VideoSource.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\Video\VideoStatus.py to BaseLib\Core\Video\VideoStatus.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\Video\__init__.py to BaseLib\Core\Video\__init__.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\__init__.py to BaseLib\Core\__init__.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\defaults.py to BaseLib\Core\defaults.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\exceptions.py to BaseLib\Core\exceptions.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\log.py to BaseLib\Core\log.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\osutils.py to BaseLib\Core\osutils.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Core\simpledefs.py to BaseLib\Core\simpledefs.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Debug\__init__.py to BaseLib\Debug\__init__.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Debug\console.py to BaseLib\Debug\console.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Lang\__init__.py to BaseLib\Lang\__init__.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Lang\lang.py to BaseLib\Lang\lang.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Player\BaseApp.py to BaseLib\Player\BaseApp.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Player\EmbeddedPlayer4Frame.py to BaseLib\Player\EmbeddedPlayer4Frame.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Player\PlayerVideoFrame.py to BaseLib\Player\PlayerVideoFrame.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Player\Reporter.py to BaseLib\Player\Reporter.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Player\UtilityStub.py to BaseLib\Player\UtilityStub.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Player\__init__.py to BaseLib\Player\__init__.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Player\swarmplayer.py to BaseLib\Player\swarmplayer.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Player\systray.py to BaseLib\Player\systray.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Plugin\AtomFeedParser.py to BaseLib\Plugin\AtomFeedParser.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Plugin\BackgroundProcess.py to BaseLib\Plugin\BackgroundProcess.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Plugin\BtHTTPServer.py to BaseLib\Plugin\BtHTTPServer.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Plugin\Search.py to BaseLib\Plugin\Search.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Plugin\WsServer.py to BaseLib\Plugin\WsServer.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Plugin\__init__.py to BaseLib\Plugin\__init__.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Plugin\defs.py to BaseLib\Plugin\defs.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Policies\RateManager.py to BaseLib\Policies\RateManager.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Policies\__init__.py to BaseLib\Policies\__init__.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\TrackerChecking\TorrentChecking.py to BaseLib\TrackerChecking\TorrentChecking.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\TrackerChecking\TrackerChecking.py to BaseLib\TrackerChecking\TrackerChecking.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\TrackerChecking\__init__.py to BaseLib\TrackerChecking\__init__.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Utilities\Instance2Instance.py to BaseLib\Utilities\Instance2Instance.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Utilities\LinuxSingleInstanceChecker.py to BaseLib\Utilities\LinuxSingleInstanceChecker.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Utilities\TimedTaskQueue.py to BaseLib\Utilities\TimedTaskQueue.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Utilities\__init__.py to BaseLib\Utilities\__init__.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Utilities\configreader.py to BaseLib\Utilities\configreader.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Video\Buttons.py to BaseLib\Video\Buttons.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Video\CachingStream.py to BaseLib\Video\CachingStream.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Video\Ogg.py to BaseLib\Video\Ogg.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Video\Progress.py to BaseLib\Video\Progress.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Video\VLCWrapper.py to BaseLib\Video\VLCWrapper.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Video\VideoFrame.py to BaseLib\Video\VideoFrame.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Video\VideoPlayer.py to BaseLib\Video\VideoPlayer.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Video\VideoServer.py to BaseLib\Video\VideoServer.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Video\__init__.py to BaseLib\Video\__init__.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Video\defs.py to BaseLib\Video\defs.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\Video\utils.py to BaseLib\Video\utils.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\WebUI\WebUI.py to BaseLib\WebUI\WebUI.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\WebUI\__init__.py to BaseLib\WebUI\__init__.pyc
+byte-compiling C:\Prog\Anaconda\BaseLib\__init__.py to BaseLib\__init__.pyc
+skipping byte-compilation of C:\Prog\Anaconda\BaseLib\__init__.py to BaseLib\__init__.pyc
+byte-compiling C:\Prog\Anaconda\build\bdist.win32\winexe\temp\M2Crypto.__m2crypto.py to M2Crypto\__m2crypto.pyc
+byte-compiling C:\Prog\Anaconda\build\bdist.win32\winexe\temp\_ctypes.py to _ctypes.pyc
+byte-compiling C:\Prog\Anaconda\build\bdist.win32\winexe\temp\_hashlib.py to _hashlib.pyc
+byte-compiling C:\Prog\Anaconda\build\bdist.win32\winexe\temp\_multiprocessing.py to _multiprocessing.pyc
+byte-compiling C:\Prog\Anaconda\build\bdist.win32\winexe\temp\_socket.py to _socket.pyc
+byte-compiling C:\Prog\Anaconda\build\bdist.win32\winexe\temp\_sqlite3.py to _sqlite3.pyc
+byte-compiling C:\Prog\Anaconda\build\bdist.win32\winexe\temp\_ssl.py to _ssl.pyc
+byte-compiling C:\Prog\Anaconda\build\bdist.win32\winexe\temp\_win32sysloader.py to _win32sysloader.pyc
+byte-compiling C:\Prog\Anaconda\build\bdist.win32\winexe\temp\apsw.py to apsw.pyc
+byte-compiling C:\Prog\Anaconda\build\bdist.win32\winexe\temp\bz2.py to bz2.pyc
+byte-compiling C:\Prog\Anaconda\build\bdist.win32\winexe\temp\pyexpat.py to pyexpat.pyc
+byte-compiling C:\Prog\Anaconda\build\bdist.win32\winexe\temp\select.py to select.pyc
+byte-compiling C:\Prog\Anaconda\build\bdist.win32\winexe\temp\unicodedata.py to unicodedata.pyc
+byte-compiling C:\Prog\Anaconda\build\bdist.win32\winexe\temp\win32api.py to win32api.pyc
+byte-compiling C:\Prog\Anaconda\build\bdist.win32\winexe\temp\win32event.py to win32event.pyc
+byte-compiling C:\Prog\Anaconda\build\bdist.win32\winexe\temp\win32evtlog.py to win32evtlog.pyc
+byte-compiling C:\Prog\Anaconda\build\bdist.win32\winexe\temp\win32file.py to win32file.pyc
+byte-compiling C:\Prog\Anaconda\build\bdist.win32\winexe\temp\win32pdh.py to win32pdh.pyc
+byte-compiling C:\Prog\Anaconda\build\bdist.win32\winexe\temp\win32ui.py to win32ui.pyc
+byte-compiling C:\Prog\Anaconda\build\bdist.win32\winexe\temp\win32wnet.py to win32wnet.pyc
+byte-compiling C:\Prog\Anaconda\build\bdist.win32\winexe\temp\wx._controls_.py to wx\_controls_.pyc
+byte-compiling C:\Prog\Anaconda\build\bdist.win32\winexe\temp\wx._core_.py to wx\_core_.pyc
+byte-compiling C:\Prog\Anaconda\build\bdist.win32\winexe\temp\wx._gdi_.py to wx\_gdi_.pyc
+byte-compiling C:\Prog\Anaconda\build\bdist.win32\winexe\temp\wx._misc_.py to wx\_misc_.pyc
+byte-compiling C:\Prog\Anaconda\build\bdist.win32\winexe\temp\wx._windows_.py to wx\_windows_.pyc
+byte-compiling c:\Python27\lib\BaseHTTPServer.py to BaseHTTPServer.pyc
+byte-compiling c:\Python27\lib\ConfigParser.py to ConfigParser.pyc
+byte-compiling c:\Python27\lib\Cookie.py to Cookie.pyc
+byte-compiling c:\Python27\lib\Queue.py to Queue.pyc
+byte-compiling c:\Python27\lib\SocketServer.py to SocketServer.pyc
+byte-compiling c:\Python27\lib\StringIO.py to StringIO.pyc
+byte-compiling c:\Python27\lib\UserDict.py to UserDict.pyc
+byte-compiling c:\Python27\lib\_LWPCookieJar.py to _LWPCookieJar.pyc
+byte-compiling c:\Python27\lib\_MozillaCookieJar.py to _MozillaCookieJar.pyc
+byte-compiling c:\Python27\lib\__future__.py to __future__.pyc
+byte-compiling c:\Python27\lib\_abcoll.py to _abcoll.pyc
+byte-compiling c:\Python27\lib\_strptime.py to _strptime.pyc
+byte-compiling c:\Python27\lib\_threading_local.py to _threading_local.pyc
+byte-compiling c:\Python27\lib\_weakrefset.py to _weakrefset.pyc
+byte-compiling c:\Python27\lib\abc.py to abc.pyc
+byte-compiling c:\Python27\lib\asyncore.py to asyncore.pyc
+byte-compiling c:\Python27\lib\atexit.py to atexit.pyc
+byte-compiling c:\Python27\lib\base64.py to base64.pyc
+byte-compiling c:\Python27\lib\bdb.py to bdb.pyc
+byte-compiling c:\Python27\lib\bisect.py to bisect.pyc
+byte-compiling c:\Python27\lib\cProfile.py to cProfile.pyc
+byte-compiling c:\Python27\lib\calendar.py to calendar.pyc
+byte-compiling c:\Python27\lib\cgi.py to cgi.pyc
+byte-compiling c:\Python27\lib\cmd.py to cmd.pyc
+byte-compiling c:\Python27\lib\codecs.py to codecs.pyc
+byte-compiling c:\Python27\lib\collections.py to collections.pyc
+byte-compiling c:\Python27\lib\commands.py to commands.pyc
+byte-compiling c:\Python27\lib\contextlib.py to contextlib.pyc
+byte-compiling c:\Python27\lib\cookielib.py to cookielib.pyc
+byte-compiling c:\Python27\lib\copy.py to copy.pyc
+byte-compiling c:\Python27\lib\copy_reg.py to copy_reg.pyc
+byte-compiling c:\Python27\lib\csv.py to csv.pyc
+byte-compiling c:\Python27\lib\ctypes\__init__.py to ctypes\__init__.pyc
+byte-compiling c:\Python27\lib\ctypes\_endian.py to ctypes\_endian.pyc
+byte-compiling c:\Python27\lib\ctypes\macholib\__init__.py to ctypes\macholib\__init__.pyc
+byte-compiling c:\Python27\lib\ctypes\macholib\dyld.py to ctypes\macholib\dyld.pyc
+byte-compiling c:\Python27\lib\ctypes\macholib\dylib.py to ctypes\macholib\dylib.pyc
+byte-compiling c:\Python27\lib\ctypes\macholib\framework.py to ctypes\macholib\framework.pyc
+byte-compiling c:\Python27\lib\ctypes\util.py to ctypes\util.pyc
+byte-compiling c:\Python27\lib\ctypes\wintypes.py to ctypes\wintypes.pyc
+byte-compiling c:\Python27\lib\curses\__init__.py to curses\__init__.pyc
+byte-compiling c:\Python27\lib\curses\ascii.py to curses\ascii.pyc
+byte-compiling c:\Python27\lib\curses\has_key.py to curses\has_key.pyc
+byte-compiling c:\Python27\lib\curses\wrapper.py to curses\wrapper.pyc
+byte-compiling c:\Python27\lib\decimal.py to decimal.pyc
+byte-compiling c:\Python27\lib\difflib.py to difflib.pyc
+byte-compiling c:\Python27\lib\dis.py to dis.pyc
+byte-compiling c:\Python27\lib\distutils\__init__.py to distutils\__init__.pyc
+byte-compiling c:\Python27\lib\distutils\errors.py to distutils\errors.pyc
+byte-compiling c:\Python27\lib\distutils\log.py to distutils\log.pyc
+byte-compiling c:\Python27\lib\distutils\spawn.py to distutils\spawn.pyc
+byte-compiling c:\Python27\lib\doctest.py to doctest.pyc
+byte-compiling c:\Python27\lib\dummy_thread.py to dummy_thread.pyc
+byte-compiling c:\Python27\lib\dummy_threading.py to dummy_threading.pyc
+byte-compiling c:\Python27\lib\email\__init__.py to email\__init__.pyc
+byte-compiling c:\Python27\lib\email\_parseaddr.py to email\_parseaddr.pyc
+byte-compiling c:\Python27\lib\email\base64mime.py to email\base64mime.pyc
+byte-compiling c:\Python27\lib\email\charset.py to email\charset.pyc
+byte-compiling c:\Python27\lib\email\encoders.py to email\encoders.pyc
+byte-compiling c:\Python27\lib\email\errors.py to email\errors.pyc
+byte-compiling c:\Python27\lib\email\feedparser.py to email\feedparser.pyc
+byte-compiling c:\Python27\lib\email\generator.py to email\generator.pyc
+byte-compiling c:\Python27\lib\email\header.py to email\header.pyc
+byte-compiling c:\Python27\lib\email\iterators.py to email\iterators.pyc
+byte-compiling c:\Python27\lib\email\message.py to email\message.pyc
+byte-compiling c:\Python27\lib\email\mime\__init__.py to email\mime\__init__.pyc
+byte-compiling c:\Python27\lib\email\parser.py to email\parser.pyc
+byte-compiling c:\Python27\lib\email\quoprimime.py to email\quoprimime.pyc
+byte-compiling c:\Python27\lib\email\utils.py to email\utils.pyc
+byte-compiling c:\Python27\lib\encodings\__init__.py to encodings\__init__.pyc
+byte-compiling c:\Python27\lib\encodings\aliases.py to encodings\aliases.pyc
+byte-compiling c:\Python27\lib\encodings\ascii.py to encodings\ascii.pyc
+byte-compiling c:\Python27\lib\encodings\base64_codec.py to encodings\base64_codec.pyc
+byte-compiling c:\Python27\lib\encodings\big5.py to encodings\big5.pyc
+byte-compiling c:\Python27\lib\encodings\big5hkscs.py to encodings\big5hkscs.pyc
+byte-compiling c:\Python27\lib\encodings\bz2_codec.py to encodings\bz2_codec.pyc
+byte-compiling c:\Python27\lib\encodings\charmap.py to encodings\charmap.pyc
+byte-compiling c:\Python27\lib\encodings\cp037.py to encodings\cp037.pyc
+byte-compiling c:\Python27\lib\encodings\cp1006.py to encodings\cp1006.pyc
+byte-compiling c:\Python27\lib\encodings\cp1026.py to encodings\cp1026.pyc
+byte-compiling c:\Python27\lib\encodings\cp1140.py to encodings\cp1140.pyc
+byte-compiling c:\Python27\lib\encodings\cp1250.py to encodings\cp1250.pyc
+byte-compiling c:\Python27\lib\encodings\cp1251.py to encodings\cp1251.pyc
+byte-compiling c:\Python27\lib\encodings\cp1252.py to encodings\cp1252.pyc
+byte-compiling c:\Python27\lib\encodings\cp1253.py to encodings\cp1253.pyc
+byte-compiling c:\Python27\lib\encodings\cp1254.py to encodings\cp1254.pyc
+byte-compiling c:\Python27\lib\encodings\cp1255.py to encodings\cp1255.pyc
+byte-compiling c:\Python27\lib\encodings\cp1256.py to encodings\cp1256.pyc
+byte-compiling c:\Python27\lib\encodings\cp1257.py to encodings\cp1257.pyc
+byte-compiling c:\Python27\lib\encodings\cp1258.py to encodings\cp1258.pyc
+byte-compiling c:\Python27\lib\encodings\cp424.py to encodings\cp424.pyc
+byte-compiling c:\Python27\lib\encodings\cp437.py to encodings\cp437.pyc
+byte-compiling c:\Python27\lib\encodings\cp500.py to encodings\cp500.pyc
+byte-compiling c:\Python27\lib\encodings\cp720.py to encodings\cp720.pyc
+byte-compiling c:\Python27\lib\encodings\cp737.py to encodings\cp737.pyc
+byte-compiling c:\Python27\lib\encodings\cp775.py to encodings\cp775.pyc
+byte-compiling c:\Python27\lib\encodings\cp850.py to encodings\cp850.pyc
+byte-compiling c:\Python27\lib\encodings\cp852.py to encodings\cp852.pyc
+byte-compiling c:\Python27\lib\encodings\cp855.py to encodings\cp855.pyc
+byte-compiling c:\Python27\lib\encodings\cp856.py to encodings\cp856.pyc
+byte-compiling c:\Python27\lib\encodings\cp857.py to encodings\cp857.pyc
+byte-compiling c:\Python27\lib\encodings\cp858.py to encodings\cp858.pyc
+byte-compiling c:\Python27\lib\encodings\cp860.py to encodings\cp860.pyc
+byte-compiling c:\Python27\lib\encodings\cp861.py to encodings\cp861.pyc
+byte-compiling c:\Python27\lib\encodings\cp862.py to encodings\cp862.pyc
+byte-compiling c:\Python27\lib\encodings\cp863.py to encodings\cp863.pyc
+byte-compiling c:\Python27\lib\encodings\cp864.py to encodings\cp864.pyc
+byte-compiling c:\Python27\lib\encodings\cp865.py to encodings\cp865.pyc
+byte-compiling c:\Python27\lib\encodings\cp866.py to encodings\cp866.pyc
+byte-compiling c:\Python27\lib\encodings\cp869.py to encodings\cp869.pyc
+byte-compiling c:\Python27\lib\encodings\cp874.py to encodings\cp874.pyc
+byte-compiling c:\Python27\lib\encodings\cp875.py to encodings\cp875.pyc
+byte-compiling c:\Python27\lib\encodings\cp932.py to encodings\cp932.pyc
+byte-compiling c:\Python27\lib\encodings\cp949.py to encodings\cp949.pyc
+byte-compiling c:\Python27\lib\encodings\cp950.py to encodings\cp950.pyc
+byte-compiling c:\Python27\lib\encodings\euc_jis_2004.py to encodings\euc_jis_2004.pyc
+byte-compiling c:\Python27\lib\encodings\euc_jisx0213.py to encodings\euc_jisx0213.pyc
+byte-compiling c:\Python27\lib\encodings\euc_jp.py to encodings\euc_jp.pyc
+byte-compiling c:\Python27\lib\encodings\euc_kr.py to encodings\euc_kr.pyc
+byte-compiling c:\Python27\lib\encodings\gb18030.py to encodings\gb18030.pyc
+byte-compiling c:\Python27\lib\encodings\gb2312.py to encodings\gb2312.pyc
+byte-compiling c:\Python27\lib\encodings\gbk.py to encodings\gbk.pyc
+byte-compiling c:\Python27\lib\encodings\hex_codec.py to encodings\hex_codec.pyc
+byte-compiling c:\Python27\lib\encodings\hp_roman8.py to encodings\hp_roman8.pyc
+byte-compiling c:\Python27\lib\encodings\hz.py to encodings\hz.pyc
+byte-compiling c:\Python27\lib\encodings\idna.py to encodings\idna.pyc
+byte-compiling c:\Python27\lib\encodings\iso2022_jp.py to encodings\iso2022_jp.pyc
+byte-compiling c:\Python27\lib\encodings\iso2022_jp_1.py to encodings\iso2022_jp_1.pyc
+byte-compiling c:\Python27\lib\encodings\iso2022_jp_2.py to encodings\iso2022_jp_2.pyc
+byte-compiling c:\Python27\lib\encodings\iso2022_jp_2004.py to encodings\iso2022_jp_2004.pyc
+byte-compiling c:\Python27\lib\encodings\iso2022_jp_3.py to encodings\iso2022_jp_3.pyc
+byte-compiling c:\Python27\lib\encodings\iso2022_jp_ext.py to encodings\iso2022_jp_ext.pyc
+byte-compiling c:\Python27\lib\encodings\iso2022_kr.py to encodings\iso2022_kr.pyc
+byte-compiling c:\Python27\lib\encodings\iso8859_1.py to encodings\iso8859_1.pyc
+byte-compiling c:\Python27\lib\encodings\iso8859_10.py to encodings\iso8859_10.pyc
+byte-compiling c:\Python27\lib\encodings\iso8859_11.py to encodings\iso8859_11.pyc
+byte-compiling c:\Python27\lib\encodings\iso8859_13.py to encodings\iso8859_13.pyc
+byte-compiling c:\Python27\lib\encodings\iso8859_14.py to encodings\iso8859_14.pyc
+byte-compiling c:\Python27\lib\encodings\iso8859_15.py to encodings\iso8859_15.pyc
+byte-compiling c:\Python27\lib\encodings\iso8859_16.py to encodings\iso8859_16.pyc
+byte-compiling c:\Python27\lib\encodings\iso8859_2.py to encodings\iso8859_2.pyc
+byte-compiling c:\Python27\lib\encodings\iso8859_3.py to encodings\iso8859_3.pyc
+byte-compiling c:\Python27\lib\encodings\iso8859_4.py to encodings\iso8859_4.pyc
+byte-compiling c:\Python27\lib\encodings\iso8859_5.py to encodings\iso8859_5.pyc
+byte-compiling c:\Python27\lib\encodings\iso8859_6.py to encodings\iso8859_6.pyc
+byte-compiling c:\Python27\lib\encodings\iso8859_7.py to encodings\iso8859_7.pyc
+byte-compiling c:\Python27\lib\encodings\iso8859_8.py to encodings\iso8859_8.pyc
+byte-compiling c:\Python27\lib\encodings\iso8859_9.py to encodings\iso8859_9.pyc
+byte-compiling c:\Python27\lib\encodings\johab.py to encodings\johab.pyc
+byte-compiling c:\Python27\lib\encodings\koi8_r.py to encodings\koi8_r.pyc
+byte-compiling c:\Python27\lib\encodings\koi8_u.py to encodings\koi8_u.pyc
+byte-compiling c:\Python27\lib\encodings\latin_1.py to encodings\latin_1.pyc
+byte-compiling c:\Python27\lib\encodings\mac_arabic.py to encodings\mac_arabic.pyc
+byte-compiling c:\Python27\lib\encodings\mac_centeuro.py to encodings\mac_centeuro.pyc
+byte-compiling c:\Python27\lib\encodings\mac_croatian.py to encodings\mac_croatian.pyc
+byte-compiling c:\Python27\lib\encodings\mac_cyrillic.py to encodings\mac_cyrillic.pyc
+byte-compiling c:\Python27\lib\encodings\mac_farsi.py to encodings\mac_farsi.pyc
+byte-compiling c:\Python27\lib\encodings\mac_greek.py to encodings\mac_greek.pyc
+byte-compiling c:\Python27\lib\encodings\mac_iceland.py to encodings\mac_iceland.pyc
+byte-compiling c:\Python27\lib\encodings\mac_latin2.py to encodings\mac_latin2.pyc
+byte-compiling c:\Python27\lib\encodings\mac_roman.py to encodings\mac_roman.pyc
+byte-compiling c:\Python27\lib\encodings\mac_romanian.py to encodings\mac_romanian.pyc
+byte-compiling c:\Python27\lib\encodings\mac_turkish.py to encodings\mac_turkish.pyc
+byte-compiling c:\Python27\lib\encodings\mbcs.py to encodings\mbcs.pyc
+byte-compiling c:\Python27\lib\encodings\palmos.py to encodings\palmos.pyc
+byte-compiling c:\Python27\lib\encodings\ptcp154.py to encodings\ptcp154.pyc
+byte-compiling c:\Python27\lib\encodings\punycode.py to encodings\punycode.pyc
+byte-compiling c:\Python27\lib\encodings\quopri_codec.py to encodings\quopri_codec.pyc
+byte-compiling c:\Python27\lib\encodings\raw_unicode_escape.py to encodings\raw_unicode_escape.pyc
+byte-compiling c:\Python27\lib\encodings\rot_13.py to encodings\rot_13.pyc
+byte-compiling c:\Python27\lib\encodings\shift_jis.py to encodings\shift_jis.pyc
+byte-compiling c:\Python27\lib\encodings\shift_jis_2004.py to encodings\shift_jis_2004.pyc
+byte-compiling c:\Python27\lib\encodings\shift_jisx0213.py to encodings\shift_jisx0213.pyc
+byte-compiling c:\Python27\lib\encodings\string_escape.py to encodings\string_escape.pyc
+byte-compiling c:\Python27\lib\encodings\tis_620.py to encodings\tis_620.pyc
+byte-compiling c:\Python27\lib\encodings\undefined.py to encodings\undefined.pyc
+byte-compiling c:\Python27\lib\encodings\unicode_escape.py to encodings\unicode_escape.pyc
+byte-compiling c:\Python27\lib\encodings\unicode_internal.py to encodings\unicode_internal.pyc
+byte-compiling c:\Python27\lib\encodings\utf_16.py to encodings\utf_16.pyc
+byte-compiling c:\Python27\lib\encodings\utf_16_be.py to encodings\utf_16_be.pyc
+byte-compiling c:\Python27\lib\encodings\utf_16_le.py to encodings\utf_16_le.pyc
+byte-compiling c:\Python27\lib\encodings\utf_32.py to encodings\utf_32.pyc
+byte-compiling c:\Python27\lib\encodings\utf_32_be.py to encodings\utf_32_be.pyc
+byte-compiling c:\Python27\lib\encodings\utf_32_le.py to encodings\utf_32_le.pyc
+byte-compiling c:\Python27\lib\encodings\utf_7.py to encodings\utf_7.pyc
+byte-compiling c:\Python27\lib\encodings\utf_8.py to encodings\utf_8.pyc
+byte-compiling c:\Python27\lib\encodings\utf_8_sig.py to encodings\utf_8_sig.pyc
+byte-compiling c:\Python27\lib\encodings\uu_codec.py to encodings\uu_codec.pyc
+byte-compiling c:\Python27\lib\encodings\zlib_codec.py to encodings\zlib_codec.pyc
+byte-compiling c:\Python27\lib\fnmatch.py to fnmatch.pyc
+byte-compiling c:\Python27\lib\ftplib.py to ftplib.pyc
+byte-compiling c:\Python27\lib\functools.py to functools.pyc
+byte-compiling c:\Python27\lib\genericpath.py to genericpath.pyc
+byte-compiling c:\Python27\lib\getopt.py to getopt.pyc
+byte-compiling c:\Python27\lib\getpass.py to getpass.pyc
+byte-compiling c:\Python27\lib\gettext.py to gettext.pyc
+byte-compiling c:\Python27\lib\glob.py to glob.pyc
+byte-compiling c:\Python27\lib\gzip.py to gzip.pyc
+byte-compiling c:\Python27\lib\hashlib.py to hashlib.pyc
+byte-compiling c:\Python27\lib\heapq.py to heapq.pyc
+byte-compiling c:\Python27\lib\hmac.py to hmac.pyc
+byte-compiling c:\Python27\lib\htmlentitydefs.py to htmlentitydefs.pyc
+byte-compiling c:\Python27\lib\httplib.py to httplib.pyc
+byte-compiling c:\Python27\lib\inspect.py to inspect.pyc
+byte-compiling c:\Python27\lib\io.py to io.pyc
+byte-compiling c:\Python27\lib\json\__init__.py to json\__init__.pyc
+byte-compiling c:\Python27\lib\json\decoder.py to json\decoder.pyc
+byte-compiling c:\Python27\lib\json\encoder.py to json\encoder.pyc
+byte-compiling c:\Python27\lib\json\scanner.py to json\scanner.pyc
+byte-compiling c:\Python27\lib\keyword.py to keyword.pyc
+byte-compiling c:\Python27\lib\linecache.py to linecache.pyc
+byte-compiling c:\Python27\lib\locale.py to locale.pyc
+byte-compiling c:\Python27\lib\logging\__init__.py to logging\__init__.pyc
+byte-compiling c:\Python27\lib\logging\handlers.py to logging\handlers.pyc
+byte-compiling c:\Python27\lib\mailcap.py to mailcap.pyc
+byte-compiling c:\Python27\lib\md5.py to md5.pyc
+byte-compiling c:\Python27\lib\mimetools.py to mimetools.pyc
+byte-compiling c:\Python27\lib\mimetypes.py to mimetypes.pyc
+byte-compiling c:\Python27\lib\multiprocessing\__init__.py to multiprocessing\__init__.pyc
+byte-compiling c:\Python27\lib\multiprocessing\connection.py to multiprocessing\connection.pyc
+byte-compiling c:\Python27\lib\multiprocessing\dummy\__init__.py to multiprocessing\dummy\__init__.pyc
+byte-compiling c:\Python27\lib\multiprocessing\dummy\connection.py to multiprocessing\dummy\connection.pyc
+byte-compiling c:\Python27\lib\multiprocessing\forking.py to multiprocessing\forking.pyc
+byte-compiling c:\Python27\lib\multiprocessing\heap.py to multiprocessing\heap.pyc
+byte-compiling c:\Python27\lib\multiprocessing\managers.py to multiprocessing\managers.pyc
+byte-compiling c:\Python27\lib\multiprocessing\pool.py to multiprocessing\pool.pyc
+byte-compiling c:\Python27\lib\multiprocessing\process.py to multiprocessing\process.pyc
+byte-compiling c:\Python27\lib\multiprocessing\queues.py to multiprocessing\queues.pyc
+byte-compiling c:\Python27\lib\multiprocessing\reduction.py to multiprocessing\reduction.pyc
+byte-compiling c:\Python27\lib\multiprocessing\sharedctypes.py to multiprocessing\sharedctypes.pyc
+byte-compiling c:\Python27\lib\multiprocessing\synchronize.py to multiprocessing\synchronize.pyc
+byte-compiling c:\Python27\lib\multiprocessing\util.py to multiprocessing\util.pyc
+byte-compiling c:\Python27\lib\new.py to new.pyc
+byte-compiling c:\Python27\lib\ntpath.py to ntpath.pyc
+byte-compiling c:\Python27\lib\nturl2path.py to nturl2path.pyc
+byte-compiling c:\Python27\lib\numbers.py to numbers.pyc
+byte-compiling c:\Python27\lib\opcode.py to opcode.pyc
+byte-compiling c:\Python27\lib\optparse.py to optparse.pyc
+byte-compiling c:\Python27\lib\os.py to os.pyc
+byte-compiling c:\Python27\lib\os2emxpath.py to os2emxpath.pyc
+byte-compiling c:\Python27\lib\pdb.py to pdb.pyc
+byte-compiling c:\Python27\lib\pickle.py to pickle.pyc
+byte-compiling c:\Python27\lib\pkgutil.py to pkgutil.pyc
+byte-compiling c:\Python27\lib\posixpath.py to posixpath.pyc
+byte-compiling c:\Python27\lib\pprint.py to pprint.pyc
+byte-compiling c:\Python27\lib\pstats.py to pstats.pyc
+byte-compiling c:\Python27\lib\py_compile.py to py_compile.pyc
+byte-compiling c:\Python27\lib\quopri.py to quopri.pyc
+byte-compiling c:\Python27\lib\random.py to random.pyc
+byte-compiling c:\Python27\lib\re.py to re.pyc
+byte-compiling c:\Python27\lib\repr.py to repr.pyc
+byte-compiling c:\Python27\lib\rfc822.py to rfc822.pyc
+byte-compiling c:\Python27\lib\runpy.py to runpy.pyc
+byte-compiling c:\Python27\lib\sets.py to sets.pyc
+byte-compiling c:\Python27\lib\sha.py to sha.pyc
+byte-compiling c:\Python27\lib\shlex.py to shlex.pyc
+byte-compiling c:\Python27\lib\shutil.py to shutil.pyc
+byte-compiling c:\Python27\lib\site-packages\M2Crypto\ASN1.py to M2Crypto\ASN1.pyc
+byte-compiling c:\Python27\lib\site-packages\M2Crypto\AuthCookie.py to M2Crypto\AuthCookie.pyc
+byte-compiling c:\Python27\lib\site-packages\M2Crypto\BIO.py to M2Crypto\BIO.pyc
+byte-compiling c:\Python27\lib\site-packages\M2Crypto\BN.py to M2Crypto\BN.pyc
+byte-compiling c:\Python27\lib\site-packages\M2Crypto\DH.py to M2Crypto\DH.pyc
+byte-compiling c:\Python27\lib\site-packages\M2Crypto\DSA.py to M2Crypto\DSA.pyc
+byte-compiling c:\Python27\lib\site-packages\M2Crypto\EC.py to M2Crypto\EC.pyc
+byte-compiling c:\Python27\lib\site-packages\M2Crypto\EVP.py to M2Crypto\EVP.pyc
+byte-compiling c:\Python27\lib\site-packages\M2Crypto\Engine.py to M2Crypto\Engine.pyc
+byte-compiling c:\Python27\lib\site-packages\M2Crypto\Err.py to M2Crypto\Err.pyc
+byte-compiling c:\Python27\lib\site-packages\M2Crypto\PGP\PublicKey.py to M2Crypto\PGP\PublicKey.pyc
+byte-compiling c:\Python27\lib\site-packages\M2Crypto\PGP\PublicKeyRing.py to M2Crypto\PGP\PublicKeyRing.pyc
+byte-compiling c:\Python27\lib\site-packages\M2Crypto\PGP\RSA.py to M2Crypto\PGP\RSA.pyc
+byte-compiling c:\Python27\lib\site-packages\M2Crypto\PGP\__init__.py to M2Crypto\PGP\__init__.pyc
+byte-compiling c:\Python27\lib\site-packages\M2Crypto\PGP\constants.py to M2Crypto\PGP\constants.pyc
+byte-compiling c:\Python27\lib\site-packages\M2Crypto\PGP\packet.py to M2Crypto\PGP\packet.pyc
+byte-compiling c:\Python27\lib\site-packages\M2Crypto\RC4.py to M2Crypto\RC4.pyc
+byte-compiling c:\Python27\lib\site-packages\M2Crypto\RSA.py to M2Crypto\RSA.pyc
+byte-compiling c:\Python27\lib\site-packages\M2Crypto\Rand.py to M2Crypto\Rand.pyc
+byte-compiling c:\Python27\lib\site-packages\M2Crypto\SMIME.py to M2Crypto\SMIME.pyc
+byte-compiling c:\Python27\lib\site-packages\M2Crypto\SSL\Checker.py to M2Crypto\SSL\Checker.pyc
+byte-compiling c:\Python27\lib\site-packages\M2Crypto\SSL\Cipher.py to M2Crypto\SSL\Cipher.pyc
+byte-compiling c:\Python27\lib\site-packages\M2Crypto\SSL\Connection.py to M2Crypto\SSL\Connection.pyc
+byte-compiling c:\Python27\lib\site-packages\M2Crypto\SSL\Context.py to M2Crypto\SSL\Context.pyc
+byte-compiling c:\Python27\lib\site-packages\M2Crypto\SSL\SSLServer.py to M2Crypto\SSL\SSLServer.pyc
+byte-compiling c:\Python27\lib\site-packages\M2Crypto\SSL\Session.py to M2Crypto\SSL\Session.pyc
+byte-compiling c:\Python27\lib\site-packages\M2Crypto\SSL\__init__.py to M2Crypto\SSL\__init__.pyc
+byte-compiling c:\Python27\lib\site-packages\M2Crypto\SSL\cb.py to M2Crypto\SSL\cb.pyc
+byte-compiling c:\Python27\lib\site-packages\M2Crypto\SSL\ssl_dispatcher.py to M2Crypto\SSL\ssl_dispatcher.pyc
+byte-compiling c:\Python27\lib\site-packages\M2Crypto\SSL\timeout.py to M2Crypto\SSL\timeout.pyc
+byte-compiling c:\Python27\lib\site-packages\M2Crypto\X509.py to M2Crypto\X509.pyc
+byte-compiling c:\Python27\lib\site-packages\M2Crypto\__init__.py to M2Crypto\__init__.pyc
+byte-compiling c:\Python27\lib\site-packages\M2Crypto\ftpslib.py to M2Crypto\ftpslib.pyc
+byte-compiling c:\Python27\lib\site-packages\M2Crypto\httpslib.py to M2Crypto\httpslib.pyc
+byte-compiling c:\Python27\lib\site-packages\M2Crypto\m2.py to M2Crypto\m2.pyc
+byte-compiling c:\Python27\lib\site-packages\M2Crypto\m2urllib.py to M2Crypto\m2urllib.pyc
+byte-compiling c:\Python27\lib\site-packages\M2Crypto\m2urllib2.py to M2Crypto\m2urllib2.pyc
+byte-compiling c:\Python27\lib\site-packages\M2Crypto\m2xmlrpclib.py to M2Crypto\m2xmlrpclib.pyc
+byte-compiling c:\Python27\lib\site-packages\M2Crypto\threading.py to M2Crypto\threading.pyc
+byte-compiling c:\Python27\lib\site-packages\M2Crypto\util.py to M2Crypto\util.pyc
+byte-compiling c:\Python27\lib\site-packages\Pythonwin\pywin\__init__.py to pywin\__init__.pyc
+byte-compiling c:\Python27\lib\site-packages\Pythonwin\pywin\dialogs\__init__.py to pywin\dialogs\__init__.pyc
+byte-compiling c:\Python27\lib\site-packages\Pythonwin\pywin\dialogs\list.py to pywin\dialogs\list.pyc
+byte-compiling c:\Python27\lib\site-packages\Pythonwin\pywin\dialogs\status.py to pywin\dialogs\status.pyc
+byte-compiling c:\Python27\lib\site-packages\Pythonwin\pywin\mfc\__init__.py to pywin\mfc\__init__.pyc
+byte-compiling c:\Python27\lib\site-packages\Pythonwin\pywin\mfc\dialog.py to pywin\mfc\dialog.pyc
+byte-compiling c:\Python27\lib\site-packages\Pythonwin\pywin\mfc\object.py to pywin\mfc\object.pyc
+byte-compiling c:\Python27\lib\site-packages\Pythonwin\pywin\mfc\thread.py to pywin\mfc\thread.pyc
+byte-compiling c:\Python27\lib\site-packages\Pythonwin\pywin\mfc\window.py to pywin\mfc\window.pyc
+byte-compiling c:\Python27\lib\site-packages\django\__init__.py to django\__init__.pyc
+byte-compiling c:\Python27\lib\site-packages\django\utils\__init__.py to django\utils\__init__.pyc
+byte-compiling c:\Python27\lib\site-packages\django\utils\simplejson\__init__.py to django\utils\simplejson\__init__.pyc
+byte-compiling c:\Python27\lib\site-packages\django\utils\simplejson\decoder.py to django\utils\simplejson\decoder.pyc
+byte-compiling c:\Python27\lib\site-packages\django\utils\simplejson\encoder.py to django\utils\simplejson\encoder.pyc
+byte-compiling c:\Python27\lib\site-packages\django\utils\simplejson\scanner.py to django\utils\simplejson\scanner.pyc
+byte-compiling c:\Python27\lib\site-packages\django\utils\version.py to django\utils\version.pyc
+byte-compiling c:\Python27\lib\site-packages\pythoncom.py to pythoncom.pyc
+byte-compiling c:\Python27\lib\site-packages\simplejson-2.5.2-py2.7.egg\simplejson\__init__.py to simplejson\__init__.pyc
+byte-compiling c:\Python27\lib\site-packages\simplejson-2.5.2-py2.7.egg\simplejson\decoder.py to simplejson\decoder.pyc
+byte-compiling c:\Python27\lib\site-packages\simplejson-2.5.2-py2.7.egg\simplejson\encoder.py to simplejson\encoder.pyc
+byte-compiling c:\Python27\lib\site-packages\simplejson-2.5.2-py2.7.egg\simplejson\ordered_dict.py to simplejson\ordered_dict.pyc
+byte-compiling c:\Python27\lib\site-packages\simplejson-2.5.2-py2.7.egg\simplejson\scanner.py to simplejson\scanner.pyc
+byte-compiling c:\Python27\lib\site-packages\sockjs\__init__.py to sockjs\__init__.pyc
+byte-compiling c:\Python27\lib\site-packages\sockjs\tornado\__init__.py to sockjs\tornado\__init__.pyc
+byte-compiling c:\Python27\lib\site-packages\sockjs\tornado\basehandler.py to sockjs\tornado\basehandler.pyc
+byte-compiling c:\Python27\lib\site-packages\sockjs\tornado\conn.py to sockjs\tornado\conn.pyc
+byte-compiling c:\Python27\lib\site-packages\sockjs\tornado\periodic.py to sockjs\tornado\periodic.pyc
+byte-compiling c:\Python27\lib\site-packages\sockjs\tornado\proto.py to sockjs\tornado\proto.pyc
+byte-compiling c:\Python27\lib\site-packages\sockjs\tornado\router.py to sockjs\tornado\router.pyc
+byte-compiling c:\Python27\lib\site-packages\sockjs\tornado\session.py to sockjs\tornado\session.pyc
+byte-compiling c:\Python27\lib\site-packages\sockjs\tornado\sessioncontainer.py to sockjs\tornado\sessioncontainer.pyc
+byte-compiling c:\Python27\lib\site-packages\sockjs\tornado\static.py to sockjs\tornado\static.pyc
+byte-compiling c:\Python27\lib\site-packages\sockjs\tornado\stats.py to sockjs\tornado\stats.pyc
+byte-compiling c:\Python27\lib\site-packages\sockjs\tornado\transports\__init__.py to sockjs\tornado\transports\__init__.pyc
+byte-compiling c:\Python27\lib\site-packages\sockjs\tornado\transports\base.py to sockjs\tornado\transports\base.pyc
+byte-compiling c:\Python27\lib\site-packages\sockjs\tornado\transports\eventsource.py to sockjs\tornado\transports\eventsource.pyc
+byte-compiling c:\Python27\lib\site-packages\sockjs\tornado\transports\htmlfile.py to sockjs\tornado\transports\htmlfile.pyc
+byte-compiling c:\Python27\lib\site-packages\sockjs\tornado\transports\jsonp.py to sockjs\tornado\transports\jsonp.pyc
+byte-compiling c:\Python27\lib\site-packages\sockjs\tornado\transports\pollingbase.py to sockjs\tornado\transports\pollingbase.pyc
+byte-compiling c:\Python27\lib\site-packages\sockjs\tornado\transports\rawwebsocket.py to sockjs\tornado\transports\rawwebsocket.pyc
+byte-compiling c:\Python27\lib\site-packages\sockjs\tornado\transports\streamingbase.py to sockjs\tornado\transports\streamingbase.pyc
+byte-compiling c:\Python27\lib\site-packages\sockjs\tornado\transports\websocket.py to sockjs\tornado\transports\websocket.pyc
+byte-compiling c:\Python27\lib\site-packages\sockjs\tornado\transports\xhr.py to sockjs\tornado\transports\xhr.pyc
+byte-compiling c:\Python27\lib\site-packages\sockjs\tornado\transports\xhrstreaming.py to sockjs\tornado\transports\xhrstreaming.pyc
+byte-compiling c:\Python27\lib\site-packages\sockjs\tornado\websocket.py to sockjs\tornado\websocket.pyc
+byte-compiling c:\Python27\lib\site-packages\tornado-2.4.1-py2.7.egg\tornado\__init__.py to tornado\__init__.pyc
+byte-compiling c:\Python27\lib\site-packages\tornado-2.4.1-py2.7.egg\tornado\autoreload.py to tornado\autoreload.pyc
+byte-compiling c:\Python27\lib\site-packages\tornado-2.4.1-py2.7.egg\tornado\escape.py to tornado\escape.pyc
+byte-compiling c:\Python27\lib\site-packages\tornado-2.4.1-py2.7.egg\tornado\httpserver.py to tornado\httpserver.pyc
+byte-compiling c:\Python27\lib\site-packages\tornado-2.4.1-py2.7.egg\tornado\httputil.py to tornado\httputil.pyc
+byte-compiling c:\Python27\lib\site-packages\tornado-2.4.1-py2.7.egg\tornado\ioloop.py to tornado\ioloop.pyc
+byte-compiling c:\Python27\lib\site-packages\tornado-2.4.1-py2.7.egg\tornado\iostream.py to tornado\iostream.pyc
+byte-compiling c:\Python27\lib\site-packages\tornado-2.4.1-py2.7.egg\tornado\locale.py to tornado\locale.pyc
+byte-compiling c:\Python27\lib\site-packages\tornado-2.4.1-py2.7.egg\tornado\netutil.py to tornado\netutil.pyc
+byte-compiling c:\Python27\lib\site-packages\tornado-2.4.1-py2.7.egg\tornado\platform\__init__.py to tornado\platform\__init__.pyc
+byte-compiling c:\Python27\lib\site-packages\tornado-2.4.1-py2.7.egg\tornado\platform\auto.py to tornado\platform\auto.pyc
+byte-compiling c:\Python27\lib\site-packages\tornado-2.4.1-py2.7.egg\tornado\platform\common.py to tornado\platform\common.pyc
+byte-compiling c:\Python27\lib\site-packages\tornado-2.4.1-py2.7.egg\tornado\platform\interface.py to tornado\platform\interface.pyc
+byte-compiling c:\Python27\lib\site-packages\tornado-2.4.1-py2.7.egg\tornado\platform\posix.py to tornado\platform\posix.pyc
+byte-compiling c:\Python27\lib\site-packages\tornado-2.4.1-py2.7.egg\tornado\platform\windows.py to tornado\platform\windows.pyc
+byte-compiling c:\Python27\lib\site-packages\tornado-2.4.1-py2.7.egg\tornado\process.py to tornado\process.pyc
+byte-compiling c:\Python27\lib\site-packages\tornado-2.4.1-py2.7.egg\tornado\stack_context.py to tornado\stack_context.pyc
+byte-compiling c:\Python27\lib\site-packages\tornado-2.4.1-py2.7.egg\tornado\template.py to tornado\template.pyc
+byte-compiling c:\Python27\lib\site-packages\tornado-2.4.1-py2.7.egg\tornado\util.py to tornado\util.pyc
+byte-compiling c:\Python27\lib\site-packages\tornado-2.4.1-py2.7.egg\tornado\web.py to tornado\web.pyc
+byte-compiling c:\Python27\lib\site-packages\win32\lib\commctrl.py to commctrl.pyc
+byte-compiling c:\Python27\lib\site-packages\win32\lib\netbios.py to netbios.pyc
+byte-compiling c:\Python27\lib\site-packages\win32\lib\pywintypes.py to pywintypes.pyc
+byte-compiling c:\Python27\lib\site-packages\win32\lib\win32con.py to win32con.pyc
+byte-compiling c:\Python27\lib\site-packages\win32\lib\win32evtlogutil.py to win32evtlogutil.pyc
+byte-compiling c:\Python27\lib\site-packages\win32\lib\winerror.py to winerror.pyc
+byte-compiling c:\Python27\lib\site-packages\win32com\__init__.py to win32com\__init__.pyc
+byte-compiling c:\Python27\lib\site-packages\win32com\client\CLSIDToClass.py to win32com\client\CLSIDToClass.pyc
+byte-compiling c:\Python27\lib\site-packages\win32com\client\__init__.py to win32com\client\__init__.pyc
+byte-compiling c:\Python27\lib\site-packages\win32com\client\build.py to win32com\client\build.pyc
+byte-compiling c:\Python27\lib\site-packages\win32com\client\dynamic.py to win32com\client\dynamic.pyc
+byte-compiling c:\Python27\lib\site-packages\win32com\client\gencache.py to win32com\client\gencache.pyc
+byte-compiling c:\Python27\lib\site-packages\win32com\client\genpy.py to win32com\client\genpy.pyc
+byte-compiling c:\Python27\lib\site-packages\win32com\client\makepy.py to win32com\client\makepy.pyc
+byte-compiling c:\Python27\lib\site-packages\win32com\client\selecttlb.py to win32com\client\selecttlb.pyc
+byte-compiling c:\Python27\lib\site-packages\win32com\client\util.py to win32com\client\util.pyc
+byte-compiling c:\Python27\lib\site-packages\win32com\gen_py\__init__.py to win32com\gen_py\__init__.pyc
+byte-compiling c:\Python27\lib\site-packages\wx-2.8-msw-unicode\wx\__init__.py to wx\__init__.pyc
+byte-compiling c:\Python27\lib\site-packages\wx-2.8-msw-unicode\wx\__version__.py to wx\__version__.pyc
+byte-compiling c:\Python27\lib\site-packages\wx-2.8-msw-unicode\wx\_controls.py to wx\_controls.pyc
+byte-compiling c:\Python27\lib\site-packages\wx-2.8-msw-unicode\wx\_core.py to wx\_core.pyc
+byte-compiling c:\Python27\lib\site-packages\wx-2.8-msw-unicode\wx\_gdi.py to wx\_gdi.pyc
+byte-compiling c:\Python27\lib\site-packages\wx-2.8-msw-unicode\wx\_misc.py to wx\_misc.pyc
+byte-compiling c:\Python27\lib\site-packages\wx-2.8-msw-unicode\wx\_windows.py to wx\_windows.pyc
+byte-compiling c:\Python27\lib\site-packages\wxversion.py to wxversion.pyc
+byte-compiling c:\Python27\lib\smtplib.py to smtplib.pyc
+byte-compiling c:\Python27\lib\socket.py to socket.pyc
+byte-compiling c:\Python27\lib\sqlite3\__init__.py to sqlite3\__init__.pyc
+byte-compiling c:\Python27\lib\sqlite3\dbapi2.py to sqlite3\dbapi2.pyc
+byte-compiling c:\Python27\lib\sre.py to sre.pyc
+byte-compiling c:\Python27\lib\sre_compile.py to sre_compile.pyc
+byte-compiling c:\Python27\lib\sre_constants.py to sre_constants.pyc
+byte-compiling c:\Python27\lib\sre_parse.py to sre_parse.pyc
+byte-compiling c:\Python27\lib\ssl.py to ssl.pyc
+byte-compiling c:\Python27\lib\stat.py to stat.pyc
+byte-compiling c:\Python27\lib\statvfs.py to statvfs.pyc
+byte-compiling c:\Python27\lib\string.py to string.pyc
+byte-compiling c:\Python27\lib\stringprep.py to stringprep.pyc
+byte-compiling c:\Python27\lib\struct.py to struct.pyc
+byte-compiling c:\Python27\lib\subprocess.py to subprocess.pyc
+byte-compiling c:\Python27\lib\tarfile.py to tarfile.pyc
+byte-compiling c:\Python27\lib\tempfile.py to tempfile.pyc
+byte-compiling c:\Python27\lib\textwrap.py to textwrap.pyc
+byte-compiling c:\Python27\lib\threading.py to threading.pyc
+byte-compiling c:\Python27\lib\token.py to token.pyc
+byte-compiling c:\Python27\lib\tokenize.py to tokenize.pyc
+byte-compiling c:\Python27\lib\traceback.py to traceback.pyc
+byte-compiling c:\Python27\lib\types.py to types.pyc
+byte-compiling c:\Python27\lib\unittest\__init__.py to unittest\__init__.pyc
+byte-compiling c:\Python27\lib\unittest\case.py to unittest\case.pyc
+byte-compiling c:\Python27\lib\unittest\loader.py to unittest\loader.pyc
+byte-compiling c:\Python27\lib\unittest\main.py to unittest\main.pyc
+byte-compiling c:\Python27\lib\unittest\result.py to unittest\result.pyc
+byte-compiling c:\Python27\lib\unittest\runner.py to unittest\runner.pyc
+byte-compiling c:\Python27\lib\unittest\signals.py to unittest\signals.pyc
+byte-compiling c:\Python27\lib\unittest\suite.py to unittest\suite.pyc
+byte-compiling c:\Python27\lib\unittest\util.py to unittest\util.pyc
+byte-compiling c:\Python27\lib\urllib.py to urllib.pyc
+byte-compiling c:\Python27\lib\urllib2.py to urllib2.pyc
+byte-compiling c:\Python27\lib\urlparse.py to urlparse.pyc
+byte-compiling c:\Python27\lib\uu.py to uu.pyc
+byte-compiling c:\Python27\lib\uuid.py to uuid.pyc
+byte-compiling c:\Python27\lib\warnings.py to warnings.pyc
+byte-compiling c:\Python27\lib\weakref.py to weakref.pyc
+byte-compiling c:\Python27\lib\webbrowser.py to webbrowser.pyc
+byte-compiling c:\Python27\lib\xml\__init__.py to xml\__init__.pyc
+byte-compiling c:\Python27\lib\xml\dom\NodeFilter.py to xml\dom\NodeFilter.pyc
+byte-compiling c:\Python27\lib\xml\dom\__init__.py to xml\dom\__init__.pyc
+byte-compiling c:\Python27\lib\xml\dom\domreg.py to xml\dom\domreg.pyc
+byte-compiling c:\Python27\lib\xml\dom\expatbuilder.py to xml\dom\expatbuilder.pyc
+byte-compiling c:\Python27\lib\xml\dom\minicompat.py to xml\dom\minicompat.pyc
+byte-compiling c:\Python27\lib\xml\dom\minidom.py to xml\dom\minidom.pyc
+byte-compiling c:\Python27\lib\xml\dom\pulldom.py to xml\dom\pulldom.pyc
+byte-compiling c:\Python27\lib\xml\dom\xmlbuilder.py to xml\dom\xmlbuilder.pyc
+byte-compiling c:\Python27\lib\xml\etree\ElementPath.py to xml\etree\ElementPath.pyc
+byte-compiling c:\Python27\lib\xml\etree\ElementTree.py to xml\etree\ElementTree.pyc
+byte-compiling c:\Python27\lib\xml\etree\__init__.py to xml\etree\__init__.pyc
+byte-compiling c:\Python27\lib\xml\parsers\__init__.py to xml\parsers\__init__.pyc
+byte-compiling c:\Python27\lib\xml\parsers\expat.py to xml\parsers\expat.pyc
+byte-compiling c:\Python27\lib\xml\sax\__init__.py to xml\sax\__init__.pyc
+byte-compiling c:\Python27\lib\xml\sax\_exceptions.py to xml\sax\_exceptions.pyc
+byte-compiling c:\Python27\lib\xml\sax\expatreader.py to xml\sax\expatreader.pyc
+byte-compiling c:\Python27\lib\xml\sax\handler.py to xml\sax\handler.pyc
+byte-compiling c:\Python27\lib\xml\sax\saxutils.py to xml\sax\saxutils.pyc
+byte-compiling c:\Python27\lib\xml\sax\xmlreader.py to xml\sax\xmlreader.pyc
+byte-compiling c:\Python27\lib\xmllib.py to xmllib.pyc
+byte-compiling c:\Python27\lib\xmlrpclib.py to xmlrpclib.pyc
+byte-compiling c:\Python27\lib\zipfile.py to zipfile.pyc
+removing c:\users\kos\appdata\local\temp\tmprtb2vt.py
+*** copy extensions ***
+copying c:\Python27\DLLs\_ctypes.pyd -> C:\Prog\Anaconda\dist
+copying c:\Python27\DLLs\_hashlib.pyd -> C:\Prog\Anaconda\dist
+copying c:\Python27\DLLs\_multiprocessing.pyd -> C:\Prog\Anaconda\dist
+copying c:\Python27\DLLs\_socket.pyd -> C:\Prog\Anaconda\dist
+copying c:\Python27\DLLs\_sqlite3.pyd -> C:\Prog\Anaconda\dist
+copying c:\Python27\DLLs\_ssl.pyd -> C:\Prog\Anaconda\dist
+copying c:\Python27\DLLs\bz2.pyd -> C:\Prog\Anaconda\dist
+copying c:\Python27\DLLs\pyexpat.pyd -> C:\Prog\Anaconda\dist
+copying c:\Python27\DLLs\select.pyd -> C:\Prog\Anaconda\dist
+copying c:\Python27\DLLs\unicodedata.pyd -> C:\Prog\Anaconda\dist
+copying c:\Python27\lib\site-packages\M2Crypto\__m2crypto.pyd -> C:\Prog\Anaconda\dist\M2Crypto.__m2crypto.pyd
+copying c:\Python27\lib\site-packages\Pythonwin\win32ui.pyd -> C:\Prog\Anaconda\dist
+copying c:\Python27\lib\site-packages\apsw.pyd -> C:\Prog\Anaconda\dist
+copying c:\Python27\lib\site-packages\win32\_win32sysloader.pyd -> C:\Prog\Anaconda\dist
+copying c:\Python27\lib\site-packages\win32\win32api.pyd -> C:\Prog\Anaconda\dist
+copying c:\Python27\lib\site-packages\win32\win32event.pyd -> C:\Prog\Anaconda\dist
+copying c:\Python27\lib\site-packages\win32\win32evtlog.pyd -> C:\Prog\Anaconda\dist
+copying c:\Python27\lib\site-packages\win32\win32file.pyd -> C:\Prog\Anaconda\dist
+copying c:\Python27\lib\site-packages\win32\win32pdh.pyd -> C:\Prog\Anaconda\dist
+copying c:\Python27\lib\site-packages\win32\win32wnet.pyd -> C:\Prog\Anaconda\dist
+copying c:\Python27\lib\site-packages\wx-2.8-msw-unicode\wx\_controls_.pyd -> C:\Prog\Anaconda\dist\wx._controls_.pyd
+copying c:\Python27\lib\site-packages\wx-2.8-msw-unicode\wx\_core_.pyd -> C:\Prog\Anaconda\dist\wx._core_.pyd
+copying c:\Python27\lib\site-packages\wx-2.8-msw-unicode\wx\_gdi_.pyd -> C:\Prog\Anaconda\dist\wx._gdi_.pyd
+copying c:\Python27\lib\site-packages\wx-2.8-msw-unicode\wx\_misc_.pyd -> C:\Prog\Anaconda\dist\wx._misc_.pyd
+copying c:\Python27\lib\site-packages\wx-2.8-msw-unicode\wx\_windows_.pyd -> C:\Prog\Anaconda\dist\wx._windows_.pyd
+*** copy dlls ***
+copying C:\Windows\system32\API-MS-Win-Core-SysInfo-L1-1-0.dll -> C:\Prog\Anaconda\dist
+copying C:\Windows\system32\API-MS-Win-Core-Handle-L1-1-0.dll -> C:\Prog\Anaconda\dist
+copying c:\Python27\lib\site-packages\wx-2.8-msw-unicode\wx\wxbase28uh_net_vc.dll -> C:\Prog\Anaconda\dist
+copying C:\Windows\system32\API-MS-Win-Core-Profile-L1-1-0.dll -> C:\Prog\Anaconda\dist
+copying C:\Windows\system32\API-MS-Win-Core-Memory-L1-1-0.dll -> C:\Prog\Anaconda\dist
+copying C:\Windows\system32\API-MS-Win-Core-ErrorHandling-L1-1-0.dll -> C:\Prog\Anaconda\dist
+copying C:\Windows\system32\API-MS-Win-Core-Debug-L1-1-0.dll -> C:\Prog\Anaconda\dist
+copying C:\Windows\system32\API-MS-Win-Core-LocalRegistry-L1-1-0.dll -> C:\Prog\Anaconda\dist
+copying c:\Python27\lib\site-packages\M2Crypto\SSLEAY32.dll -> C:\Prog\Anaconda\dist
+copying C:\Windows\system32\API-MS-Win-Core-Interlocked-L1-1-0.dll -> C:\Prog\Anaconda\dist
+copying C:\Windows\system32\API-MS-Win-Core-Localization-L1-1-0.dll -> C:\Prog\Anaconda\dist
+copying C:\Windows\system32\API-MS-Win-Core-Misc-L1-1-0.dll -> C:\Prog\Anaconda\dist
+copying C:\Windows\system32\API-MS-Win-Core-IO-L1-1-0.dll -> C:\Prog\Anaconda\dist
+copying c:\Python27\lib\site-packages\wx-2.8-msw-unicode\wx\wxmsw28uh_html_vc.dll -> C:\Prog\Anaconda\dist
+copying C:\Windows\system32\MSWSOCK.dll -> C:\Prog\Anaconda\dist
+copying C:\Windows\system32\pywintypes27.dll -> C:\Prog\Anaconda\dist
+copying C:\Windows\system32\API-MS-Win-Core-LibraryLoader-L1-1-0.dll -> C:\Prog\Anaconda\dist
+copying c:\Python27\lib\site-packages\wx-2.8-msw-unicode\wx\wxbase28uh_vc.dll -> C:\Prog\Anaconda\dist
+copying C:\Windows\system32\python27.dll -> C:\Prog\Anaconda\dist
+setting sys.winver for 'C:\Prog\Anaconda\dist\python27.dll' to 'py2exe'
+copying c:\Python27\lib\site-packages\M2Crypto\LIBEAY32.dll -> C:\Prog\Anaconda\dist
+copying C:\Windows\system32\API-MS-Win-Core-ProcessThreads-L1-1-0.dll -> C:\Prog\Anaconda\dist
+copying C:\Windows\system32\MPR.dll -> C:\Prog\Anaconda\dist
+copying c:\Python27\lib\site-packages\wx-2.8-msw-unicode\wx\wxmsw28uh_core_vc.dll -> C:\Prog\Anaconda\dist
+copying C:\Windows\system32\API-MS-Win-Core-ProcessEnvironment-L1-1-0.dll -> C:\Prog\Anaconda\dist
+copying c:\Python27\w9xpopen.exe -> C:\Prog\Anaconda\dist
+copying c:\Python27\DLLs\sqlite3.dll -> C:\Prog\Anaconda\dist
+copying C:\Windows\system32\API-MS-Win-Core-DelayLoad-L1-1-0.dll -> C:\Prog\Anaconda\dist
+copying C:\Windows\system32\API-MS-Win-Core-Synch-L1-1-0.dll -> C:\Prog\Anaconda\dist
+copying C:\Windows\system32\API-MS-Win-Core-String-L1-1-0.dll -> C:\Prog\Anaconda\dist
+copying C:\Windows\system32\pythoncom27.dll -> C:\Prog\Anaconda\dist
+copying c:\Python27\lib\site-packages\wx-2.8-msw-unicode\wx\wxmsw28uh_adv_vc.dll -> C:\Prog\Anaconda\dist
+copying c:\Python27\lib\site-packages\py2exe\run_w.exe -> C:\Prog\Anaconda\dist\SwarmEngine.exe
+The following modules appear to be missing
+['BaseLib.Main.vwxGUI.UserDownloadChoice', 'ElementC14N', '_curses', '_scproxy', 'dummy.Process', 'psyco', 'pycurl', 'simplejson._speedups', 'tornado.epoll', 'vlc', 'win32com.shell']
+
+*** binary dependencies ***
+Your executable(s) also depend on these dlls which are not included,
+you may or may not need to distribute them.
+
+Make sure you have the license if you distribute any of them, and
+make sure you don't distribute files belonging to the operating system.
+
+   RPCRT4.dll - C:\Windows\system32\RPCRT4.dll
+   OLEAUT32.dll - C:\Windows\system32\OLEAUT32.dll
+   USER32.dll - C:\Windows\system32\USER32.dll
+   SHELL32.dll - C:\Windows\system32\SHELL32.dll
+   ole32.dll - C:\Windows\system32\ole32.dll
+   COMDLG32.dll - C:\Windows\system32\COMDLG32.dll
+   WSOCK32.dll - C:\Windows\system32\WSOCK32.dll
+   COMCTL32.dll - C:\Windows\system32\COMCTL32.dll
+   ADVAPI32.dll - C:\Windows\system32\ADVAPI32.dll
+   mfc90.dll - c:\Python27\lib\site-packages\Pythonwin\mfc90.dll
+   msvcrt.dll - C:\Windows\system32\msvcrt.dll
+   WS2_32.dll - C:\Windows\system32\WS2_32.dll
+   WINSPOOL.DRV - C:\Windows\system32\WINSPOOL.DRV
+   GDI32.dll - C:\Windows\system32\GDI32.dll
+   gdiplus.dll - c:\Python27\lib\site-packages\wx-2.8-msw-unicode\wx\gdiplus.dll
+   VERSION.dll - C:\Windows\system32\VERSION.dll
+   KERNEL32.dll - C:\Windows\system32\KERNEL32.dll
+   NETAPI32.dll - C:\Windows\system32\NETAPI32.dll
+   WINMM.dll - C:\Windows\system32\WINMM.dll
+   ntdll.dll - C:\Windows\system32\ntdll.dll
+
+C:\Prog\Anaconda>REM Arno: Move py2exe results to installdir 
+
+C:\Prog\Anaconda>move dist\*.* dist\installdir\bgprocess 
+C:\Prog\Anaconda\dist\API-MS-Win-Core-Debug-L1-1-0.dll
+C:\Prog\Anaconda\dist\API-MS-Win-Core-DelayLoad-L1-1-0.dll
+C:\Prog\Anaconda\dist\API-MS-Win-Core-ErrorHandling-L1-1-0.dll
+C:\Prog\Anaconda\dist\API-MS-Win-Core-Handle-L1-1-0.dll
+C:\Prog\Anaconda\dist\API-MS-Win-Core-Interlocked-L1-1-0.dll
+C:\Prog\Anaconda\dist\API-MS-Win-Core-IO-L1-1-0.dll
+C:\Prog\Anaconda\dist\API-MS-Win-Core-LibraryLoader-L1-1-0.dll
+C:\Prog\Anaconda\dist\API-MS-Win-Core-Localization-L1-1-0.dll
+C:\Prog\Anaconda\dist\API-MS-Win-Core-LocalRegistry-L1-1-0.dll
+C:\Prog\Anaconda\dist\API-MS-Win-Core-Memory-L1-1-0.dll
+C:\Prog\Anaconda\dist\API-MS-Win-Core-Misc-L1-1-0.dll
+C:\Prog\Anaconda\dist\API-MS-Win-Core-ProcessEnvironment-L1-1-0.dll
+C:\Prog\Anaconda\dist\API-MS-Win-Core-ProcessThreads-L1-1-0.dll
+C:\Prog\Anaconda\dist\API-MS-Win-Core-Profile-L1-1-0.dll
+C:\Prog\Anaconda\dist\API-MS-Win-Core-String-L1-1-0.dll
+C:\Prog\Anaconda\dist\API-MS-Win-Core-Synch-L1-1-0.dll
+C:\Prog\Anaconda\dist\API-MS-Win-Core-SysInfo-L1-1-0.dll
+C:\Prog\Anaconda\dist\apsw.pyd
+C:\Prog\Anaconda\dist\bz2.pyd
+C:\Prog\Anaconda\dist\LIBEAY32.dll
+C:\Prog\Anaconda\dist\library.zip
+C:\Prog\Anaconda\dist\M2Crypto.__m2crypto.pyd
+C:\Prog\Anaconda\dist\MPR.dll
+C:\Prog\Anaconda\dist\MSWSOCK.dll
+C:\Prog\Anaconda\dist\pyexpat.pyd
+C:\Prog\Anaconda\dist\python27.dll
+C:\Prog\Anaconda\dist\pythoncom27.dll
+C:\Prog\Anaconda\dist\pywintypes27.dll
+C:\Prog\Anaconda\dist\select.pyd
+C:\Prog\Anaconda\dist\sqlite3.dll
+C:\Prog\Anaconda\dist\SSLEAY32.dll
+C:\Prog\Anaconda\dist\SwarmEngine.exe
+C:\Prog\Anaconda\dist\unicodedata.pyd
+C:\Prog\Anaconda\dist\w9xpopen.exe
+C:\Prog\Anaconda\dist\win32api.pyd
+C:\Prog\Anaconda\dist\win32event.pyd
+C:\Prog\Anaconda\dist\win32evtlog.pyd
+C:\Prog\Anaconda\dist\win32file.pyd
+C:\Prog\Anaconda\dist\win32pdh.pyd
+C:\Prog\Anaconda\dist\win32ui.pyd
+C:\Prog\Anaconda\dist\win32wnet.pyd
+C:\Prog\Anaconda\dist\wx._controls_.pyd
+C:\Prog\Anaconda\dist\wx._core_.pyd
+C:\Prog\Anaconda\dist\wx._gdi_.pyd
+C:\Prog\Anaconda\dist\wx._misc_.pyd
+C:\Prog\Anaconda\dist\wx._windows_.pyd
+C:\Prog\Anaconda\dist\wxbase28uh_net_vc.dll
+C:\Prog\Anaconda\dist\wxbase28uh_vc.dll
+C:\Prog\Anaconda\dist\wxmsw28uh_adv_vc.dll
+C:\Prog\Anaconda\dist\wxmsw28uh_core_vc.dll
+C:\Prog\Anaconda\dist\wxmsw28uh_html_vc.dll
+C:\Prog\Anaconda\dist\_ctypes.pyd
+C:\Prog\Anaconda\dist\_hashlib.pyd
+C:\Prog\Anaconda\dist\_multiprocessing.pyd
+C:\Prog\Anaconda\dist\_socket.pyd
+C:\Prog\Anaconda\dist\_sqlite3.pyd
+C:\Prog\Anaconda\dist\_ssl.pyd
+C:\Prog\Anaconda\dist\_win32sysloader.pyd
+Перемещено файлов:        58.
+
+C:\Prog\Anaconda>copy BaseLib\Images\SwarmVideoIcon.ico dist\installdir\bgprocess\BaseLib\Images 
+Скопировано файлов:         1.
+
+C:\Prog\Anaconda>xcopy vlc4plugin\* dist\installdir /E /I 
+Скопировано файлов: 0.
+
+C:\Prog\Anaconda>REM Riccardo:  move the files needed for the WebUI 
+
+C:\Prog\Anaconda>xcopy BaseLib\WebUI dist\installdir\bgprocess\BaseLib\WebUI /S /I 
+BaseLib\WebUI\WebUI.py
+BaseLib\WebUI\__init__.py
+BaseLib\WebUI\images\arrows.png
+BaseLib\WebUI\images\favicon.png
+BaseLib\WebUI\images\headBG.png
+BaseLib\WebUI\images\p2p-next.png
+BaseLib\WebUI\images\pause.png
+BaseLib\WebUI\images\pause_red.png
+BaseLib\WebUI\images\progress_blue.png
+BaseLib\WebUI\images\progress_green.png
+BaseLib\WebUI\images\progress_red.png
+BaseLib\WebUI\images\remove.png
+BaseLib\WebUI\images\remove_big.png
+BaseLib\WebUI\images\remove_red.png
+BaseLib\WebUI\images\resume.png
+BaseLib\WebUI\images\resume_green.png
+BaseLib\WebUI\images\splugin.png
+BaseLib\WebUI\images\users_arrow.png
+BaseLib\WebUI\images\users_arrow_green.png
+BaseLib\WebUI\images\users_arrow_red.png
+BaseLib\WebUI\images\users_arrow_red_light.png
+BaseLib\WebUI\index\body.html
+BaseLib\WebUI\index\head.html
+BaseLib\WebUI\index\stylesheet.css
+BaseLib\WebUI\javascript\download.js
+BaseLib\WebUI\javascript\json.min.js
+BaseLib\WebUI\javascript\tribe.interface.js
+BaseLib\WebUI\javascript\tribe.js
+Скопировано файлов: 28.
+
+C:\Prog\Anaconda>del dist\installdir\bgprocess\BaseLib\WebUI\*.py 
+
+C:\Prog\Anaconda>REM Diego: replace vlc *.txt with P2P-Next License.txt 
+
+C:\Prog\Anaconda>del dist\installdir\*.txt 
+
+C:\Prog\Anaconda>type BaseLib\ns-LICENSE.txt BaseLib\binary-LICENSE-postfix.txt  1>BaseLib\binary-LICENSE.txt 
+
+C:\Prog\Anaconda>copy BaseLib\binary-LICENSE.txt dist\installdir 
+Скопировано файлов:         1.
+
+C:\Prog\Anaconda>REM NSSA Search API requires overlay 
+
+C:\Prog\Anaconda>copy BaseLib\schema_sdb_v*.sql dist\installdir\bgprocess\BaseLib 
+BaseLib\schema_sdb_v5.sql
+Скопировано файлов:         1.
+
+C:\Prog\Anaconda>copy BaseLib\Core\superpeer.txt dist\installdir\bgprocess\BaseLib\Core 
+Скопировано файлов:         1.
+
+C:\Prog\Anaconda>REM Diego: sign axvlc.dll 
+
+C:\Prog\Anaconda>"C:\Program Files\Microsoft Platform SDK for Windows Server 2003 R2\Bin\signtool.exe" sign /f c:\build\certs\swarmplayerprivatekey.pfx /p "" /d "SwarmPlugin for Internet Explorer" /du "http://www.pds.ewi.tudelft.nl/code.html" /t "http://timestamp.verisign.com/scripts/timestamp.dll" "dist\installdir\activex\axvlc.dll" 
+
+C:\Prog\Anaconda>copy BaseLib\Plugin\Build\Win32\heading.bmp dist\installdir 
+Скопировано файлов:         1.
+
+C:\Prog\Anaconda>REM TODO Diego: manifest? 
+
+C:\Prog\Anaconda>copy BaseLib\Plugin\Build\Win32\swarmplugin.nsi dist\installdir 
+Скопировано файлов:         1.
+
+C:\Prog\Anaconda>REM copy BaseLib\Plugin\Build\Win32\swarmplugin.exe.manifest dist\installdir 
+
+C:\Prog\Anaconda>copy c:\Python27\Lib\site-packages\wx-2.8-msw-unicode\wx\msvcp71.dll dist\installdir\bgprocess 
+Не удается найти указанный файл.
+
+C:\Prog\Anaconda>copy reset*.bat dist\installdir 
+reset-keepid.bat
+reset.bat
+Скопировано файлов:         2.
+
+C:\Prog\Anaconda>cd dist\installdir 
+
+C:\Prog\Anaconda\dist\installdir>"c:\Program Files\NSIS\makensis.exe" swarmplugin.nsi 
+MakeNSIS v2.46 - Copyright 1995-2009 Contributors
+See the file COPYING for license details.
+Credits can be found in the Users Manual.
+
+Processing config: 
+Processing plugin dlls: "c:\Program Files\NSIS\Plugins\*.dll"
+ - AdvSplash::show
+ - Banner::destroy
+ - Banner::getWindow
+ - Banner::show
+ - BgImage::AddImage
+ - BgImage::AddText
+ - BgImage::Clear
+ - BgImage::Destroy
+ - BgImage::Redraw
+ - BgImage::SetBg
+ - BgImage::SetReturn
+ - BgImage::Sound
+ - Dialer::AttemptConnect
+ - Dialer::AutodialHangup
+ - Dialer::AutodialOnline
+ - Dialer::AutodialUnattended
+ - Dialer::GetConnectedState
+ - InstallOptions::dialog
+ - InstallOptions::initDialog
+ - InstallOptions::show
+ - LangDLL::LangDialog
+ - Math::Script
+ - NSISdl::download
+ - NSISdl::download_quiet
+ - SimpleFC::AddApplication
+ - SimpleFC::AddPort
+ - SimpleFC::AdvAddRule
+ - SimpleFC::AdvExistsRule
+ - SimpleFC::AdvRemoveRule
+ - SimpleFC::AllowDisallowExceptionsNotAllowed
+ - SimpleFC::AllowDisallowIcmpInboundEchoRequest
+ - SimpleFC::AllowDisallowIcmpInboundMaskRequest
+ - SimpleFC::AllowDisallowIcmpInboundRouterRequest
+ - SimpleFC::AllowDisallowIcmpInboundTimestampRequest
+ - SimpleFC::AllowDisallowIcmpOutboundDestinationUnreachable
+ - SimpleFC::AllowDisallowIcmpOutboundPacketTooBig
+ - SimpleFC::AllowDisallowIcmpOutboundParameterProblem
+ - SimpleFC::AllowDisallowIcmpOutboundSourceQuench
+ - SimpleFC::AllowDisallowIcmpOutboundTimeExceeded
+ - SimpleFC::AllowDisallowIcmpRedirect
+ - SimpleFC::AreExceptionsNotAllowed
+ - SimpleFC::AreNotificationsEnabled
+ - SimpleFC::EnableDisableApplication
+ - SimpleFC::EnableDisableFirewall
+ - SimpleFC::EnableDisableNotifications
+ - SimpleFC::EnableDisablePort
+ - SimpleFC::IsApplicationAdded
+ - SimpleFC::IsApplicationEnabled
+ - SimpleFC::IsFirewallEnabled
+ - SimpleFC::IsFirewallServiceRunning
+ - SimpleFC::IsIcmpTypeAllowed
+ - SimpleFC::IsPortAdded
+ - SimpleFC::IsPortEnabled
+ - SimpleFC::RemoveApplication
+ - SimpleFC::RemovePort
+ - SimpleFC::RestoreDefaults
+ - SimpleFC::StartStopFirewallService
+ - Splash::show
+ - StartMenu::Init
+ - StartMenu::Select
+ - StartMenu::Show
+ - System::Alloc
+ - System::Call
+ - System::Copy
+ - System::Free
+ - System::Get
+ - System::Int64Op
+ - System::Store
+ - TypeLib::GetLibVersion
+ - TypeLib::Register
+ - TypeLib::UnRegister
+ - UserInfo::GetAccountType
+ - UserInfo::GetName
+ - UserInfo::GetOriginalAccountType
+ - VPatch::GetFileCRC32
+ - VPatch::GetFileMD5
+ - VPatch::vpatchfile
+ - nsDialogs::Create
+ - nsDialogs::CreateControl
+ - nsDialogs::CreateItem
+ - nsDialogs::CreateTimer
+ - nsDialogs::GetUserData
+ - nsDialogs::KillTimer
+ - nsDialogs::OnBack
+ - nsDialogs::OnChange
+ - nsDialogs::OnClick
+ - nsDialogs::OnNotify
+ - nsDialogs::SelectFileDialog
+ - nsDialogs::SelectFolderDialog
+ - nsDialogs::SetRTL
+ - nsDialogs::SetUserData
+ - nsDialogs::Show
+ - nsExec::Exec
+ - nsExec::ExecToLog
+ - nsExec::ExecToStack
+
+!define: "MUI_INSERT_NSISCONF"=""
+
+Changing directory to: "C:\Prog\Anaconda\dist\installdir"
+
+Processing script file: "swarmplugin.nsi"
+!define: "PRODUCT"="SwarmVideo"
+!define: "VERSION"="0.0.8"
+!define: "BG"="bgprocess"
+!define: "STARTUP"="Software\Microsoft\Windows\CurrentVersion\Run"
+!include: "c:\Program Files\NSIS\Include\MUI.nsh"
+!include: "c:\Program Files\NSIS\Contrib\Modern UI\System.nsh"
+NSIS Modern User Interface version 1.8 - Copyright 2002-2009 Joost Verburg (c:\Program Files\NSIS\Contrib\Modern UI\System.nsh:8)
+!define: "MUI_INCLUDED"=""
+!define: "MUI_SYSVERSION"="1.8"
+!define: "MUI_VERBOSE"="3"
+!include: closed: "c:\Program Files\NSIS\Contrib\Modern UI\System.nsh"
+!include: closed: "c:\Program Files\NSIS\Include\MUI.nsh"
+Name: "SwarmVideo 0.0.8"
+OutFile: "SwarmVideo_0.0.8.exe"
+InstallDir: "$PROGRAMFILES\SwarmVideo"
+InstallRegKey: "HKCU\Software\SwarmVideo\"
+SetCompressor: lzma
+CompletedText: "Installation completed. Thank you for choosing SwarmVideo"
+BrandingText: "SwarmVideo"
+!define: "MUI_ABORTWARNING"=""
+!define: "MUI_HEADERIMAGE"=""
+!define: "MUI_HEADERIMAGE_BITMAP"="heading.bmp"
+!define: "MUI_LICENSEPAGE_RADIOBUTTONS"=""
+!define: "MUI_LICENSEPAGE_RADIOBUTTONS_TEXT_ACCEPT"="I accept"
+!define: "MUI_LICENSEPAGE_RADIOBUTTONS_TEXT_DECLINE"="I decline"
+!insertmacro: MUI_PAGE_INSTFILES
+!insertmacro: end of MUI_PAGE_INSTFILES
+!insertmacro: MUI_PAGE_FINISH
+!insertmacro: end of MUI_PAGE_FINISH
+!insertmacro: MUI_UNPAGE_CONFIRM
+!insertmacro: end of MUI_UNPAGE_CONFIRM
+!insertmacro: MUI_UNPAGE_INSTFILES
+!insertmacro: end of MUI_UNPAGE_INSTFILES
+!insertmacro: MUI_LANGUAGE
+!insertmacro: end of MUI_LANGUAGE
+Section: "!Main EXE" ->(SecMain)
+SectionIn: [RO] 
+SetOutPath: "$INSTDIR"
+File: "binary-LICENSE.txt" [compress] 20760/88591 bytes
+ExecWait: "taskkill /F /IM SwarmEngine.exe" (->)
+File: Descending to: ".\bgprocess\"
+File: "API-MS-Win-Core-Debug-L1-1-0.dll" [compress] 850/3072 bytes
+File: "API-MS-Win-Core-DelayLoad-L1-1-0.dll" [compress] 806/3072 bytes
+File: "API-MS-Win-Core-ErrorHandling-L1-1-0.dll" [compress] 882/3072 bytes
+File: "API-MS-Win-Core-Handle-L1-1-0.dll" [compress] 848/3072 bytes
+File: "API-MS-Win-Core-IO-L1-1-0.dll" [compress] 903/3072 bytes
+File: "API-MS-Win-Core-Interlocked-L1-1-0.dll" [compress] 955/3584 bytes
+File: "API-MS-Win-Core-LibraryLoader-L1-1-0.dll" [compress] 1064/3584 bytes
+File: "API-MS-Win-Core-LocalRegistry-L1-1-0.dll" [compress] 1201/4096 bytes
+File: "API-MS-Win-Core-Localization-L1-1-0.dll" [compress] 1325/4096 bytes
+File: "API-MS-Win-Core-Memory-L1-1-0.dll" [compress] 969/3584 bytes
+File: "API-MS-Win-Core-Misc-L1-1-0.dll" [compress] 1159/4096 bytes
+File: "API-MS-Win-Core-ProcessEnvironment-L1-1-0.dll" [compress] 1021/3584 bytes
+File: "API-MS-Win-Core-ProcessThreads-L1-1-0.dll" [compress] 1344/4608 bytes
+File: "API-MS-Win-Core-Profile-L1-1-0.dll" [compress] 828/3072 bytes
+File: "API-MS-Win-Core-String-L1-1-0.dll" [compress] 897/3072 bytes
+File: "API-MS-Win-Core-Synch-L1-1-0.dll" [compress] 1236/4096 bytes
+File: "API-MS-Win-Core-SysInfo-L1-1-0.dll" [compress] 1132/4096 bytes
+File: "LIBEAY32.dll" [compress] 456990/1177600 bytes
+File: "M2Crypto.__m2crypto.pyd" [compress] 67387/335872 bytes
+File: "MPR.dll" [compress] 31662/64000 bytes
+File: "MSWSOCK.dll" [compress] 115583/232448 bytes
+File: "SSLEAY32.dll" [compress] 108860/264704 bytes
+File: "SwarmEngine.exe" [compress] 9181/19456 bytes
+File: "_ctypes.pyd" [compress] 35598/87040 bytes
+File: "_hashlib.pyd" [compress] 142965/358912 bytes
+File: "_multiprocessing.pyd" [compress] 11285/26624 bytes
+File: "_socket.pyd" [compress] 18520/43520 bytes
+File: "_sqlite3.pyd" [compress] 19773/46592 bytes
+File: "_ssl.pyd" [compress] 352620/876032 bytes
+File: "_win32sysloader.pyd" [compress] 3442/8192 bytes
+File: "apsw.pyd" [compress] 339521/778240 bytes
+File: "bz2.pyd" [compress] 30994/68608 bytes
+File: "library.zip" [compress] 1900922/9112329 bytes
+File: "pyexpat.pyd" [compress] 50249/126976 bytes
+File: "python27.dll" [compress] 895749/2433536 bytes
+File: "pythoncom27.dll" [compress] 104478/358912 bytes
+File: "pywintypes27.dll" [compress] 36424/110080 bytes
+File: "select.pyd" [compress] 5111/10240 bytes
+File: "sqlite3.dll" [compress] 218481/426496 bytes
+File: "unicodedata.pyd" [compress] 177531/686080 bytes
+File: "w9xpopen.exe" [compress] 23889/49664 bytes
+File: "win32api.pyd" [compress] 33364/98816 bytes
+File: "win32event.pyd" [compress] 6639/18432 bytes
+File: "win32evtlog.pyd" [compress] 12849/33792 bytes
+File: "win32file.pyd" [compress] 34996/111616 bytes
+File: "win32pdh.pyd" [compress] 9543/24064 bytes
+File: "win32ui.pyd" [compress] 178295/778752 bytes
+File: "win32wnet.pyd" [compress] 10217/25088 bytes
+File: "wx._controls_.pyd" [compress] 162431/966144 bytes
+File: "wx._core_.pyd" [compress] 190946/981504 bytes
+File: "wx._gdi_.pyd" [compress] 143583/746496 bytes
+File: "wx._misc_.pyd" [compress] 127083/674816 bytes
+File: "wx._windows_.pyd" [compress] 113719/670720 bytes
+File: "wxbase28uh_net_vc.dll" [compress] 40403/122368 bytes
+File: "wxbase28uh_vc.dll" [compress] 384023/1300992 bytes
+File: "wxmsw28uh_adv_vc.dll" [compress] 184561/730112 bytes
+File: "wxmsw28uh_core_vc.dll" [compress] 851470/3165184 bytes
+File: "wxmsw28uh_html_vc.dll" [compress] 131750/479744 bytes
+File: Descending to: ".\bgprocess\BaseLib\"
+File: "schema_sdb_v5.sql" [compress] 2652/11315 bytes
+File: Descending to: ".\bgprocess\BaseLib\Core\"
+File: "superpeer.txt" [compress] 743/1403 bytes
+File: Descending to: ".\bgprocess\BaseLib\Images\"
+File: "SwarmVideoIcon.ico" [compress] 2480/13094 bytes
+File: Descending to: ".\bgprocess\BaseLib\WebUI\"
+File: Descending to: ".\bgprocess\BaseLib\WebUI\images\"
+File: "arrows.png" [compress] 501 bytes
+File: "favicon.png" [compress] 891 bytes
+File: "headBG.png" [compress] 873 bytes
+File: "p2p-next.png" [compress] 1143 bytes
+File: "pause.png" [compress] 2650 bytes
+File: "pause_red.png" [compress] 2605 bytes
+File: "progress_blue.png" [compress] 752 bytes
+File: "progress_green.png" [compress] 773 bytes
+File: "progress_red.png" [compress] 792 bytes
+File: "remove.png" [compress] 739 bytes
+File: "remove_big.png" [compress] 2476 bytes
+File: "remove_red.png" [compress] 764 bytes
+File: "resume.png" [compress] 2451 bytes
+File: "resume_green.png" [compress] 2467 bytes
+File: "splugin.png" [compress] 1216 bytes
+File: "users_arrow.png" [compress] 5866/5867 bytes
+File: "users_arrow_green.png" [compress] 6025 bytes
+File: "users_arrow_red.png" [compress] 6540 bytes
+File: "users_arrow_red_light.png" [compress] 6738 bytes
+File: Descending to: ".\bgprocess\BaseLib\WebUI\index\"
+File: "body.html" [compress] 415/1041 bytes
+File: "head.html" [compress] 470/1062 bytes
+File: "stylesheet.css" [compress] 1732/7259 bytes
+File: Descending to: ".\bgprocess\BaseLib\WebUI\javascript\"
+File: "download.js" [compress] 1292/5056 bytes
+File: "json.min.js" [compress] 648/1269 bytes
+File: "tribe.interface.js" [compress] 1047/4106 bytes
+File: "tribe.js" [compress] 3008/12672 bytes
+File: Returning to: "."
+WriteRegStr: HKLM\Software\SwarmVideo\BGProcessPath=$INSTDIR\bgprocess\SwarmEngine.exe
+WriteRegStr: HKLM\Software\SwarmVideo\InstallDir=$INSTDIR
+WriteRegStr: HKLM\Software\Microsoft\Windows\CurrentVersion\Run\SwarmVideo=$INSTDIR\bgprocess\SwarmEngine.exe
+WriteRegStr: HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Uninstall\SwarmVideo\DisplayName=SwarmVideo
+WriteRegStr: HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Uninstall\SwarmVideo\UninstallString=$INSTDIR\Uninstall.exe
+WriteUninstaller: "$INSTDIR\Uninstall.exe"
+File: "SimpleFC.dll"->"$PLUGINSDIR\SimpleFC.dll" [compress] 79082/179712 bytes
+Plugin Command: AddApplication SwarmEngine $INSTDIR\bgprocess\SwarmEngine.exe 0 2  1
+Pop: $0
+SectionEnd
+Section: "-Post"
+Exec: "$INSTDIR\bgprocess\SwarmEngine.exe" (->)
+SectionEnd
+Section: "Uninstall"
+ExecWait: "taskkill /F /IM SwarmEngine.exe" (->)
+RMDir: /r "$INSTDIR"
+SetShellVarContext: all
+RMDir: "$SMPROGRAMS\SwarmVideo"
+RMDir: /r "$SMPROGRAMS\SwarmVideo"
+ReadEnvStr: HOMEDRIVE->$R0
+ReadEnvStr: HOMEPATH->$R1
+RMDir: /r "$R0$R1\AppData\Roaming\.SwarmVideo"
+DeleteRegKey: HKEY_LOCAL_MACHINE\SOFTWARE\SwarmVideo
+DeleteRegKey: HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\SwarmVideo
+DeleteRegValue: HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Run\SwarmVideo
+File: "SimpleFC.dll"->"$PLUGINSDIR\SimpleFC.dll" [compress] 79082/179712 bytes
+Plugin Command: RemoveApplication $INSTDIR\bgprocess\SwarmEngine.exe
+Pop: $0
+SectionEnd
+Function: ".onInit"
+File: "System.dll"->"$PLUGINSDIR\System.dll" [compress] 5871/11264 bytes
+Plugin Command: Call kernel32::CreateMutexA(i 0, i 0, t "SwarmVideo") i .r1 ?e
+Pop: $R0
+StrCmp "$R0" "0" equal=+3, nonequal=
+MessageBox: 0: "The installer is already running."
+Abort: ""
+FunctionEnd
+
+Processed 1 file, writing output:
+Adding plug-ins initializing function... Done!
+Processing pages... Done!
+Removing unused resources... Done!
+Generating language tables... Done!
+Generating uninstaller... Done!
+
+Output: "C:\Prog\Anaconda\dist\installdir\SwarmVideo_0.0.8.exe"
+Install: 3 pages (192 bytes), 2 sections (1 required) (2096 bytes), 339 instructions (9492 bytes), 238 strings (4062 bytes), 1 language table (262 bytes).
+Uninstall: 3 pages (192 bytes), 
+1 section (1048 bytes), 77 instructions (2156 bytes), 85 strings (1629 bytes), 1 language table (254 bytes).
+Datablock optimizer saved 7295 bytes (~0.0%).
+
+Using lzma compression.
+
+EXE header size:               46080 / 34304 bytes
+Install code:                   3618 / 16480 bytes
+Install data:                7967167 / 29158435 bytes
+Uninstall code+data:           89890 / 95431 bytes
+CRC (0xA896DC50):                  4 / 4 bytes
+
+Total size:                  8106759 / 29304654 bytes (27.6%)
