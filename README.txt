@@ -30,6 +30,10 @@ following software packages. See www.p2p-next.org for binary distributions.
    7-Zip >= 4.6.5 (optional, to build SwarmPlayer V2/SwarmTransport)
    sockjs-tornado - https://github.com/MrJoes/sockjs-tornado.git
    python-py2deb - For create deb packets (Linux only)
+   nat-pmp - https://github.com/yimingliu/py-natpmp for Traversal NAT across router.
+	     Применить patch4.patch прежде чем инсталлировать. Исправить setup.py пакета,
+	     изменить zip_safe=True на zip_safe=False что бы пакетустановился в несжатом виде. 
+	     А то будут проблеммы с py2exe
 
 Next-Share runs on Windows (XP,Vista), Mac OS X and Linux. On Linux, it is 
 easiest to try to install these packages via a package manager such as

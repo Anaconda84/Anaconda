@@ -100,6 +100,7 @@ from BaseLib.Core.ClosedSwarm.ClosedSwarm import InvalidPOAException
 
 from BaseLib.Plugin.WsServer import *
 from BaseLib.Plugin.BtHTTPServer import *
+from BaseLib.Plugin.NatPMP import *
 from sockjs.tornado import SockJSConnection, SockJSRouter, proto
 from BaseLib.Plugin.defs import *
 
@@ -130,6 +131,10 @@ class BackgroundApp(BaseApp):
         self.q = Queue()
         self.p = Process(target=serveHTTP, args=(self.q,))
         self.p.start()
+
+	#Running NAT Traversal server. For access internet.
+        nat_pmp = NatPMP(sport, bt_port, 600)
+        nat_pmp.start()
 
         BaseApp.__init__(self, logdir, appname, appversion, params, single_instance_checker, installdir, i2iport, sport)
         self.httpport = httpport

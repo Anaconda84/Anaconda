@@ -1,0 +1,40 @@
+*** NATPMP.py	2013-04-08 11:42:43.442709200 +0400
+--- NATPMP.py.new	2013-04-08 11:37:22.634360000 +0400
+***************
+*** 331,338 ****
+      response = None
+      port_mapping_request = PortMapRequest(protocol, private_port, public_port, lifetime)
+      port_mapping_response = send_request_with_retry(gateway_ip, port_mapping_request, response_data_class=PortMapResponse, retry=retry)
+!     if port_mapping_response.result != 0 and use_exception:
+!         raise NATPMPResultError(port_mapping_response.result, error_str(port_mapping_response.result), port_mapping_response)
+      return port_mapping_response
+  
+  
+--- 331,338 ----
+      response = None
+      port_mapping_request = PortMapRequest(protocol, private_port, public_port, lifetime)
+      port_mapping_response = send_request_with_retry(gateway_ip, port_mapping_request, response_data_class=PortMapResponse, retry=retry)
+! #    if port_mapping_response.result != 0 and use_exception:
+! #        raise NATPMPResultError(port_mapping_response.result, error_str(port_mapping_response.result), port_mapping_response)
+      return port_mapping_response
+  
+  
+***************
+*** 358,365 ****
+          if source_addr[0] != gateway_ip or source_addr[1] != NATPMP_PORT:
+              data = "" # discard data if source mismatch, as per specification
+          n += 1
+!     if n >= retry and not data:
+!         raise NATPMPUnsupportedError(NATPMP_GATEWAY_NO_SUPPORT, error_str(NATPMP_GATEWAY_NO_SUPPORT))
+      if data and response_data_class:
+          data = response_data_class(data)
+      return data
+--- 358,365 ----
+          if source_addr[0] != gateway_ip or source_addr[1] != NATPMP_PORT:
+              data = "" # discard data if source mismatch, as per specification
+          n += 1
+! #    if n >= retry and not data:
+! #        raise NATPMPUnsupportedError(NATPMP_GATEWAY_NO_SUPPORT, error_str(NATPMP_GATEWAY_NO_SUPPORT))
+      if data and response_data_class:
+          data = response_data_class(data)
+      return data
