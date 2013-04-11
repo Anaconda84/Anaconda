@@ -9,6 +9,11 @@ from threading import Thread, Event
 from BaseLib.Core.osutils import *
 from multiprocessing import Process, Queue
 
+try:
+    import natpmp as NATPMP
+except ImportError:
+    import NATPMP
+
 max_size=2**16
 DEBUG = True
 PORT = 8888
@@ -32,6 +37,8 @@ def serveHTTP(q):
     RefQueue.q = q
     period_cbk = tornado.ioloop.PeriodicCallback(period_run, 1000, loop)
     period_cbk.start()
+    period_cbk_upnp = tornado.ioloop.PeriodicCallback(period_upnp, 30*60*1000, loop)
+    period_cbk_upnp.start()
     loop.start()
 
 def period_run():
@@ -40,6 +47,22 @@ def period_run():
         if signal == 'stop':                           
            print >>sys.stderr,'Stopping BtHTTPServer.'
            loop.stop()
+
+def period_upnp():
+    public_port1 = 8621
+    private_port1 = 8621
+    public_port2 = 8888
+    private_port2 = 8888
+    protocol = NATPMP.NATPMP_PROTOCOL_TCP
+    lifetime = int(3600)
+    gateway = NATPMP.get_gateway_addr()
+    print >>sys.stderr,time.asctime(),'-', "NatPMP: gateway=", gateway
+    resp1 = NATPMP.map_port(protocol, public_port1, private_port1, lifetime, gateway_ip=gateway, use_exception=False)
+    resp2 = NATPMP.map_port(protocol, public_port2, private_port2, lifetime, gateway_ip=gateway, use_exception=False)
+    print >>sys.stderr,time.asctime(),'-', "NatPMP: ", resp1
+    print >>sys.stderr,time.asctime(),'-', "NatPMP: ", resp2
+
+
 
 class MainHandler(tornado.web.RequestHandler):
     CHUNK_SIZE = 512000         # 0.5 MB
