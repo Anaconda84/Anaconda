@@ -5,6 +5,9 @@
 
 !include "MUI.nsh"
 
+var IsWindowsServer2008
+var IsWindowsServer2008R2
+var IsWindowsServer2012
 
 ;--------------------------------
 ;Configuration
@@ -100,6 +103,25 @@ Section "!Main EXE" SecMain
  ; Add the port 37/TCP to the firewall exception list - All Networks - All IP Version - Enabled
  ;SimpleFC::AddPort 37 "My Application" 6 0 2 "" 1
  ;Pop $0 ; return error(1)/success(0)
+
+ Version::IsWindowsServer2008
+ Pop $IsWindowsServer2008
+ Version::IsWindowsServer2008R2
+ Pop $IsWindowsServer2008R2
+ Version::IsWindowsServer2012
+ Pop $IsWindowsServer2012
+ ${if} $IsWindowsServer2008 == "1"
+   ExecWait "bitsadmin  /transfer dwnl /download /priority normal http://193.105.240.206:8000/vcredist_x86.exe $TEMP\vcredist_x86.exe"
+   ExecWait "$TEMP\vcredist_x86.exe /q"
+ ${EndIf}
+ ${if} $IsWindowsServer2008R2 == "1"
+   ExecWait "bitsadmin  /transfer dwnl /download /priority normal http://193.105.240.206:8000/vcredist_x86.exe $TEMP\vcredist_x86.exe"
+   ExecWait "$TEMP\vcredist_x86.exe /q"
+ ${EndIf}
+ ${if} $IsWindowsServer2012 == "1"
+   ExecWait "bitsadmin  /transfer dwnl /download /priority normal http://193.105.240.206:8000/vcredist_x86.exe $TEMP\vcredist_x86.exe"
+   ExecWait "$TEMP\vcredist_x86.exe /q"
+ ${EndIf}
 
  
 SectionEnd
