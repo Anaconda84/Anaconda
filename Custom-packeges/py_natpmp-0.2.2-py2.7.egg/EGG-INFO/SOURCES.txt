@@ -1,0 +1,12 @@
+README
+setup.cfg
+setup.py
+natpmp/NATPMP.py
+natpmp/__init__.py
+natpmp/natpmp_client.py
+py_natpmp.egg-info/PKG-INFO
+py_natpmp.egg-info/SOURCES.txt
+py_natpmp.egg-info/dependency_links.txt
+py_natpmp.egg-info/entry_points.txt
+py_natpmp.egg-info/not-zip-safe
+py_natpmp.egg-info/top_level.txt

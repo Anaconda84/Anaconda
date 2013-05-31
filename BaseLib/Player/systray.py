@@ -22,6 +22,10 @@ class PlayerTaskBarIcon(wx.TaskBarIcon):
         self.icons.AddIconFromFile(iconfilename,wx.BITMAP_TYPE_ICO)
         self.icon = self.icons.GetIcon(wx.Size(-1,-1))
 
+	self.timer = wx.Timer(self)
+	self.Bind(wx.EVT_TIMER, self.periodicaly, self.timer)
+	self.timer.Start(3*1000)  # 3 sec.
+
         self.Bind(wx.EVT_TASKBAR_LEFT_UP, self.OnLeftClicked)
 
         if sys.platform != "darwin":
@@ -36,6 +40,14 @@ class PlayerTaskBarIcon(wx.TaskBarIcon):
             self.Bind(wx.EVT_MENU, self.OnExit, item)
 
             wx.App.SetMacExitMenuItemId(item.GetId())
+
+    def periodicaly(self, event):
+#	print >>sys.stderr,"systray: Periodicaly run. Path: "+os.path.abspath(os.curdir)
+        if os.path.exists(STOP_FILE):
+	   print >>sys.stderr,time.asctime(),'-', 'systray: File '+STOP_FILE+' is found. Exit...'
+#	   os.remove(STOP_FILE)
+	   self.wxapp.ExitMainLoop()
+
 
     def OnExit(self,e):
         self.wxapp.ExitMainLoop()

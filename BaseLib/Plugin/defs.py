@@ -1,5 +1,8 @@
 # Written by Arno Bakker
 # see LICENSE.txt for license information
+import os
+
+STOP_FILE = os.path.join(os.getenv("APPDATA"), 'SwarmVideo', 'goodbay')
 
 URLPATH_CONTENT_PREFIX = '/content'
 URLPATH_TORRENT_POSTFIX = '.tstream'
@@ -15,8 +18,8 @@ HITS_TIMEOUT = 1800.0
 UPDATE_SITES = 'http://localhost'
 UPDATE_PATH = 'distr'
 
-VERSION = '0.8'
+VERSION = '0.9'
 
 # output log file filename or None(to screen)
-#LOG_FILE = None
-LOG_FILE = 'SwarmPlugin.log'
+LOG_FILE = None
+#LOG_FILE = 'SwarmPlugin.log'

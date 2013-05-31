@@ -1,0 +1,3 @@
+[console_scripts]
+natpmp-client.py = natpmp.natpmp_client:main
+

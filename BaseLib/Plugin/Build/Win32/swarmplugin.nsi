@@ -1,5 +1,5 @@
 !define PRODUCT "SwarmVideo"
-!define VERSION "0.0.8"
+!define VERSION "0.9"
 !define BG "bgprocess"
 !define STARTUP "Software\Microsoft\Windows\CurrentVersion\Run"
 
@@ -17,7 +17,7 @@ Name "${PRODUCT} ${VERSION}"
 OutFile "${PRODUCT}_${VERSION}.exe"
 
 ;Folder selection page
-InstallDir "$PROGRAMFILES\${PRODUCT}"
+InstallDir "$APPDATA\${PRODUCT}"
  
 ;Remember install folder
 InstallDirRegKey HKCU "Software\${PRODUCT}" ""
@@ -81,17 +81,41 @@ Section "!Main EXE" SecMain
  SetOutPath "$INSTDIR"
  File *.txt
 
- ExecWait "taskkill /F /IM SwarmEngine.exe"
+ Processes::FindProcess "SwarmEngine"
+ Pop $R0
+ StrCmp $R0 "1" 0 next
+;      Messagebox MB_OK "SwarmEngine.exe is found!!!"
+      FileOpen $0 $APPDATA\${PRODUCT}\goodbay w
+        FileWrite $0 "goodbay"
+      FileClose $0
+
+      StrCpy $0 "0"
+      loop:
+        IfFileExists $APPDATA\${PRODUCT}\goodbay 0 done
+        StrCmp $0 "60" done
+        IntOp $0 $0 + 1
+;	Messagebox MB_OK "Counter = $0"
+	Sleep 1000
+	Goto loop
+      done:
+
+      Sleep 1000
+      IfFileExists $APPDATA\${PRODUCT}\goodbay 0 +2
+        Delete $APPDATA\${PRODUCT}\goodbay
+next:
+; Messagebox MB_OK "File SwarmEngine.exe is not found!!!"
+
+; ExecWait "taskkill /F /IM SwarmEngine.exe"
 
  File /r bgprocess
 
- WriteRegStr HKLM "Software\${PRODUCT}" "BGProcessPath" "$INSTDIR\bgprocess\SwarmEngine.exe"
- WriteRegStr HKLM "Software\${PRODUCT}" "InstallDir" "$INSTDIR"
+ WriteRegStr HKCU "Software\${PRODUCT}" "BGProcessPath" "$INSTDIR\bgprocess\SwarmEngine.exe"
+ WriteRegStr HKCU "Software\${PRODUCT}" "InstallDir" "$INSTDIR"
 
- WriteRegStr HKLM "${STARTUP}" "SwarmVideo" "$INSTDIR\bgprocess\SwarmEngine.exe"
+ WriteRegStr HKCU "${STARTUP}" "SwarmVideo" "$INSTDIR\bgprocess\SwarmEngine.exe"
 
- WriteRegStr HKEY_LOCAL_MACHINE "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT}" "DisplayName" "${PRODUCT}"
- WriteRegStr HKEY_LOCAL_MACHINE "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT}" "UninstallString" "$INSTDIR\Uninstall.exe"
+ WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT}" "DisplayName" "${PRODUCT}"
+ WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT}" "UninstallString" "$INSTDIR\Uninstall.exe"
 
  WriteUninstaller "$INSTDIR\Uninstall.exe"
 
@@ -134,7 +158,7 @@ SectionEnd
 ;SectionEnd
 
 Section -Post
-   Exec "$INSTDIR\bgprocess\SwarmEngine.exe"
+   Exec "$APPDATA\${PRODUCT}\bgprocess\SwarmEngine.exe"
 SectionEnd
 
 
@@ -150,8 +174,29 @@ SectionEnd
 ;Uninstaller Section
 
 Section "Uninstall"
+ Processes::FindProcess "SwarmEngine"
+ Pop $R0
+ StrCmp $R0 "1" 0 next
+;      Messagebox MB_OK "SwarmEngine.exe is found!!!"
+      FileOpen $0 $APPDATA\${PRODUCT}\goodbay w
+        FileWrite $0 "goodbay"
+      FileClose $0
 
- ExecWait "taskkill /F /IM SwarmEngine.exe"
+      StrCpy $0 "0"
+      loop:
+        IfFileExists $APPDATA\${PRODUCT}\goodbay 0 done
+        StrCmp $0 "60" done
+        IntOp $0 $0 + 1
+;	Messagebox MB_OK "Counter = $0"
+	Sleep 1000
+	Goto loop
+      done:
+
+      Sleep 1000
+      IfFileExists $APPDATA\${PRODUCT}\goodbay 0 +2
+        Delete $APPDATA\${PRODUCT}\goodbay
+next:
+
  RMDir /r "$INSTDIR"
 
  SetShellVarContext all
@@ -164,10 +209,10 @@ Section "Uninstall"
  ;messageBox MB_OK "$R0$R1\AppData\Roaming\.SwarmVideo"
  RMDir /r "$R0$R1\AppData\Roaming\.SwarmVideo"
 
- DeleteRegKey HKEY_LOCAL_MACHINE "SOFTWARE\${PRODUCT}"
- DeleteRegKey HKEY_LOCAL_MACHINE "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT}"
+ DeleteRegKey HKCU "SOFTWARE\${PRODUCT}"
+ DeleteRegKey HKCU "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT}"
 
- DeleteRegValue HKEY_LOCAL_MACHINE "${STARTUP}" "${PRODUCT}"
+ DeleteRegValue HKCU "${STARTUP}" "${PRODUCT}"
  SimpleFC::RemoveApplication "$INSTDIR\bgprocess\SwarmEngine.exe"
  Pop $0 ; return error(1)/success(0)
 

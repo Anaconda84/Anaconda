@@ -992,5 +992,8 @@ def run_bgapp(appname,appversion,i2iport,sessport,httpport,ws_serverport,bt_port
     app.q.put('stop')
     print >>sys.stderr,time.asctime(),'-', "bg: Sending stopping signal to BtHTTPServer."
     app.p.join()
+    if os.path.exists(STOP_FILE):
+       os.remove(STOP_FILE)
+       print >>sys.stderr,time.asctime(),'-', "bg: Stop file "+STOP_FILE+" deleted."
     # Ultimate catchall for hanging popen2's and what not
     os._exit(0)

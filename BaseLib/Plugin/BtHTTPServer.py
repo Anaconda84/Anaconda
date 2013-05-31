@@ -57,10 +57,12 @@ def period_upnp():
     lifetime = int(3600)
     gateway = NATPMP.get_gateway_addr()
     print >>sys.stderr,time.asctime(),'-', "NatPMP: gateway=", gateway
-    resp1 = NATPMP.map_port(protocol, public_port1, private_port1, lifetime, gateway_ip=gateway, use_exception=False)
-    resp2 = NATPMP.map_port(protocol, public_port2, private_port2, lifetime, gateway_ip=gateway, use_exception=False)
-    print >>sys.stderr,time.asctime(),'-', "NatPMP: ", resp1
-    print >>sys.stderr,time.asctime(),'-', "NatPMP: ", resp2
+    if gateway:
+      resp1 = NATPMP.map_port(protocol, public_port1, private_port1, lifetime, gateway_ip=gateway, use_exception=False)
+      if resp1:
+        print >>sys.stderr,time.asctime(),'-', "NatPMP: ", resp1
+        resp2 = NATPMP.map_port(protocol, public_port2, private_port2, lifetime, gateway_ip=gateway, use_exception=False)
+        print >>sys.stderr,time.asctime(),'-', "NatPMP: ", resp2
 
 
 

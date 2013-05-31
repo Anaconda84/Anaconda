@@ -1,0 +1,11 @@
+Metadata-Version: 1.0
+Name: py-natpmp
+Version: 0.2.2
+Summary: Python classes for interacting with NAT-PMP v0
+Home-page: http://yimingliu.com
+Author: Yiming Liu
+Author-email: UNKNOWN
+License: BSD
+Description: Provides functions to interact with NAT-PMP gateways implementing version 0 of the NAT-PMP draft specification.
+Keywords: NAT-PMP NAT networking port port_forwarding port_mapping AirPort Apple
+Platform: UNKNOWN
